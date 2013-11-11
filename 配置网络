@@ -1,2 +1,19 @@
 前言
 ====
+
+
+
+
+    root@Laptop31:~# lspci -v -nn | grep 'Wireless'
+    04:00.0 Network controller [0280]: Broadcom Corporation BCM4313 802.11bgn Wireless Network Adapter [14e4:4727] (rev 01)
+    root@Laptop31:~# apt-get install b43-fwcutter 
+    Reading package lists... Done
+    Building dependency tree       
+......
+    Unpacking b43-fwcutter (from .../b43-fwcutter_1%3a015-9_amd64.deb) ...
+    Processing triggers for man-db ...
+    Setting up b43-fwcutter (1:015-9) ...
+    root@Laptop31:~# apt-get install firmware-b43legacy-installer 
+    Reading package lists... Done
+......
+    
