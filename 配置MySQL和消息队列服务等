@@ -1,2 +1,30 @@
 前言
 ====
+    root@Laptop31:/etc/apt# apt-get install mysql-server python-mysqldb
+Reading package lists... Done
+Building dependency tree       
+Reading state information... Done
+The following packages were automatically installed and are no longer required:
+  gir1.2-ubuntuoneui-3.0 libubuntuoneui-3.0-1 thunderbird-globalmenu
+Use 'apt-get autoremove' to remove them.
+The following extra packages will be installed:
+  libdbd-mysql-perl libdbi-perl libhtml-template-perl libmysqlclient18
+  libnet-daemon-perl libplrpc-perl libterm-readkey-perl mysql-client-5.5
+  mysql-client-core-5.5 mysql-common mysql-server-5.5 mysql-server-core-5.5
+......
+Do you want to continue [Y/n]? y   
+......
+  ┌────────────────────┤ Configuring mysql-server-5.5 ├─────────────────────┐   
+  │ While not mandatory, it is highly recommended that you set a password   │   
+  │ for the MySQL administrative "root" user.                               │   
+  │                                                                         │   
+  │ If this field is left blank, the password will not be changed.          │   
+  │                                                                         │   
+  │ New password for the MySQL "root" user:                                 │   
+  │                                                                         │   
+  │ _______________________________________________________________________ │   
+  │                                                                         │   
+  │                                 <Ok>                                    │   
+  │                                                                         │   
+  └─────────────────────────────────────────────────────────────────────────┘   
+                                                                                
