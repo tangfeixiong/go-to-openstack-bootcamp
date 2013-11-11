@@ -1,5 +1,7 @@
-#实验过程
-##准备
+实验过程
+=======
+准备
+----
 ###安装Ubuntu
 ####USB安装
 ####配置Ubuntu在线更新系统apt-get
@@ -36,3 +38,94 @@ Ubuntu在全球各地有[镜像网站](https://launchpad.net/ubuntu/+cdmirrors)�
     deb-src http://ftp.astral.ro/mirrors/ubuntu.com/ubuntu/ precise-backports main restricted universe multiverse
 
     
+    root@Laptop31:/etc/apt# apt-get install ubuntu-cloud-keyring python-software-properties software-properties-common python-keyring
+    Reading package lists... Done
+    Building dependency tree       
+    Reading state information... Done
+    python-keyring is already the newest version.
+    python-keyring set to manually installed.
+    The following package was automatically installed and is no longer required:
+      thunderbird-globalmenu
+    Use 'apt-get autoremove' to remove them.
+    The following NEW packages will be installed:
+      ubuntu-cloud-keyring
+    The following packages will be upgraded:
+      python-software-properties software-properties-common
+    2 upgraded, 1 newly installed, 0 to remove and 136 not upgraded.
+    Need to get 37.8 kB of archives.
+    After this operation, 47.1 kB of additional disk space will be used.
+    Do you want to continue [Y/n]?  y
+    Get:1 http://ro.archive.ubuntu.com/ubuntu/ precise-updates/universe ubuntu-cloud-keyring all 2012.08.14~12.04.1 [5,144 B]
+    Get:2 http://ro.archive.ubuntu.com/ubuntu/ precise-updates/main python-software-properties all 0.82.7.6 [23.8 kB]
+    Get:3 http://ro.archive.ubuntu.com/ubuntu/ precise-updates/main software-properties-common all 0.82.7.6 [8,846 B]
+    Fetched 37.8 kB in 0s (242 kB/s)                      
+    Selecting previously unselected package ubuntu-cloud-keyring.
+    (Reading database ... 145117 files and directories currently installed.)
+    Unpacking ubuntu-cloud-keyring (from .../ubuntu-cloud-keyring_2012.08.14~12.04.1_all.deb) ...
+    Preparing to replace python-software-properties 0.82.7.3 (using .../python-software-properties_0.82.7.6_all.deb) ...
+    Unpacking replacement python-software-properties ...
+    Preparing to replace software-properties-common 0.82.7.3 (using .../software-properties-common_0.82.7.6_all.deb) ...
+    Unpacking replacement software-properties-common ...
+    Processing triggers for man-db ...
+    Setting up ubuntu-cloud-keyring (2012.08.14~12.04.1) ...
+    Importing ubuntu-cloud.archive.canonical.com keyring
+    OK
+    Processing ubuntu-cloud.archive.canonical.com removal keyring
+    OK
+    Setting up python-software-properties (0.82.7.6) ...
+    Setting up software-properties-common (0.82.7.6) ...
+    root@Laptop31:/etc/apt# vi sources.list.d/grizzly.list
+    ### OpenStack grizzly version
+    deb http://ubuntu-cloud.archive.canonical.com/ubuntu precise-updates/grizzly main
+    root@Laptop31:/etc/apt# ls sources.list.d/
+    grizzly.list
+    root@Laptop31:/etc/apt# apt-get update
+    Get:1 http://ftp.astral.ro precise Release.gpg [198 B]
+    Get:2 http://ftp.astral.ro precise-updates Release.gpg [198 B]                 
+    Get:3 http://ftp.astral.ro precise-backports Release.gpg [198 B]               
+    Get:4 http://ftp.astral.ro precise Release [49.6 kB]                           
+    Hit http://ro.archive.ubuntu.com precise Release.gpg                           
+    Hit http://ro.archive.ubuntu.com precise-updates Release.gpg                   
+......
+    Get:69 http://ftp.astral.ro precise-backports/restricted Translation-en [14 B]
+    Get:70 http://ftp.astral.ro precise-backports/universe Translation-en [26.9 kB]
+    Fetched 26.0 MB in 9s (2,835 kB/s)                                             
+    Reading package lists... Done
+    root@Laptop31:/etc/apt# apt-get upgrade
+    Reading package lists... Done
+    Building dependency tree       
+    Reading state information... Done
+    The following packages have been kept back:
+      linux-headers-generic-lts-raring linux-image-generic-lts-raring
+    The following packages will be upgraded:
+      accountsservice apparmor apport apport-gtk apt apt-transport-https apt-utils
+....
+      xserver-xorg-core-lts-raring xserver-xorg-video-intel-lts-raring
+    136 upgraded, 0 newly installed, 0 to remove and 2 not upgraded.
+    Need to get 128 MB of archives.
+    After this operation, 3,553 kB of additional disk space will be used.
+    Do you want to continue [Y/n]? y
+......
+    Processing triggers for libc-bin ...
+    ldconfig deferred processing now taking place
+    Processing triggers for initramfs-tools ...
+    update-initramfs: Generating /boot/initrd.img-3.8.0-29-generic
+    root@Laptop31:/etc/apt# apt-get dist-upgrade
+    Reading package lists... Done
+    Building dependency tree       
+    Reading state information... Done
+    Calculating upgrade... Done
+    The following NEW packages will be installed:
+      linux-headers-3.8.0-33 linux-headers-3.8.0-33-generic
+      linux-image-3.8.0-33-generic
+    The following packages will be upgraded:
+      linux-headers-generic-lts-raring linux-image-generic-lts-raring
+    2 upgraded, 3 newly installed, 0 to remove and 0 not upgraded.
+    Need to get 61.2 MB of archives.
+    After this operation, 248 MB of additional disk space will be used.
+    Do you want to continue [Y/n]? y
+    Get:1 http://ro.archive.ubuntu.com/ubuntu/ precise-updates/main linux-image-3.8.0-33-generic amd64 3.8.0-33.48~precise1 [47.9 MB]
+......
+    Setting up linux-headers-generic-lts-raring (3.8.0.33.33) ...
+    Setting up linux-image-generic-lts-raring (3.8.0.33.33) ...
+
