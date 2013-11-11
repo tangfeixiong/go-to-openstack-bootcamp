@@ -1,0 +1,38 @@
+#实验过程
+##准备
+###安装Ubuntu
+####USB安装
+####配置Ubuntu在线更新系统apt-get
+Ubuntu在全球各地有[镜像网站](https://launchpad.net/ubuntu/+cdmirrors)提供在线更新。
+修改在线更新的仓库配置文件/etc/apt/sources.list
+1. 使用vim编辑器
+2. 添加本地镜像仓库的地址
+如在国内，使用网易的镜像站，将以下内容添加到文件的开头：
+    deb http://mirrors.163.com/ubuntu/ precise main restricted universe multiverse
+    deb http://mirrors.163.com/ubuntu/ precise-security main restricted universe multiverse
+    deb http://mirrors.163.com/ubuntu/ precise-updates main restricted universe multiverse
+    deb http://mirrors.163.com/ubuntu/ precise-proposed main restricted universe multiverse
+    deb http://mirrors.163.com/ubuntu/ precise-backports main restricted universe multiverse
+    deb-src http://mirrors.163.com/ubuntu/ precise main restricted universe multiverse
+    deb-src http://mirrors.163.com/ubuntu/ precise-security main restricted universe multiverse
+    deb-src http://mirrors.163.com/ubuntu/ precise-updates main restricted universe multiverse
+    deb-src http://mirrors.163.com/ubuntu/ precise-proposed main restricted universe multiverse
+    deb-src http://mirrors.163.com/ubuntu/ precise-backports main restricted universe multiverse
+
+如在罗马尼亚，使用在google搜到的一个镜像站：
+    deb http://ftp.astral.ro/mirrors/ubuntu.com/ubuntu/ precise main restricted
+    deb-src http://ftp.astral.ro/mirrors/ubuntu.com/ubuntu/ precise main restricted
+    deb http://ftp.astral.ro/mirrors/ubuntu.com/ubuntu/ precise-updates main restricted
+    deb-src http://ftp.astral.ro/mirrors/ubuntu.com/ubuntu/ precise-updates main restricted
+    deb http://ftp.astral.ro/mirrors/ubuntu.com/ubuntu/ precise universe
+    deb-src http://ftp.astral.ro/mirrors/ubuntu.com/ubuntu/ precise universe
+    deb http://ftp.astral.ro/mirrors/ubuntu.com/ubuntu/ precise-updates universe
+    deb-src http://ftp.astral.ro/mirrors/ubuntu.com/ubuntu/ precise-updates universe
+    deb http://ftp.astral.ro/mirrors/ubuntu.com/ubuntu/ precise multiverse
+    deb-src http://ftp.astral.ro/mirrors/ubuntu.com/ubuntu/ precise multiverse
+    deb http://ftp.astral.ro/mirrors/ubuntu.com/ubuntu/ precise-updates multiverse
+    deb-src http://ftp.astral.ro/mirrors/ubuntu.com/ubuntu/ precise-updates multiverse
+    deb http://ftp.astral.ro/mirrors/ubuntu.com/ubuntu/ precise-backports main restricted universe multiverse
+    deb-src http://ftp.astral.ro/mirrors/ubuntu.com/ubuntu/ precise-backports main restricted universe multiverse
+
+    
