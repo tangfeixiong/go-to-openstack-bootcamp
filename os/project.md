@@ -3,7 +3,7 @@
 ### 学习                                                                4天
     * 安装ubuntu 14.04                                                  1d
         可以使用虚拟机，windows下的虚拟化平台可以使用VirtualBox或VMware Player（或VMware Workstation）
-		- [Virtual Box!](https://www.virtualbox.org/wiki/Downloads)
+                - `[Virtual Box](https://www.virtualbox.org/wiki/Downloads)`
 		- [VMware Player!](https://my.vmware.com/web/vmware/free#desktop_end_user_computing/vmware_player/6_0)
 		- [Ubuntu Mirrors!](https://launchpad.net/ubuntu/+archivemirrors)
 	
