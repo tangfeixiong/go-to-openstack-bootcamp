@@ -3,20 +3,23 @@
 ### 学习                                                                4天
 
 * 安装ubuntu 14.04                                                  1d
+
   可以使用虚拟机，windows下的虚拟化平台可以使用VirtualBox或VMware Player（或VMware Workstation）
-  1. [Virtual Box](https://www.virtualbox.org/wiki/Downloads) 
-  2. [VMware Player](https://my.vmware.com/web/vmware/free#desktop_end_user_computing/vmware_player/6_0)
-  3. [Ubuntu Mirrors](https://launchpad.net/ubuntu/+archivemirrors)
+  - [Virtual Box](https://www.virtualbox.org/wiki/Downloads) 
+  - [VMware Player](https://my.vmware.com/web/vmware/free#desktop_end_user_computing/vmware_player/6_0)
+  - [Ubuntu Mirrors](https://launchpad.net/ubuntu/+archivemirrors)
 
 * 设置OpenStack开发环境                                             1d
   1. 使用devstack安装icehouse或juno，也可以安装havana
+
      devstack是社区推荐的openstack单机开发环境
-    * [DevStack](https://wiki.openstack.org/wiki/DevStack)
-    * [OpenStack](http://docs.openstack.org/)
+    - [DevStack](https://wiki.openstack.org/wiki/DevStack)
+    - [OpenStack](http://docs.openstack.org/)
 
   2. 掌握bash命令screen
+
      devstack在用户会话模式下安装openstack，通过screen命令切换会话窗口，可以检查openstack各组件的控制台日志
-    * [screen GNU user manual](http://www.gnu.org/software/screen/manual/screen.html)
+    - [screen GNU user manual](http://www.gnu.org/software/screen/manual/screen.html)
 
 * 练习OpenStack操作                                                 1d 
   - [End User Guide](http://docs.openstack.org/user-guide/content/)
@@ -27,7 +30,6 @@
   - [for CentOS](http://www.centos.org/docs/5/html/Deployment_Guide-en-US/ch-httpd.html)
   - [for OpenStack](http://docs.openstack.org/juno/install-guide/install/apt/content/install_dashboard.html)
 		
-    
 	
 ## Sprint 02: Python开发环境                                            1周
 ### 学习                                                                4天
