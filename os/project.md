@@ -1,29 +1,31 @@
 # Iteration 01: OpenStack开发环境                                       11月份
 ## Sprint 01: OpenStack开发平台                                         1周
 ### 学习                                                                4天
-    * 安装ubuntu 14.04                                                  1d
-        可以使用虚拟机，windows下的虚拟化平台可以使用VirtualBox或VMware Player（或VMware Workstation）
-                - `[Virtual Box](https://www.virtualbox.org/wiki/Downloads)`
-		- [VMware Player!](https://my.vmware.com/web/vmware/free#desktop_end_user_computing/vmware_player/6_0)
-		- [Ubuntu Mirrors!](https://launchpad.net/ubuntu/+archivemirrors)
-	
-	* 设置OpenStack开发环境                                             1d
-	    1 使用devstack安装icehouse或juno，也可以安装havana
-            devstack是社区推荐的openstack单机开发环境
-		    - [DevStack!](https://wiki.openstack.org/wiki/DevStack)
-		    - [OpenStack!](http://docs.openstack.org/)
-	    2 掌握bash命令screen
-            devstack在用户会话模式下安装openstack，通过screen命令切换会话窗口，可以检查openstack各组件的控制台日志
-			- [screen GNU user manual!](http://www.gnu.org/software/screen/manual/screen.html)
-	
-	* 练习OpenStack操作                                                 1d
-	    - [End User Guide!](http://docs.openstack.org/user-guide/content/)
-		- [Admin User Guide!](http://docs.openstack.org/user-guide-admin/content/)
 
-	* 掌握Apache HTTPD在Linux下的管理和OpenStack下的使用                1d
-        - [for Ubuntu!](https://help.ubuntu.com/14.04/serverguide/httpd.html)
-        - [for CentOS!](http://www.centos.org/docs/5/html/Deployment_Guide-en-US/ch-httpd.html)
-		- [for OpenStack!](http://docs.openstack.org/juno/install-guide/install/apt/content/install_dashboard.html)
+    * 安装ubuntu 14.04                                                  1d
+      可以使用虚拟机，windows下的虚拟化平台可以使用VirtualBox或VMware Player（或VMware Workstation）
+        - [Virtual Box](https://www.virtualbox.org/wiki/Downloads) 
+        - [VMware Player](https://my.vmware.com/web/vmware/free#desktop_end_user_computing/vmware_player/6_0)
+        - [Ubuntu Mirrors](https://launchpad.net/ubuntu/+archivemirrors)
+
+    * 设置OpenStack开发环境                                             1d
+        1. 使用devstack安装icehouse或juno，也可以安装havana
+           devstack是社区推荐的openstack单机开发环境
+	    - [DevStack](https://wiki.openstack.org/wiki/DevStack)
+	    - [OpenStack](http://docs.openstack.org/)
+
+        2. 掌握bash命令screen
+           devstack在用户会话模式下安装openstack，通过screen命令切换会话窗口，可以检查openstack各组件的控制台日志
+	    - [screen GNU user manual](http://www.gnu.org/software/screen/manual/screen.html)
+
+    * 练习OpenStack操作                                                 1d
+	    - [End User Guide!](http://docs.openstack.org/user-guide/content/)
+	    - [Admin User Guide!](http://docs.openstack.org/user-guide-admin/content/)
+
+    * 掌握Apache HTTPD在Linux下的管理和OpenStack下的使用                1d
+            - [for Ubuntu!](https://help.ubuntu.com/14.04/serverguide/httpd.html)
+            - [for CentOS!](http://www.centos.org/docs/5/html/Deployment_Guide-en-US/ch-httpd.html)
+	    - [for OpenStack!](http://docs.openstack.org/juno/install-guide/install/apt/content/install_dashboard.html)
 		
 
     
