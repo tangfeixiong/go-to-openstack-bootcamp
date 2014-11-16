@@ -79,30 +79,34 @@ Install python 2.7.8 from source
 
         #) missing openssl
             .. image:: /os/image/get-pip-miss-httpshandler.png
+
             install openssl-devel
+
             .. image:: /os/image/get-pip-yum-openssl-devel.png
         #) run get-pip.py correctly
             ``make`` and ``make install`` again
+
             .. image:: /os/image/get-pip.png
 
 3. about ``virtualenv``
     .. code:: bash
-	[root@host-172-16-32-173 ~]# pip install virtualenv
+        [root@host-172-16-32-173 ~]# pip install virtualenv
 
-	Downloading/unpacking virtualenv
+        Downloading/unpacking virtualenv
 
-	  Downloading virtualenv-1.11.6-py2.py3-none-any.whl (1.6MB): 1.6MB downloaded
+          Downloading virtualenv-1.11.6-py2.py3-none-any.whl (1.6MB): 1.6MB downloaded
 
-	Installing collected packages: virtualenv
+        Installing collected packages: virtualenv
 
-	Successfully installed virtualenv
+        Successfully installed virtualenv
 
-	Cleaning up...
+        Cleaning up...
     
     * ``virtualenv`` 
         .. image:: /os/image/virtualenv-activate.png
     * install ``python-novaclient`` in the virtual environment
         .. image:: /os/image/virtualenv-install-novaclient.png
+
         .. image: /image/virtualenv-install-novaclient1.png
 
 4. fully installation of developer environment
