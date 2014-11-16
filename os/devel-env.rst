@@ -6,7 +6,7 @@ A CentOS 6.5 VM is used as lab. VM can be launched with any Hypervisor (such as 
 
 .. image:: /os/image/launch-centos-inst.png
 
-using easy_install with setuptools from ez_setup.py
+Using easy_install with setuptools from ez_setup.py
 ----------------------------------------------------------
 the default python installation in CentOS instance.
 
@@ -16,17 +16,17 @@ the default python installation in CentOS instance.
     * `setuptools in PYPI <https://pypi.python.org/pypi/setuptools>`_
     * download ``ez_setup.py`` with wget command
         .. image:: /os/image/ez_setup.py-dl.png
-    * run ez_setup.py to download and install setuptools
+    * run ``ez_setup.py`` to download and install setuptools
         .. image:: /os/image/ez_setup.setuptools.png
-    * verify easy_install in setuptools
+    * verify ``easy_install`` in setuptools
         .. image:: /os/image/easy_install.verify.png
 2. install pip
-    * install pip with easy_install
+    * install `pip` with easy_install
         .. image:: /os/image/easy_install-pip.png
     * pip search packages
         .. image:: /os/image/pip-search-example.png
 
-install python 2.7.8 from source
+Install python 2.7.8 from source
 --------------------------------
 1. setup python 2.7.8
     * go to download site
@@ -64,17 +64,17 @@ install python 2.7.8 from source
             note: the screenshot shows incorrect operation. the correct is following
 
             .. code:: bash
-[root@host-172-16-32-173 ~]# sed -i 's/#zlib/zlib/g' Python-2.7.8/Modules/Setup
+		[root@host-172-16-32-173 ~]# sed -i 's/#zlib/zlib/g' Python-2.7.8/Modules/Setup
 
-[root@host-172-16-32-173 ~]# cat Python-2.7.8/Modules/Setup | grep zlib
+		[root@host-172-16-32-173 ~]# cat Python-2.7.8/Modules/Setup | grep zlib
 
-# Andrew Kuchling's zlib module.
+		# Andrew Kuchling's zlib module.
 
-# This require zlib 1.1.3 (or later).
+		# This require zlib 1.1.3 (or later).
 
-# See http://www.gzip.org/zlib/
+		# See http://www.gzip.org/zlib/
 
-zlib zlibmodule.c -I$(prefix)/include -L$(exec_prefix)/lib -lz
+		zlib zlibmodule.c -I$(prefix)/include -L$(exec_prefix)/lib -lz
 
         #) missing openssl
             .. image:: /os/image/get-pip-miss-httpshandler.png
@@ -86,17 +86,17 @@ zlib zlibmodule.c -I$(prefix)/include -L$(exec_prefix)/lib -lz
 
 3. about ``virtualenv``
     .. code:: bash
-[root@host-172-16-32-173 ~]# pip install virtualenv
+	[root@host-172-16-32-173 ~]# pip install virtualenv
 
-Downloading/unpacking virtualenv
+	Downloading/unpacking virtualenv
 
-  Downloading virtualenv-1.11.6-py2.py3-none-any.whl (1.6MB): 1.6MB downloaded
+	  Downloading virtualenv-1.11.6-py2.py3-none-any.whl (1.6MB): 1.6MB downloaded
 
-Installing collected packages: virtualenv
+	Installing collected packages: virtualenv
 
-Successfully installed virtualenv
+	Successfully installed virtualenv
 
-Cleaning up...
+	Cleaning up...
     
     * ``virtualenv`` 
         .. image:: /os/image/virtualenv-activate.png
