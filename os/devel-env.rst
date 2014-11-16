@@ -1,5 +1,5 @@
-Manually Setup Python 2.7.8 Developer Environment
-=================================================
+Manually Setup Python 2.7.8 
+============================
 Preparation
 -----------
 A CentOS 6.5 VM is used as lab. VM can be launched with any Hypervisor (such as VMware, VirtualBox, virsh).
