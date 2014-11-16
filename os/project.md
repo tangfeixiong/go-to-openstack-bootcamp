@@ -57,9 +57,10 @@
     - [Python 2.7](https://docs.python.org/2.7/)
     - [调试器](https://docs.python.org/2.7/library/debug.html)
 		
-  * Python SDK (PyPI和Pip)                                            
-    - [SDK目录](https://pypi.python.org/pypi)
-    - [SDK在线安装工具](https://pip.pypa.io/en/latest/installing.html#install-pip)
+  * Python SDK (PyPI和pip)                                            
+    - [PyPI-Python Package Index](https://pypi.python.org/pypi)
+	- [PyPI mirrors](http://www.pypi-mirrors.org/)
+    - [pip-在线安装工具](https://pip.pypa.io/en/latest/installing.html#install-pip)
     - [pip vs easy_install](https://packaging.python.org/en/latest/technical.html#pip-vs-easy-install) 
 		
   * 开发环境和生产环境                                                
