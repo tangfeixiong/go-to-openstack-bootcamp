@@ -54,6 +54,7 @@ Install python 2.7.8 from source
 
 2. install pip in alternative way
     https://pip.pypa.io/en/latest/installing.html
+
     * download ``get-pip.py``
         .. image:: /os/image/get-pip-wget.png
     * investigate issues
@@ -64,17 +65,17 @@ Install python 2.7.8 from source
             note: the screenshot shows incorrect operation. the correct is following
 
             .. code:: bash
-		[root@host-172-16-32-173 ~]# sed -i 's/#zlib/zlib/g' Python-2.7.8/Modules/Setup
+            [root@host-172-16-32-173 ~]# sed -i 's/#zlib/zlib/g' Python-2.7.8/Modules/Setup
 
-		[root@host-172-16-32-173 ~]# cat Python-2.7.8/Modules/Setup | grep zlib
+            [root@host-172-16-32-173 ~]# cat Python-2.7.8/Modules/Setup | grep zlib
 
-		# Andrew Kuchling's zlib module.
+            # Andrew Kuchling's zlib module.
 
-		# This require zlib 1.1.3 (or later).
+            # This require zlib 1.1.3 (or later).
 
-		# See http://www.gzip.org/zlib/
+            # See http://www.gzip.org/zlib/
 
-		zlib zlibmodule.c -I$(prefix)/include -L$(exec_prefix)/lib -lz
+            zlib zlibmodule.c -I$(prefix)/include -L$(exec_prefix)/lib -lz
 
         #) missing openssl
             .. image:: /os/image/get-pip-miss-httpshandler.png
