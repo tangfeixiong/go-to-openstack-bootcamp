@@ -15,11 +15,11 @@ the default python installation in CentOS instance.
 1. install setuptools
     * `setuptools in PYPI <https://pypi.python.org/pypi/setuptools>`_
     * download ``ez_setup.py`` with wget command
-        .. image:: /image/ez_setup.py-dl.png
+        .. image:: /os/image/ez_setup.py-dl.png
     * run ez_setup.py to download and install setuptools
-        .. image:: /image/ez_setup.setuptools.png
+        .. image:: /os/image/ez_setup.setuptools.png
     * verify easy_install in setuptools
-        .. image:: /image/easy_install.verify.png
+        .. image:: /os/image/easy_install.verify.png
 2. install pip
     * install pip with easy_install
         .. image:: /image/easy_install-pip.png
