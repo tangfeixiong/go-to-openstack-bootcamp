@@ -76,6 +76,8 @@ Install python 2.7.8 from source
                 # See http://www.gzip.org/zlib/
 
                 zlib zlibmodule.c -I$(prefix)/include -L$(exec_prefix)/lib -lz
+ 
+                [root@host-172-16-32-173 ~]# cd Python-2.7.8; make && make install
 
         #) missing openssl
             .. image:: /os/image/get-pip-miss-httpshandler.png
@@ -83,9 +85,10 @@ Install python 2.7.8 from source
             install openssl-devel
 
             .. image:: /os/image/get-pip-yum-openssl-devel.png
-        #) run get-pip.py correctly
-            ``make`` and ``make install`` again
 
+            at last, ``make`` and ``make install`` again
+
+        #) run `get-pip.py` to install 
             .. image:: /os/image/get-pip.png
 
 3. about ``virtualenv``
