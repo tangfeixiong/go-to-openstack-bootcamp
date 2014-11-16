@@ -88,7 +88,7 @@ Install python 2.7.8 from source
 
             at last, ``make`` and ``make install`` again
 
-        #) run `get-pip.py` to install 
+        #) run ``get-pip.py`` to install 
             .. image:: /os/image/get-pip.png
 
 3. about ``virtualenv``
