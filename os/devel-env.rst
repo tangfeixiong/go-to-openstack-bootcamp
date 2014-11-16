@@ -2,16 +2,18 @@ Manually Setup Python 2.7.8 Developer Environment
 =================================================
 Preparation
 -----------
-A CentOS 6.5 VM is used as lab
-.. image:: /image/launch-centos-inst.png
+A CentOS 6.5 VM is used as lab. VM can be launched with any Hypervisor (such as VMware, VirtualBox, virsh).
+
+.. image:: /os/image/launch-centos-inst.png
 
 using easy_install with setuptools from ez_setup.py
 ----------------------------------------------------------
-the default python installation in CentOS instance
-.. image:: /image/instance-default-python.png 
+the default python installation in CentOS instance.
+
+.. image:: /os/image/instance-default-python.png 
 
 1. install setuptools
-    * .. _setuptools in PYPI: https://pypi.python.org/pypi/setuptools
+    * `setuptools in PYPI <https://pypi.python.org/pypi/setuptools>`_
     * download ``ez_setup.py`` with wget command
         .. image:: /image/ez_setup.py-dl.png
     * run ez_setup.py to download and install setuptools
