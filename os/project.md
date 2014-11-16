@@ -6,7 +6,7 @@
 
   windows下可以使用虚拟机，虚拟化平台可以使用VirtualBox或VMware Player（或VMware Workstation）
   - [Ubuntu Mirrors](https://launchpad.net/ubuntu/+archivemirrors)
-    ![domestic](/image/domestic-ubuntu-mirrors.png)
+    ![domestic](/os/image/domestic-ubuntu-mirrors.png)
 
     For example:
     ![isos-in-aliyun](/os/image/aliyun-ubuntu-14.04.1.png)
