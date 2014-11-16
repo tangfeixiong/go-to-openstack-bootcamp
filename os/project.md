@@ -1,62 +1,79 @@
-# Iteration 01: OpenStack开发环境                                       11月份
-## Sprint 01: OpenStack开发平台                                         1周
-### 学习                                                                4天
+# Iteration 01: OpenStack开发环境                                       
+## Sprint 01: OpenStack开发平台                                        
+### 学习                                                            
 
-* 安装ubuntu 14.04                                                  1d
+* 安装Ubuntu或CentOS                                                   
 
-  可以使用虚拟机，windows下的虚拟化平台可以使用VirtualBox或VMware Player（或VMware Workstation）
-  - [Virtual Box](https://www.virtualbox.org/wiki/Downloads) 
-  - [VMware Player](https://my.vmware.com/web/vmware/free#desktop_end_user_computing/vmware_player/6_0)
+  windows下可以使用虚拟机，虚拟化平台可以使用VirtualBox或VMware Player（或VMware Workstation）
   - [Ubuntu Mirrors](https://launchpad.net/ubuntu/+archivemirrors)
+    ![domestic](/image/domestic-ubuntu-mirrors.png)
+    For example:
+    ![isos-in-aliyun](/image/aliyun-ubuntu-14.04.1.png)
+  - [CentOS Mirrors](http://www.centos.org/download/mirrors/)
+    ![domestic](/image/domestic-centos-mirrors.png)
+    For example:
+    ![isos-in-aliyun](/image/aliyun-centos-6.5-isos-x86_64.png)
+  - [Virtual Box](https://www.virtualbox.org/wiki/Downloads) 
+    Tutorial: [How to Install Ubuntu on VirtualBox (with Pictures) - wikiHow](http://www.wikihow.com/Install-Ubuntu-on-VirtualBox)
+  - [VMware Player](https://my.vmware.com/web/vmware/free#desktop_end_user_computing/vmware_player/6_0)
+    Tutorial: [CentOS 6.3 Step by Step Installation Guide with Screenshots](http://www.tecmint.com/centos-6-3-step-by-step-installation-guide-with-screenshots/)
+  - http://www.baidu.com 
 
-* 设置OpenStack开发环境                                             1d
+* 设置OpenStack开发环境                                                  
   1. 使用devstack安装icehouse或juno，也可以安装havana
 
-     devstack是社区推荐的openstack单机开发环境
-    - [DevStack](https://wiki.openstack.org/wiki/DevStack)
-    - [OpenStack](http://docs.openstack.org/)
-
+    devstack是社区推荐的openstack单机(or multi-node)开发环境
+    - [DevStack developer](https://wiki.openstack.org/wiki/DevStack)
+    - [Source code in Github](https://github.com/openstack-dev/devstack)
+    - [Stack Tutorial](http://docs.openstack.org/developer/devstack/)
+    
   2. 掌握bash命令screen
 
-     devstack在用户会话模式下安装openstack，通过screen命令切换会话窗口，可以检查openstack各组件的控制台日志
+    devstack在用户会话模式下安装openstack，通过screen命令切换会话窗口，可以检查openstack各组件的控制台日志
     - [screen GNU user manual](http://www.gnu.org/software/screen/manual/screen.html)
 
-* 练习OpenStack操作                                                 1d 
+* 练习OpenStack操作                                                     
   - [End User Guide](http://docs.openstack.org/user-guide/content/)
   - [Admin User Guide](http://docs.openstack.org/user-guide-admin/content/)
+  - [OpenStack Documentation](http://docs.openstack.org/)
 
-* 掌握Apache HTTPD在Linux下的管理和OpenStack下的使用                1d
+* 掌握Apache HTTPD在Linux下的管理和OpenStack下的使用                           
   - [for Ubuntu](https://help.ubuntu.com/14.04/serverguide/httpd.html)
   - [for CentOS](http://www.centos.org/docs/5/html/Deployment_Guide-en-US/ch-httpd.html)
   - [for OpenStack](http://docs.openstack.org/juno/install-guide/install/apt/content/install_dashboard.html)
 		
 	
-## Sprint 02: Python开发环境                                            1周
-### 学习                                                                4天
-    * Python2.6/2.7及开发工具                                           1d
-	    - [Python 2.7](https://docs.python.org/2.7/)
-		- [调试器](https://docs.python.org/2.7/library/debug.html)
+## Sprint 02: Python开发环境                                            
+### 学习                                                                
+  * Python2.6/2.7及开发工具                                           
+    - [Python 2.7](https://docs.python.org/2.7/)
+    - [调试器](https://docs.python.org/2.7/library/debug.html)
 		
-    * Python SDK (PyPI和Pip)                                            1d
-        - [SDK目录](https://pypi.python.org/pypi)
-		- [pip vs easy_install](https://packaging.python.org/en/latest/technical.html#pip-vs-easy-install) 
-		- [SDK在线安装工具](https://pip.pypa.io/en/latest/)
+  * Python SDK (PyPI和Pip)                                            
+    - [SDK目录](https://pypi.python.org/pypi)
+    - [SDK在线安装工具](https://pip.pypa.io/en/latest/installing.html#install-pip)
+    - [pip vs easy_install](https://packaging.python.org/en/latest/technical.html#pip-vs-easy-install) 
 		
-	* 开发环境和生产环境                                                1d
-        - [virtualenv](https://packaging.python.org/en/latest/installing.html#virtual-environments)
-		- [staging](https://docs.python.org/2.7/using/index.html)
-		- [production](https://docs.python.org/2/library/site.html)
+  * 开发环境和生产环境                                                
+    - [virtualenv](https://virtualenv.pypa.io/en/latest/virtualenv.html#installation)
+    - [staging](https://docs.python.org/2.7/using/index.html)
+    - [production](https://docs.python.org/2/library/site.html)
 		
-    * OpenStack开发环境                                                 1d
-	    1 所有项目
-		    - [openstack.org的developer docs](http://docs.openstack.org/developer/openstack-projects.html)
-		    - [源代码](https://github.com/openstack)
-        2 Nova项目及相关
-		    - [nova](http://docs.openstack.org/developer/nova/)
-			- [python-nova-client BP](https://blueprints.launchpad.net/python-novaclient)
-			- [单元测试] (https://wiki.openstack.org/wiki/Testing#Unit_Tests)
+  * OpenStack开发环境                                                 
+    1 Nova及相关项目
+      - [源代码](https://github.com/openstack/nova)
+      - [wiki](https://wiki.openstack.org/wiki/Nova)
+      - [developer](http://docs.openstack.org/developer/nova/)
+        a. Setup Environment
+        b. Unit Tests
+        ...
+    2 所有项目
+      - [Developer Documentation](http://docs.openstack.org/developer/openstack-projects.html)
+      - [源代码](https://github.com/openstack)
+      - [单元测试] (https://wiki.openstack.org/wiki/Testing#Unit_Tests)
 
-
+### Written
+  * [manually setup python 2.7.8 developer environment](/devel-env.rst)     
 	
 
 # Iteration 02: 需求分析                                                12月份~1月份
