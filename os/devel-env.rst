@@ -89,7 +89,7 @@ Install python 2.7.8 from source
             .. image:: /os/image/get-pip.png
 
 3. about ``virtualenv``
-    .. code:: bash
+        .. code:: bash
         [root@host-172-16-32-173 ~]# pip install virtualenv
 
         Downloading/unpacking virtualenv
@@ -107,7 +107,7 @@ Install python 2.7.8 from source
     * install ``python-novaclient`` in the virtual environment
         .. image:: /os/image/virtualenv-install-novaclient.png
 
-        .. image: /image/virtualenv-install-novaclient1.png
+        .. image:: /os/image/virtualenv-install-novaclient1.png
 
 4. fully installation of developer environment
     .. code:: bash
