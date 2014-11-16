@@ -72,8 +72,8 @@
       - [源代码](https://github.com/openstack)
       - [单元测试] (https://wiki.openstack.org/wiki/Testing#Unit_Tests)
 
-### Written
-  * [manually setup python 2.7.8 developer environment](/devel-env.rst)     
+### To-Do
+  * manually setup python 2.7.8 developer environment    
 	
 
 # Iteration 02: 需求分析                                                12月份~1月份
