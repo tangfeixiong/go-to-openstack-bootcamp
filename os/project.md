@@ -18,9 +18,11 @@
     ![isos-in-aliyun](/os/image/aliyun-centos-6.5-isos-x86_64.png)
 
   - [Virtual Box](https://www.virtualbox.org/wiki/Downloads) 
+    
     Tutorial: [How to Install Ubuntu on VirtualBox (with Pictures) - wikiHow](http://www.wikihow.com/Install-Ubuntu-on-VirtualBox)
 
   - [VMware Player](https://my.vmware.com/web/vmware/free#desktop_end_user_computing/vmware_player/6_0)
+    
     Tutorial: [CentOS 6.3 Step by Step Installation Guide with Screenshots](http://www.tecmint.com/centos-6-3-step-by-step-installation-guide-with-screenshots/)
 
   - http://www.baidu.com 
