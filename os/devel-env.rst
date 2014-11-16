@@ -22,9 +22,9 @@ the default python installation in CentOS instance.
         .. image:: /os/image/easy_install.verify.png
 2. install pip
     * install pip with easy_install
-        .. image:: /image/easy_install-pip.png
+        .. image:: /os/image/easy_install-pip.png
     * pip search packages
-        .. image:: /image/pip-search-example.png
+        .. image:: /os/image/pip-search-example.png
 
 install python 2.7.8 from source
 --------------------------------
