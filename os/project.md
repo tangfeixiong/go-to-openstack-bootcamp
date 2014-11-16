@@ -7,16 +7,22 @@
   windows下可以使用虚拟机，虚拟化平台可以使用VirtualBox或VMware Player（或VMware Workstation）
   - [Ubuntu Mirrors](https://launchpad.net/ubuntu/+archivemirrors)
     ![domestic](/image/domestic-ubuntu-mirrors.png)
+
     For example:
-    ![isos-in-aliyun](/image/aliyun-ubuntu-14.04.1.png)
+    ![isos-in-aliyun](/os/image/aliyun-ubuntu-14.04.1.png)
+
   - [CentOS Mirrors](http://www.centos.org/download/mirrors/)
-    ![domestic](/image/domestic-centos-mirrors.png)
+    ![domestic](/os/image/domestic-centos-mirrors.png)
+
     For example:
-    ![isos-in-aliyun](/image/aliyun-centos-6.5-isos-x86_64.png)
+    ![isos-in-aliyun](/os/image/aliyun-centos-6.5-isos-x86_64.png)
+
   - [Virtual Box](https://www.virtualbox.org/wiki/Downloads) 
     Tutorial: [How to Install Ubuntu on VirtualBox (with Pictures) - wikiHow](http://www.wikihow.com/Install-Ubuntu-on-VirtualBox)
+
   - [VMware Player](https://my.vmware.com/web/vmware/free#desktop_end_user_computing/vmware_player/6_0)
     Tutorial: [CentOS 6.3 Step by Step Installation Guide with Screenshots](http://www.tecmint.com/centos-6-3-step-by-step-installation-guide-with-screenshots/)
+
   - http://www.baidu.com 
 
 * 设置OpenStack开发环境                                                  
