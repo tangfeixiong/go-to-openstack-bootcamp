@@ -36,11 +36,10 @@
 
 而作为OpenStack私有云网管，要负责检查租户的虚拟网络设施：
 
-    1. 通过路由器的ID，在OpenStack网络节点上进行CLI操作
-	
+    1. 通过路由器的ID，在OpenStack网络节点上进行CLI操作	
 	2. 在该路由器上操作网络命令
 	
 更多请参考
 ----------
-# http://docs.openstack.org/user-guide/content/dashboard_create_networks.html
-# https://openstack.redhat.com/Networking_in_too_much_detail
+    #. http://docs.openstack.org/user-guide/content/dashboard_create_networks.html
+    #. https://openstack.redhat.com/Networking_in_too_much_detail
