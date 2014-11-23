@@ -11,3 +11,4 @@
 
 2 Exercise
   * [Manually Setup Python 2.7.8 for CentOS 6.5](/os/devel-env.rst)
+  * [OpenStack租户网络简明设置](/os/tenant-networking-zh.rst)
