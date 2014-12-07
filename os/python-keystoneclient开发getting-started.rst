@@ -318,3 +318,207 @@ Keystone Client代码入口
             sys.exit(1)
 
     ...
+
+* keystoneclient包的初始元数据
+*bash*::
+
+    (py27)
+    Administrator@lenovo-9d779749 ~/github.com/openstack/python-keystoneclient
+    $ cat keystoneclient/__init__.py
+    ...
+
+    """The python bindings for the OpenStack Identity (Keystone) project.
+
+    See :py:class:`keystoneclient.v3.client.Client` for the Identity V3 client.
+
+    See :py:class:`keystoneclient.v2_0.client.Client` for the Identity V2.0 client.
+
+    """
+
+    import pbr.version
+
+    from keystoneclient import access
+    from keystoneclient import client
+    from keystoneclient import exceptions
+    from keystoneclient import generic
+    from keystoneclient import httpclient
+    from keystoneclient import service_catalog
+    from keystoneclient import v2_0
+    from keystoneclient import v3
+
+
+    __version__ = pbr.version.VersionInfo('python-keystoneclient').version_string()
+
+    __all__ = [
+        # Modules
+        'generic',
+        'v2_0',
+        'v3',
+
+        # Packages
+        'access',
+        'client',
+        'exceptions',
+        'httpclient',
+        'service_catalog',
+    ]
+
+    (py27)
+    Administrator@lenovo-9d779749 ~/github.com/openstack/python-keystoneclient
+    $ python
+    Python 2.7.8 (default, Jul 28 2014, 01:34:03)
+    [GCC 4.8.3] on cygwin
+    Type "help", "copyright", "credits" or "license" for more information.
+    >>> import keystoneclient
+    >>> dir(keystoneclient)
+    ['__all__', '__builtins__', '__doc__', '__file__', '__name__', '__package__', '__path__', '__version__', '_discover', 'access', 'adapter', 'auth', 'base', 'baseclient', 'client', 'discover', 'exceptions', 'generic', 'httpclient', 'i18n', 'openstack', 'pbr', 'service_catalog', 'session', 'utils', 'v2_0', 'v3']
+    >>> keystoneclient.__version__
+    '0.11.2.43'
+    >>> keystoneclient.__all__
+    ['generic', 'v2_0', 'v3', 'access', 'client', 'exceptions', 'httpclient', 'service_catalog']
+
+    >>> import keystoneclient.shell as python_keystoneclient_shell
+    >>> dir(keystoneclient.shell)
+    ['OpenStackHelpFormatter', 'OpenStackIdentityShell', '__builtins__', '__doc__', '__file__', '__name__', '__package__', 'access', 'argparse', 'encodeutils', 'env', 'exc', 'getpass', 'keystoneclient', 'logging', 'main', 'os', 'print_function', 'session', 'shell_bootstrap', 'shell_generic', 'shell_v2_0', 'six', 'sys', 'utils']
+
+* 编程调用shell.py的main函数
+*bash*::
+
+    >>> python_keystoneclient_shell.main()
+    usage: keystone [--version] [--debug] [--os-username <auth-user-name>]
+                    [--os-password <auth-password>]
+                    [--os-tenant-name <auth-tenant-name>]
+                    [--os-tenant-id <tenant-id>] [--os-auth-url <auth-url>]
+                    [--os-region-name <region-name>]
+                    [--os-identity-api-version <identity-api-version>]
+                    [--os-token <service-token>]
+                    [--os-endpoint <service-endpoint>] [--os-cache]
+                    [--force-new-token] [--stale-duration <seconds>] [--insecure]
+                    [--os-cacert <ca-certificate>] [--os-cert <certificate>]
+                    [--os-key <key>] [--timeout <seconds>]
+                    <subcommand> ...
+
+    Pending deprecation: Command-line interface to the OpenStack Identity API.
+    This CLI is pending deprecation in favor of python-openstackclient. For a
+    Python library, continue using python-keystoneclient.
+
+    Positional arguments:
+      <subcommand>
+        catalog                 List service catalog, possibly filtered by
+                                service.
+        ec2-credentials-create  Create EC2-compatible credentials for user per
+                                tenant.
+        ec2-credentials-delete  Delete EC2-compatible credentials.
+        ec2-credentials-get     Display EC2-compatible credentials.
+        ec2-credentials-list    List EC2-compatible credentials for a user.
+        endpoint-create         Create a new endpoint associated with a service.
+        endpoint-delete         Delete a service endpoint.
+        endpoint-get            Find endpoint filtered by a specific attribute or
+                                service type.
+        endpoint-list           List configured service endpoints.
+        password-update         Update own password.
+        role-create             Create new role.
+        role-delete             Delete role.
+        role-get                Display role details.
+        role-list               List all roles.
+        service-create          Add service to Service Catalog.
+        service-delete          Delete service from Service Catalog.
+        service-get             Display service from Service Catalog.
+        service-list            List all services in Service Catalog.
+        tenant-create           Create new tenant.
+        tenant-delete           Delete tenant.
+        tenant-get              Display tenant details.
+        tenant-list             List all tenants.
+        tenant-update           Update tenant name, description, enabled status.
+        token-get               Display the current user token.
+        user-create             Create new user.
+        user-delete             Delete user.
+        user-get                Display user details.
+        user-list               List users.
+        user-password-update    Update user password.
+        user-role-add           Add role to user.
+        user-role-list          List roles granted to a user.
+        user-role-remove        Remove role from user.
+        user-update             Update user's name, email, and enabled status.
+        discover                Discover Keystone servers, supported API versions
+                                and extensions.
+        bootstrap               Grants a new role to a new user on a new tenant,
+                                after creating each.
+        bash-completion         Prints all of the commands and options to stdout.
+        help                    Display help about this program or one of its
+                                subcommands.
+
+    Optional arguments:
+      --version                 Shows the client version and exits.
+      --debug                   Prints debugging output onto the console, this
+                                includes the curl request and response calls.
+                                Helpful for debugging and understanding the API
+                                calls.
+      --os-username <auth-user-name>
+                                Name used for authentication with the OpenStack
+                                Identity service. Defaults to env[OS_USERNAME].
+      --os-password <auth-password>
+                                Password used for authentication with the
+                                OpenStack Identity service. Defaults to
+                                env[OS_PASSWORD].
+      --os-tenant-name <auth-tenant-name>
+                                Tenant to request authorization on. Defaults to
+                                env[OS_TENANT_NAME].
+      --os-tenant-id <tenant-id>
+                                Tenant to request authorization on. Defaults to
+                                env[OS_TENANT_ID].
+      --os-auth-url <auth-url>  Specify the Identity endpoint to use for
+                                authentication. Defaults to env[OS_AUTH_URL].
+      --os-region-name <region-name>
+                                Specify the region to use. Defaults to
+                                env[OS_REGION_NAME].
+      --os-identity-api-version <identity-api-version>
+                                Specify Identity API version to use. Defaults to
+                                env[OS_IDENTITY_API_VERSION] or 2.0.
+      --os-token <service-token>
+                                Specify an existing token to use instead of
+                                retrieving one via authentication (e.g. with
+                                username & password). Defaults to
+                                env[OS_SERVICE_TOKEN].
+      --os-endpoint <service-endpoint>
+                                Specify an endpoint to use instead of retrieving
+                                one from the service catalog (via authentication).
+                                Defaults to env[OS_SERVICE_ENDPOINT].
+      --os-cache                Use the auth token cache. Defaults to
+                                env[OS_CACHE].
+      --force-new-token         If the keyring is available and in use, token will
+                                always be stored and fetched from the keyring
+                                until the token has expired. Use this option to
+                                request a new token and replace the existing one
+                                in the keyring.
+      --stale-duration <seconds>
+                                Stale duration (in seconds) used to determine
+                                whether a token has expired when retrieving it
+                                from keyring. This is useful in mitigating process
+                                or network delays. Default is 30 seconds.
+      --insecure                Explicitly allow client to perform "insecure" TLS
+                                (https) requests. The server's certificate will
+                                not be verified against any certificate
+                                authorities. This option should be used with
+                                caution.
+      --os-cacert <ca-certificate>
+                                Specify a CA bundle file to use in verifying a TLS
+                                (https) server certificate. Defaults to
+                                env[OS_CACERT].
+      --os-cert <certificate>   Defaults to env[OS_CERT].
+      --os-key <key>            Defaults to env[OS_KEY].
+      --timeout <seconds>       Set request timeout (in seconds).
+
+    See "keystone help COMMAND" for help on a specific command.
+
+* 编程调用shell.py的OpenStackIdentityShell类
+*bash*::
+
+    >>> dir(python_keystoneclient_shell.OpenStackIdentityShell)
+    ['__class__', '__delattr__', '__dict__', '__doc__', '__format__', '__getattribute__', '__hash__', '__init__', '__module__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__str__', '__subclasshook__', '__weakref__', '_add_bash_completion_subparser', '_find_actions', 'auth_check', 'do_bash_completion', 'do_help', 'get_api_class', 'get_base_parser', 'get_subcommand_parser', 'main']
+    >>> myObj = python_keystoneclient_shell.OpenStackIdentityShell()
+    >>> myObj.main(['--version'])
+    0.11.2.43
+    (py27)
+    Administrator@lenovo-9d779749 ~/github.com/openstack/python-keystoneclient
+    $
