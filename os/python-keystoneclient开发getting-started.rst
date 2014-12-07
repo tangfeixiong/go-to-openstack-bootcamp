@@ -28,16 +28,16 @@ Community Resources
 示例 git clone 
 ^^^^^^^^^^^^^^^^
     *bash* 
-	.. code::
-        Administrator@lenovo-9d779749 ~/python-workspace/openstack-devel$
-        git clone https://github.com/openstack/python-keystoneclient.git
+    .. code::
+        Administrator@lenovo-9d779749 ~/python-workspace/openstack-devel
+		$ git clone https://github.com/openstack/python-keystoneclient.git
 
 .. _staging:
 安装Staging环境
 ---------------
 * 使用tox将keystone client安装到默认的virtuaenv，后面有tox的较详细的安装和设置章节
     *bash*
-	.. code::
+    .. code::
     Administrator@lenovo-9d779749 ~/github.com/openstack/python-keystoneclient
     $ tox -e py27
     py27 create: /home/Administrator/github.com/openstack/python-keystoneclient/.tox/py27
@@ -86,4 +86,4 @@ Community Resources
     ERROR: InvocationError: '/home/Administrator/github.com/openstack/python-keystoneclient/.tox/py27/bin/python setup.py testr --testr-args='
     ___________________________________ summary ____________________________________
     ERROR:   py27: commands failed
-		
+        
