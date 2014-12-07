@@ -522,3 +522,204 @@ Keystone Client代码入口
     (py27)
     Administrator@lenovo-9d779749 ~/github.com/openstack/python-keystoneclient
     $
+
+使用pdb调试shell.py
+^^^^^^^^^^^^^^^^^^^
+*bash* and *pdb*::
+
+    (py27)
+    Administrator@lenovo-9d779749 ~/github.com/openstack/python-keystoneclient
+    $ python
+    Python 2.7.8 (default, Jul 28 2014, 01:34:03)
+    [GCC 4.8.3] on cygwin
+    Type "help", "copyright", "credits" or "license" for more information.
+    >>> import pdb, keystoneclient.shell
+    >>> pdb.run('keystoneclient.shell.main()')
+    > /usr/lib/python2.7/pdb.py(1238)run()
+    -> Pdb().run(statement, globals, locals)
+
+    (Pdb) help step
+    s(tep)
+    Execute the current line, stop at the first possible occasion
+    (either in a function that is called or in the current function).
+
+    (Pdb) help return
+    r(eturn)
+    Continue execution until the current function returns.
+    (Pdb) r
+    --Return--
+    > /usr/lib/python2.7/pdb.py(104)__init__()->None
+    -> self.commands_bnum = None # The breakpoint number for which we are
+    (Pdb) r
+    > <string>(1)<module>()
+    (Pdb) s
+    --Call--
+    > /home/Administrator/github.com/openstack/python-keystoneclient/keystoneclient/shell.py(461)main()
+    -> def main():
+
+    (Pdb) help next
+    n(ext)
+    Continue execution until the next line in the current function
+    is reached or it returns.
+    (Pdb) n
+    > /home/Administrator/github.com/openstack/python-keystoneclient/keystoneclient/shell.py(462)main()
+    -> try:
+
+    (Pdb) l
+    457             heading = '%s%s' % (heading[0].upper(), heading[1:])
+    458             super(OpenStackHelpFormatter, self).start_section(heading)
+    459
+    460
+    461     def main():
+    462  ->     try:
+    463             OpenStackIdentityShell().main(sys.argv[1:])
+    464
+    465         except Exception as e:
+    466             print(encodeutils.safe_encode(six.text_type(e)), file=sys.stderr)
+    467             sys.exit(1)
+
+    (Pdb) l 315, 396
+    315
+    316         def main(self, argv):
+    317             # Parse args once to find version
+    318             parser = self.get_base_parser()
+    319             (options, args) = parser.parse_known_args(argv)
+    320
+    321             # build available subcommands based on version
+    322             api_version = options.os_identity_api_version
+    323             subcommand_parser = self.get_subcommand_parser(api_version)
+    324             self.parser = subcommand_parser
+    325
+    326             # Handle top-level --help/-h before attempting to parse
+    327             # a command off the command line
+    328             if not argv or options.help:
+    329                 self.do_help(options)
+    330                 return 0
+    331
+    332             # Parse args again and call whatever callback was selected
+    333             args = subcommand_parser.parse_args(argv)
+    334
+    335             # Short-circuit and deal with help command right away.
+    336             if args.func == self.do_help:
+    337                 self.do_help(args)
+    338                 return 0
+    339             elif args.func == self.do_bash_completion:
+    340                 self.do_bash_completion(args)
+    341                 return 0
+    342
+    343             if args.debug:
+    344                 logging_level = logging.DEBUG
+    345                 iso_logger = logging.getLogger('iso8601')
+    346                 iso_logger.setLevel('WARN')
+    347             else:
+    348                 logging_level = logging.WARNING
+    349
+    350             logging.basicConfig(level=logging_level)
+    351
+    352             # TODO(heckj): supporting backwards compatibility with environment
+    353             # variables. To be removed after DEVSTACK is updated, ideally in
+    354             # the Grizzly release cycle.
+    355             args.os_token = args.os_token or env('SERVICE_TOKEN')
+    356             args.os_endpoint = args.os_endpoint or env('SERVICE_ENDPOINT')
+    357
+    358             if utils.isunauthenticated(args.func):
+    359                 self.cs = shell_generic.CLIENT_CLASS(endpoint=args.os_auth_url,
+    360                                                      cacert=args.os_cacert,
+    361                                                      key=args.os_key,
+    362                                                      cert=args.os_cert,
+    363                                                      insecure=args.insecure,
+    364                                                      timeout=args.timeout)
+    365             else:
+    366                 self.auth_check(args)
+    367                 token = None
+    368                 if args.os_token and args.os_endpoint:
+    369                     token = args.os_token
+    370                 api_version = options.os_identity_api_version
+    371                 self.cs = self.get_api_class(api_version)(
+    372                     username=args.os_username,
+    373                     tenant_name=args.os_tenant_name,
+    374                     tenant_id=args.os_tenant_id,
+    375                     token=token,
+    376                     endpoint=args.os_endpoint,
+    377                     password=args.os_password,
+    378                     auth_url=args.os_auth_url,
+    379                     region_name=args.os_region_name,
+    380                     cacert=args.os_cacert,
+    381                     key=args.os_key,
+    382                     cert=args.os_cert,
+    383                     insecure=args.insecure,
+    384                     debug=args.debug,
+    385                     use_keyring=args.os_cache,
+    386                     force_new_token=args.force_new_token,
+    387                     stale_duration=args.stale_duration,
+    388                     timeout=args.timeout)
+    389
+    390             try:
+    391                 args.func(self.cs, args)
+    392             except exc.Unauthorized:
+    393                 raise exc.CommandError("Invalid OpenStack Identity credentials.")
+    394             except exc.AuthorizationFailure:
+    395                 raise exc.CommandError("Unable to authorize user")
+    396
+
+    (Pdb) help break
+    b(reak) ([file:]lineno | function) [, condition]
+    With a line number argument, set a break there in the current
+    file.  With a function name, set a break at first executable line
+    of that function.  Without argument, list all breaks.  If a second
+    argument is present, it is a string specifying an expression
+    which must evaluate to true before the breakpoint is honored.
+
+    The line number may be prefixed with a filename and a colon,
+    to specify a breakpoint in another file (probably one that
+    hasn't been loaded yet).  The file is searched for on sys.path;
+    the .py suffix may be omitted.
+    (Pdb) b 328
+    Breakpoint 1 at /home/Administrator/github.com/openstack/python-keystoneclient/keystoneclient/shell.py:328
+
+    (Pdb) help continue
+    c(ont(inue))
+    Continue execution, only stop when a breakpoint is encountered.
+
+    (Pdb) options
+    Namespace(debug=False, force_new_token=False, help=False, insecure=False, os_auth_url='', os_cacert=None, os_cache=False, os_cert=None, os_endpoint='', os_identity_api_version='', os_key=None, os_password='', os_region_name='', os_tenant_id='', os_tenant_name='', os_token='', os_username='', stale_duration=30, timeout=600)
+    (Pdb) args
+    self = <keystoneclient.shell.OpenStackIdentityShell object at 0x7f8ffdec>
+    argv = []
+    ...
+    (Pdb) l
+    431                     self.subcommands[args.command].print_help()
+    432                 else:
+    433                     raise exc.CommandError("'%s' is not a valid subcommand" %
+    434                                            args.command)
+    435             else:
+    436  ->             self.parser.print_help()
+    437
+    438
+    439     # I'm picky about my shell help.
+    440     class OpenStackHelpFormatter(argparse.HelpFormatter):
+    441         INDENT_BEFORE_ARGUMENTS = 6
+    (Pdb) n
+    > /home/Administrator/github.com/openstack/python-keystoneclient/keystoneclient/shell.py(330)main()
+    -> return 0
+    (Pdb) n
+    --Return--
+    > /home/Administrator/github.com/openstack/python-keystoneclient/keystoneclient/shell.py(330)main()->0
+    -> return 0
+    (Pdb) n
+    --Return--
+    > /home/Administrator/github.com/openstack/python-keystoneclient/keystoneclient/shell.py(463)main()->None
+    -> OpenStackIdentityShell().main(sys.argv[1:])
+    (Pdb) n
+    --Return--
+    > <string>(1)<module>()->None
+    (Pdb) n
+
+    >>> quit()
+    (py27)
+    Administrator@lenovo-9d779749 ~/github.com/openstack/python-keystoneclient
+    $
+
+**关于pdb，详细参考**
+
+    https://docs.python.org/2.7/library/pdb.html
