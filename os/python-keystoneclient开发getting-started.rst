@@ -973,7 +973,7 @@ Pypi Mirror
     (stagingenv)
 在virtualenv中安装tox
 *bash*
-    .. code:：bash
+    .. code:: bash
     (stagingenv)
     Administrator@lenovo-9d779749 ~/python-workspace/openstack-devel/
     $ pip install tox
