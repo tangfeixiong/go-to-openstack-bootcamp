@@ -1,11 +1,25 @@
 OpenStack python-keystoneclient开发 getting started
 ===================================================
+摘要
+----
+# :ref:`prerequisite`
+# :ref:`communityresources`
+# :ref:`staging`
+# :ref:`gettingstarted`
+    * :ref:`appentrance`
+	* :ref:`pdbdebugger`
+# :ref:`abouttox`
+# :ref:`aboutpypi`
+# :ref:`aboutvirtualenv`
+
+.. _prerequisite:
 Pre-requisite
 -------------
 1. Linux (以下为cygwin模拟环境)
 2. Python (包括开发环境和工具，如pip，virtualenv)
 3. Git
 
+.. _communityresources:
 Community Resources
 -------------------
 1. Repositories
@@ -26,9 +40,9 @@ Community Resources
     Administrator@lenovo-9d779749 ~/python-workspace/openstack-devel$
     git clone https://github.com/openstack/python-keystoneclient.git
 
-
-Staging
--------
+.. _staging:
+安装Staging环境
+---------------
 #. 使用tox将keystone client安装到默认的virtuaenv，后面有tox的较详细的安装和设置章节
 *bash*  .. code::
     Administrator@lenovo-9d779749 ~/github.com/openstack/python-keystoneclient
@@ -94,8 +108,10 @@ Staging
     $ which keystone
     /home/Administrator/github.com/openstack/python-keystoneclient/.tox/py27/bin/keystone
 
+.. _gettingstarted:
 开发第一步
 ----------
+.. _appentry:
 Keystone Client代码入口
 ^^^^^^^^^^^^^^^^^^^^^^^
 #. main函数
@@ -517,8 +533,9 @@ Keystone Client代码入口
     Administrator@lenovo-9d779749 ~/github.com/openstack/python-keystoneclient
     $
 
-调试shell.py
-^^^^^^^^^^^^
+.. _pdbdebugger:
+使用pdb调试shell.py
+^^^^^^^^^^^^^^^^^^^
 *bash* and *pdb*
     .. code::
     (py27)
@@ -709,6 +726,7 @@ Keystone Client代码入口
 
     https://docs.python.org/2.7/library/pdb.html
 
+.. _abouttox:
 关于tox
 -------
 # 参考
@@ -929,6 +947,7 @@ tox按照tox.ini中的envlist依次测试
     $ ls .tox/py27/
     bin  etc  include  lib  log
 
+.. _aboutpypi:
 Pypi Mirror
 -----------
 以下在virtualenv中安装python-keystoneclient时使用的是pypi服务器是镜像
@@ -944,6 +963,7 @@ Pypi Mirror
 
     https://pypi.python.org/mirrors
     
+.. _aboutvirtualenv:
 关于virtualenv
 --------------
 详细参考请到pypi网站搜索
