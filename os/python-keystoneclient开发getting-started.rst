@@ -3,7 +3,7 @@ OpenStack python-keystoneclient开发 getting started
 Pre-requisite
 -------------
 1. Linux (以下为cygwin模拟环境)
-2. Python
+2. Python (包括开发环境和工具，如pip，virtualenv)
 3. Git
 
 Community Resources
