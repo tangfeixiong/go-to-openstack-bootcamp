@@ -1,5 +1,5 @@
-OpenStack python-keystoneclient开发 getting started
-===================================================
+python-keystoneclient开发 - getting started
+===========================================
 .. contents::
 
 Pre-requisite
@@ -963,7 +963,7 @@ Pypi Mirror
     
 关于virtualenv
 --------------
-详细参考请到pypi网站搜索
+详细参考到pypi网站搜索
 * 创建virtualenv
 *bash*::
 
@@ -975,7 +975,8 @@ Pypi Mirror
     Installing setuptools, pip...done.
     Overwriting stagingenv/bin/activate.fish with new content
 
-* 使用virtualenv
+Enter virtualenv
+^^^^^^^^^^^^^^^^
 *bash*::
 
     Administrator@lenovo-9d779749 ~/python-workspace/openstack-devel
