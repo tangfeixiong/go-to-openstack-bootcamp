@@ -2,15 +2,15 @@ OpenStack python-keystoneclient开发 getting started
 ===================================================
 摘要
 ----
-# :ref:`prerequisite`
-# :ref:`communityresources`
-# :ref:`staging`
-# :ref:`gettingstarted`
+* :ref:`prerequisite`
+* :ref:`communityresources`
+* :ref:`staging`
+* :ref:`gettingstarted`
     * :ref:`appentrance`
-	* :ref:`pdbdebugger`
-# :ref:`abouttox`
-# :ref:`aboutpypi`
-# :ref:`aboutvirtualenv`
+    * :ref:`pdbdebugger`
+* :ref:`abouttox`
+* :ref:`aboutpypi`
+* :ref:`aboutvirtualenv`
 
 .. _prerequisite:
 Pre-requisite
