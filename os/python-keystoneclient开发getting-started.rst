@@ -23,8 +23,8 @@ Community Resources
 ^^^^^^^^^^^^^^^^
 *bash*  
 .. code:: bash 
-Administrator@lenovo-9d779749 ~/python-workspace/openstack-devel$
-git clone https://github.com/openstack/python-keystoneclient.git
+    Administrator@lenovo-9d779749 ~/python-workspace/openstack-devel$
+    git clone https://github.com/openstack/python-keystoneclient.git
 
 
 Staging
