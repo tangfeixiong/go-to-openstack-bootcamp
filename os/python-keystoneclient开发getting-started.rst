@@ -773,7 +773,7 @@ Keystone Client代码入口
     Successfully installed tox virtualenv py
     Cleaning up...
 
-#. tox.ini
+* tox.ini
 *bash*::
 
     Administrator@lenovo-9d779749 ~/python-workspace/openstack-devel/keystone-2014.2
@@ -901,7 +901,7 @@ Keystone Client代码入口
       keystone.i18n
     local-check-factory = keystone.hacking.checks.factory
     
-* tox按照tox.ini中的envlist依次测试   
+* 按照tox.ini中的envlist依次测试   
 *bash*::
 
     dministrator@lenovo-9d779749 ~/python-workspace/openstack-devel/keystone-2014.2
@@ -960,5 +960,812 @@ Pypi Mirror
     http://www.pypi-mirrors.org/
 
     https://pypi.python.org/mirrors
+    
+关于virtualenv
+--------------
+详细参考请到pypi网站搜索
+* 创建virtualenv
+*bash*::
 
+    Administrator@lenovo-9d779749 ~/python-workspace/openstack-devel
+    $ virtualenv stagingenv/
+    Overwriting stagingenv/lib/python2.7/site.py with new content
+    New python executable in stagingenv/bin/python2.7
+    Not overwriting existing python script stagingenv/bin/python (you must use stagingenv/bin/python2.7)
+    Installing setuptools, pip...done.
+    Overwriting stagingenv/bin/activate.fish with new content
+
+* 使用virtualenv
+*bash*::
+
+    Administrator@lenovo-9d779749 ~/python-workspace/openstack-devel
+    $ source stagingenv/bin/activate
+    (stagingenv)
+    Administrator@lenovo-9d779749 ~/python-workspace/openstack-devel
+    $ echo $VIRTUAL_ENV
+    /home/Administrator/python-workspace/openstack-devel/stagingenv
+    (stagingenv)
+    Administrator@lenovo-9d779749 ~/python-workspace/openstack-devel
+    $ ls stagingenv/
+    bin  include  lib
+    (stagingenv)
+
+* 在virtualenv中安装tox
+*bash*::
+
+    (stagingenv)
+    Administrator@lenovo-9d779749 ~/python-workspace/openstack-devel/
+    $ pip install tox
+    Requirement already satisfied (use --upgrade to upgrade): tox in /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages
+    Requirement already satisfied (use --upgrade to upgrade): virtualenv>=1.9.1 in /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages (from tox)
+    Requirement already satisfied (use --upgrade to upgrade): py>=1.4.15 in /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages (from tox)
+    Cleaning up...
+
+* 在virtualenv中安装python-keystoneclient
+*bash*::
+
+    (stagingenv)
+    Administrator@lenovo-9d779749 ~/python-workspace/openstack-devel/
+    $ cd ~/github.com/openstack/python-keystoneclient
+    Administrator@lenovo-9d779749 ~/github.com/openstack/python-keystoneclient
+    $ python setup.py install
+    running install
+    Requirement already satisfied (use --upgrade to upgrade): pbr>=0.6,!=0.7,<1.0 in /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages
+    Requirement already satisfied (use --upgrade to upgrade): argparse in /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages
+    Downloading/unpacking Babel>=1.3
+      http://pypi.douban.com/simple/Babel/ uses an insecure transport scheme (http). Consider using https if pypi.douban.com has it available
+      Downloading Babel-1.3.tar.gz (3.4MB): 3.4MB downloaded
+      Running setup.py (path:/home/Administrator/python-workspace/openstack-devel/stagingenv/build/Babel/setup.py) egg_info for package Babel
+
+        warning: no previously-included files matching '*' found under directory 'docs/_build'
+        warning: no previously-included files matching '*.pyc' found under directory 'tests'
+        warning: no previously-included files matching '*.pyo' found under directory 'tests'
+    Downloading/unpacking iso8601>=0.1.9
+      http://pypi.douban.com/simple/iso8601/ uses an insecure transport scheme (http). Consider using https if pypi.douban.com has it available
+      Downloading iso8601-0.1.10.tar.gz
+      Running setup.py (path:/home/Administrator/python-workspace/openstack-devel/stagingenv/build/iso8601/setup.py) egg_info for package iso8601
+
+    Downloading/unpacking netaddr>=0.7.12
+      http://pypi.douban.com/simple/netaddr/ uses an insecure transport scheme (http). Consider using https if pypi.douban.com has it available
+      Downloading netaddr-0.7.12.tar.gz (1.5MB): 1.5MB downloaded
+      Running setup.py (path:/home/Administrator/python-workspace/openstack-devel/stagingenv/build/netaddr/setup.py) egg_info for package netaddr
+
+        warning: no previously-included files matching '*.svn*' found anywhere in distribution
+        warning: no previously-included files matching '*.git*' found anywhere in distribution
+    Downloading/unpacking oslo.config>=1.4.0
+      http://pypi.douban.com/simple/oslo.config/ uses an insecure transport scheme (http). Consider using https if pypi.douban.com has it available
+      Downloading oslo.config-1.5.0-py2.py3-none-any.whl
+    Downloading/unpacking oslo.i18n>=1.0.0
+      http://pypi.douban.com/simple/oslo.i18n/ uses an insecure transport scheme (http). Consider using https if pypi.douban.com has it available
+      Downloading oslo.i18n-1.1.0-py2.py3-none-any.whl
+    Downloading/unpacking oslo.serialization>=1.0.0
+      http://pypi.douban.com/simple/oslo.serialization/ uses an insecure transport scheme (http). Consider using https if pypi.douban.com has it available
+      Downloading oslo.serialization-1.1.0-py2.py3-none-any.whl
+    Downloading/unpacking oslo.utils>=1.0.0
+      http://pypi.douban.com/simple/oslo.utils/ uses an insecure transport scheme (http). Consider using https if pypi.douban.com has it available
+      Downloading oslo.utils-1.1.0-py2.py3-none-any.whl
+    Downloading/unpacking PrettyTable>=0.7,<0.8
+      http://pypi.douban.com/simple/PrettyTable/ uses an insecure transport scheme (http). Consider using https if pypi.douban.com has it available
+      Downloading prettytable-0.7.2.zip
+      Running setup.py (path:/home/Administrator/python-workspace/openstack-devel/stagingenv/build/PrettyTable/setup.py) egg_info for package PrettyTable
+
+    Downloading/unpacking requests>=2.2.0,!=2.4.0
+      http://pypi.douban.com/simple/requests/ uses an insecure transport scheme (http). Consider using https if pypi.douban.com has it available
+      Downloading requests-2.5.0-py2.py3-none-any.whl (464kB): 464kB downloaded
+    Downloading/unpacking six>=1.7.0
+      http://pypi.douban.com/simple/six/ uses an insecure transport scheme (http). Consider using https if pypi.douban.com has it available
+      Downloading six-1.8.0-py2.py3-none-any.whl
+    Downloading/unpacking stevedore>=1.1.0
+      http://pypi.douban.com/simple/stevedore/ uses an insecure transport scheme (http). Consider using https if pypi.douban.com has it available
+      Downloading stevedore-1.1.0-py2.py3-none-any.whl
+    Requirement already satisfied (use --upgrade to upgrade): pip in /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages (from pbr>=0.6,!=0.7,<1.0)
+    Downloading/unpacking pytz>=0a (from Babel>=1.3)
+      http://pypi.douban.com/simple/pytz/ uses an insecure transport scheme (http). Consider using https if pypi.douban.com has it available
+      Downloading pytz-2014.10-py2.py3-none-any.whl (477kB): 477kB downloaded
+    Downloading/unpacking netifaces>=0.10.4 (from oslo.utils>=1.0.0)
+      http://pypi.douban.com/simple/netifaces/ uses an insecure transport scheme (http). Consider using https if pypi.douban.com has it available
+      Downloading netifaces-0.10.4.tar.gz
+      Running setup.py (path:/home/Administrator/python-workspace/openstack-devel/stagingenv/build/netifaces/setup.py) egg_info for package netifaces
+
+    Installing collected packages: Babel, iso8601, netaddr, oslo.config, oslo.i18n, oslo.serialization, oslo.utils, PrettyTable, requests, six, stevedore, pytz, netifaces
+      Running setup.py install for Babel
+
+        warning: no previously-included files matching '*' found under directory 'docs/_build'
+        warning: no previously-included files matching '*.pyc' found under directory 'tests'
+        warning: no previously-included files matching '*.pyo' found under directory 'tests'
+        Installing pybabel script to /home/Administrator/python-workspace/openstack-devel/stagingenv/bin
+      Running setup.py install for iso8601
+
+      Running setup.py install for netaddr
+        changing mode of build/scripts-2.7/netaddr from 644 to 755
+
+        warning: no previously-included files matching '*.svn*' found anywhere in distribution
+        warning: no previously-included files matching '*.git*' found anywhere in distribution
+        changing mode of /home/Administrator/python-workspace/openstack-devel/stagingenv/bin/netaddr to 755
+      Found existing installation: oslo.config 1.2.1
+        Uninstalling oslo.config:
+          Successfully uninstalled oslo.config
+      Running setup.py install for PrettyTable
+
+      Found existing installation: six 1.4.1
+        Uninstalling six:
+          Successfully uninstalled six
+      Running setup.py install for netifaces
+        checking for getifaddrs...found.
+        checking for getnameinfo...found.
+        checking for optional header files...none found.
+        checking whether struct sockaddr has a length field...no.
+        checking which sockaddr_xxx structs are defined...in in6 un.
+        checking for routing socket support...no.
+        checking for sysctl(CTL_NET...) support...no.
+        checking for netlink support...no.
+        building 'netifaces' extension
+        gcc -fno-strict-aliasing -ggdb -O2 -pipe -Wimplicit-function-declaration -fdebug-prefix-map=/usr/src/ports/python/python-2.7.8-1.i686/build=/usr/src/debug/python-2.7.8-1 -fdebug-prefix-map=/usr/src/ports/python/python-2.7.8-1.i686/src/Python-2.7.8=/usr/src/debug/python-2.7.8-1 -DNDEBUG -g -fwrapv -O3 -Wall -Wstrict-prototypes -DNETIFACES_VERSION=0.10.4 -DHAVE_GETIFADDRS=1 -DHAVE_GETNAMEINFO=1 -DHAVE_SOCKADDR_IN=1 -DHAVE_SOCKADDR_IN6=1 -DHAVE_SOCKADDR_UN=1 -I/usr/include/python2.7 -c netifaces.c -o build/temp.cygwin-1.7.32-i686-2.7/netifaces.o
+        netifaces.c: In function ‘gateways’:
+        netifaces.c:1213:22: warning: unused variable ‘defaults’ [-Wunused-variable]
+           PyObject *result, *defaults;
+                              ^
+        netifaces.c:2262:3: warning: ‘result’ is used uninitialized in this function [-Wuninitialized]
+           return result;
+           ^
+        gcc -shared -Wl,--enable-auto-image-base -L. build/temp.cygwin-1.7.32-i686-2.7/netifaces.o -L/home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/config -L/usr/lib -lpython2.7 -o build/lib.cygwin-1.7.32-i686-2.7/netifaces.dll
+
+    Successfully installed Babel iso8601 netaddr oslo.config oslo.i18n oslo.serialization oslo.utils PrettyTable requests six stevedore pytz netifaces
+    Cleaning up...
+    running build
+    running build_py
+    creating build
+    creating build/lib
+    creating build/lib/keystoneclient
+    creating build/lib/keystoneclient/auth
+    copying keystoneclient/auth/base.py -> build/lib/keystoneclient/auth
+    copying keystoneclient/auth/cli.py -> build/lib/keystoneclient/auth
+    copying keystoneclient/auth/conf.py -> build/lib/keystoneclient/auth
+    copying keystoneclient/auth/token_endpoint.py -> build/lib/keystoneclient/auth
+    copying keystoneclient/auth/__init__.py -> build/lib/keystoneclient/auth
+    creating build/lib/keystoneclient/auth/identity
+    creating build/lib/keystoneclient/auth/identity/generic
+    copying keystoneclient/auth/identity/generic/base.py -> build/lib/keystoneclient/auth/identity/generic
+    copying keystoneclient/auth/identity/generic/password.py -> build/lib/keystoneclient/auth/identity/generic
+    copying keystoneclient/auth/identity/generic/token.py -> build/lib/keystoneclient/auth/identity/generic
+    copying keystoneclient/auth/identity/generic/__init__.py -> build/lib/keystoneclient/auth/identity/generic
+    copying keystoneclient/auth/identity/base.py -> build/lib/keystoneclient/auth/identity
+    copying keystoneclient/auth/identity/v2.py -> build/lib/keystoneclient/auth/identity
+    copying keystoneclient/auth/identity/v3.py -> build/lib/keystoneclient/auth/identity
+    copying keystoneclient/auth/identity/__init__.py -> build/lib/keystoneclient/auth/identity
+    creating build/lib/keystoneclient/tests
+    creating build/lib/keystoneclient/tests/v2_0
+    copying keystoneclient/tests/v2_0/client_fixtures.py -> build/lib/keystoneclient/tests/v2_0
+    copying keystoneclient/tests/v2_0/test_access.py -> build/lib/keystoneclient/tests/v2_0
+    copying keystoneclient/tests/v2_0/test_auth.py -> build/lib/keystoneclient/tests/v2_0
+    copying keystoneclient/tests/v2_0/test_client.py -> build/lib/keystoneclient/tests/v2_0
+    copying keystoneclient/tests/v2_0/test_discovery.py -> build/lib/keystoneclient/tests/v2_0
+    copying keystoneclient/tests/v2_0/test_ec2.py -> build/lib/keystoneclient/tests/v2_0
+    copying keystoneclient/tests/v2_0/test_endpoints.py -> build/lib/keystoneclient/tests/v2_0
+    copying keystoneclient/tests/v2_0/test_extensions.py -> build/lib/keystoneclient/tests/v2_0
+    copying keystoneclient/tests/v2_0/test_roles.py -> build/lib/keystoneclient/tests/v2_0
+    copying keystoneclient/tests/v2_0/test_services.py -> build/lib/keystoneclient/tests/v2_0
+    copying keystoneclient/tests/v2_0/test_service_catalog.py -> build/lib/keystoneclient/tests/v2_0
+    copying keystoneclient/tests/v2_0/test_shell.py -> build/lib/keystoneclient/tests/v2_0
+    copying keystoneclient/tests/v2_0/test_tenants.py -> build/lib/keystoneclient/tests/v2_0
+    copying keystoneclient/tests/v2_0/test_tokens.py -> build/lib/keystoneclient/tests/v2_0
+    copying keystoneclient/tests/v2_0/test_users.py -> build/lib/keystoneclient/tests/v2_0
+    copying keystoneclient/tests/v2_0/utils.py -> build/lib/keystoneclient/tests/v2_0
+    copying keystoneclient/tests/v2_0/__init__.py -> build/lib/keystoneclient/tests/v2_0
+    creating build/lib/keystoneclient/openstack
+    creating build/lib/keystoneclient/openstack/common
+    copying keystoneclient/openstack/common/memorycache.py -> build/lib/keystoneclient/openstack/common
+    copying keystoneclient/openstack/common/uuidutils.py -> build/lib/keystoneclient/openstack/common
+    copying keystoneclient/openstack/common/_i18n.py -> build/lib/keystoneclient/openstack/common
+    copying keystoneclient/openstack/common/__init__.py -> build/lib/keystoneclient/openstack/common
+    creating build/lib/keystoneclient/tests/v3
+    copying keystoneclient/tests/v3/client_fixtures.py -> build/lib/keystoneclient/tests/v3
+    copying keystoneclient/tests/v3/saml2_fixtures.py -> build/lib/keystoneclient/tests/v3
+    copying keystoneclient/tests/v3/test_access.py -> build/lib/keystoneclient/tests/v3
+    copying keystoneclient/tests/v3/test_auth.py -> build/lib/keystoneclient/tests/v3
+    copying keystoneclient/tests/v3/test_auth_saml2.py -> build/lib/keystoneclient/tests/v3
+    copying keystoneclient/tests/v3/test_client.py -> build/lib/keystoneclient/tests/v3
+    copying keystoneclient/tests/v3/test_credentials.py -> build/lib/keystoneclient/tests/v3
+    copying keystoneclient/tests/v3/test_discover.py -> build/lib/keystoneclient/tests/v3
+    copying keystoneclient/tests/v3/test_domains.py -> build/lib/keystoneclient/tests/v3
+    copying keystoneclient/tests/v3/test_endpoints.py -> build/lib/keystoneclient/tests/v3
+    copying keystoneclient/tests/v3/test_endpoint_filter.py -> build/lib/keystoneclient/tests/v3
+    copying keystoneclient/tests/v3/test_endpoint_policy.py -> build/lib/keystoneclient/tests/v3
+    copying keystoneclient/tests/v3/test_federation.py -> build/lib/keystoneclient/tests/v3
+    copying keystoneclient/tests/v3/test_groups.py -> build/lib/keystoneclient/tests/v3
+    copying keystoneclient/tests/v3/test_oauth1.py -> build/lib/keystoneclient/tests/v3
+    copying keystoneclient/tests/v3/test_policies.py -> build/lib/keystoneclient/tests/v3
+    copying keystoneclient/tests/v3/test_projects.py -> build/lib/keystoneclient/tests/v3
+    copying keystoneclient/tests/v3/test_regions.py -> build/lib/keystoneclient/tests/v3
+    copying keystoneclient/tests/v3/test_roles.py -> build/lib/keystoneclient/tests/v3
+    copying keystoneclient/tests/v3/test_role_assignments.py -> build/lib/keystoneclient/tests/v3
+    copying keystoneclient/tests/v3/test_services.py -> build/lib/keystoneclient/tests/v3
+    copying keystoneclient/tests/v3/test_service_catalog.py -> build/lib/keystoneclient/tests/v3
+    copying keystoneclient/tests/v3/test_tokens.py -> build/lib/keystoneclient/tests/v3
+    copying keystoneclient/tests/v3/test_trusts.py -> build/lib/keystoneclient/tests/v3
+    copying keystoneclient/tests/v3/test_users.py -> build/lib/keystoneclient/tests/v3
+    copying keystoneclient/tests/v3/utils.py -> build/lib/keystoneclient/tests/v3
+    copying keystoneclient/tests/v3/__init__.py -> build/lib/keystoneclient/tests/v3
+    creating build/lib/keystoneclient/generic
+    copying keystoneclient/generic/client.py -> build/lib/keystoneclient/generic
+    copying keystoneclient/generic/shell.py -> build/lib/keystoneclient/generic
+    copying keystoneclient/generic/__init__.py -> build/lib/keystoneclient/generic
+    creating build/lib/keystoneclient/openstack/common/apiclient
+    copying keystoneclient/openstack/common/apiclient/auth.py -> build/lib/keystoneclient/openstack/common/apiclient
+    copying keystoneclient/openstack/common/apiclient/base.py -> build/lib/keystoneclient/openstack/common/apiclient
+    copying keystoneclient/openstack/common/apiclient/client.py -> build/lib/keystoneclient/openstack/common/apiclient
+    copying keystoneclient/openstack/common/apiclient/exceptions.py -> build/lib/keystoneclient/openstack/common/apiclient
+    copying keystoneclient/openstack/common/apiclient/fake_client.py -> build/lib/keystoneclient/openstack/common/apiclient
+    copying keystoneclient/openstack/common/apiclient/utils.py -> build/lib/keystoneclient/openstack/common/apiclient
+    copying keystoneclient/openstack/common/apiclient/__init__.py -> build/lib/keystoneclient/openstack/common/apiclient
+    creating build/lib/keystoneclient/contrib
+    copying keystoneclient/contrib/__init__.py -> build/lib/keystoneclient/contrib
+    creating build/lib/keystoneclient/v2_0
+    copying keystoneclient/v2_0/client.py -> build/lib/keystoneclient/v2_0
+    copying keystoneclient/v2_0/ec2.py -> build/lib/keystoneclient/v2_0
+    copying keystoneclient/v2_0/endpoints.py -> build/lib/keystoneclient/v2_0
+    copying keystoneclient/v2_0/extensions.py -> build/lib/keystoneclient/v2_0
+    copying keystoneclient/v2_0/roles.py -> build/lib/keystoneclient/v2_0
+    copying keystoneclient/v2_0/services.py -> build/lib/keystoneclient/v2_0
+    copying keystoneclient/v2_0/shell.py -> build/lib/keystoneclient/v2_0
+    copying keystoneclient/v2_0/tenants.py -> build/lib/keystoneclient/v2_0
+    copying keystoneclient/v2_0/tokens.py -> build/lib/keystoneclient/v2_0
+    copying keystoneclient/v2_0/users.py -> build/lib/keystoneclient/v2_0
+    copying keystoneclient/v2_0/__init__.py -> build/lib/keystoneclient/v2_0
+    creating build/lib/keystoneclient/common
+    copying keystoneclient/common/cms.py -> build/lib/keystoneclient/common
+    copying keystoneclient/common/__init__.py -> build/lib/keystoneclient/common
+    creating build/lib/keystoneclient/fixture
+    copying keystoneclient/fixture/discovery.py -> build/lib/keystoneclient/fixture
+    copying keystoneclient/fixture/exception.py -> build/lib/keystoneclient/fixture
+    copying keystoneclient/fixture/v2.py -> build/lib/keystoneclient/fixture
+    copying keystoneclient/fixture/v3.py -> build/lib/keystoneclient/fixture
+    copying keystoneclient/fixture/__init__.py -> build/lib/keystoneclient/fixture
+    creating build/lib/keystoneclient/v3
+    creating build/lib/keystoneclient/v3/contrib
+    creating build/lib/keystoneclient/v3/contrib/federation
+    copying keystoneclient/v3/contrib/federation/base.py -> build/lib/keystoneclient/v3/contrib/federation
+    copying keystoneclient/v3/contrib/federation/core.py -> build/lib/keystoneclient/v3/contrib/federation
+    copying keystoneclient/v3/contrib/federation/domains.py -> build/lib/keystoneclient/v3/contrib/federation
+    copying keystoneclient/v3/contrib/federation/identity_providers.py -> build/lib/keystoneclient/v3/contrib/federation
+    copying keystoneclient/v3/contrib/federation/mappings.py -> build/lib/keystoneclient/v3/contrib/federation
+    copying keystoneclient/v3/contrib/federation/projects.py -> build/lib/keystoneclient/v3/contrib/federation
+    copying keystoneclient/v3/contrib/federation/protocols.py -> build/lib/keystoneclient/v3/contrib/federation
+    copying keystoneclient/v3/contrib/federation/__init__.py -> build/lib/keystoneclient/v3/contrib/federation
+    creating build/lib/keystoneclient/middleware
+    copying keystoneclient/middleware/auth_token.py -> build/lib/keystoneclient/middleware
+    copying keystoneclient/middleware/memcache_crypt.py -> build/lib/keystoneclient/middleware
+    copying keystoneclient/middleware/s3_token.py -> build/lib/keystoneclient/middleware
+    copying keystoneclient/middleware/__init__.py -> build/lib/keystoneclient/middleware
+    creating build/lib/keystoneclient/contrib/bootstrap
+    copying keystoneclient/contrib/bootstrap/shell.py -> build/lib/keystoneclient/contrib/bootstrap
+    copying keystoneclient/contrib/bootstrap/__init__.py -> build/lib/keystoneclient/contrib/bootstrap
+    creating build/lib/keystoneclient/contrib/auth
+    creating build/lib/keystoneclient/contrib/auth/v3
+    copying keystoneclient/contrib/auth/v3/saml2.py -> build/lib/keystoneclient/contrib/auth/v3
+    copying keystoneclient/contrib/auth/v3/__init__.py -> build/lib/keystoneclient/contrib/auth/v3
+    copying keystoneclient/v3/client.py -> build/lib/keystoneclient/v3
+    copying keystoneclient/v3/credentials.py -> build/lib/keystoneclient/v3
+    copying keystoneclient/v3/domains.py -> build/lib/keystoneclient/v3
+    copying keystoneclient/v3/endpoints.py -> build/lib/keystoneclient/v3
+    copying keystoneclient/v3/groups.py -> build/lib/keystoneclient/v3
+    copying keystoneclient/v3/policies.py -> build/lib/keystoneclient/v3
+    copying keystoneclient/v3/projects.py -> build/lib/keystoneclient/v3
+    copying keystoneclient/v3/regions.py -> build/lib/keystoneclient/v3
+    copying keystoneclient/v3/roles.py -> build/lib/keystoneclient/v3
+    copying keystoneclient/v3/role_assignments.py -> build/lib/keystoneclient/v3
+    copying keystoneclient/v3/services.py -> build/lib/keystoneclient/v3
+    copying keystoneclient/v3/tokens.py -> build/lib/keystoneclient/v3
+    copying keystoneclient/v3/users.py -> build/lib/keystoneclient/v3
+    copying keystoneclient/v3/__init__.py -> build/lib/keystoneclient/v3
+    creating build/lib/keystoneclient/tests/auth
+    copying keystoneclient/tests/auth/test_cli.py -> build/lib/keystoneclient/tests/auth
+    copying keystoneclient/tests/auth/test_conf.py -> build/lib/keystoneclient/tests/auth
+    copying keystoneclient/tests/auth/test_identity_common.py -> build/lib/keystoneclient/tests/auth
+    copying keystoneclient/tests/auth/test_identity_v2.py -> build/lib/keystoneclient/tests/auth
+    copying keystoneclient/tests/auth/test_identity_v3.py -> build/lib/keystoneclient/tests/auth
+    copying keystoneclient/tests/auth/test_password.py -> build/lib/keystoneclient/tests/auth
+    copying keystoneclient/tests/auth/test_token.py -> build/lib/keystoneclient/tests/auth
+    copying keystoneclient/tests/auth/test_token_endpoint.py -> build/lib/keystoneclient/tests/auth
+    copying keystoneclient/tests/auth/utils.py -> build/lib/keystoneclient/tests/auth
+    copying keystoneclient/tests/auth/__init__.py -> build/lib/keystoneclient/tests/auth
+    creating build/lib/keystoneclient/apiclient
+    copying keystoneclient/apiclient/exceptions.py -> build/lib/keystoneclient/apiclient
+    copying keystoneclient/apiclient/__init__.py -> build/lib/keystoneclient/apiclient
+    creating build/lib/keystoneclient/v3/contrib/oauth1
+    copying keystoneclient/v3/contrib/oauth1/access_tokens.py -> build/lib/keystoneclient/v3/contrib/oauth1
+    copying keystoneclient/v3/contrib/oauth1/auth.py -> build/lib/keystoneclient/v3/contrib/oauth1
+    copying keystoneclient/v3/contrib/oauth1/consumers.py -> build/lib/keystoneclient/v3/contrib/oauth1
+    copying keystoneclient/v3/contrib/oauth1/core.py -> build/lib/keystoneclient/v3/contrib/oauth1
+    copying keystoneclient/v3/contrib/oauth1/request_tokens.py -> build/lib/keystoneclient/v3/contrib/oauth1
+    copying keystoneclient/v3/contrib/oauth1/utils.py -> build/lib/keystoneclient/v3/contrib/oauth1
+    copying keystoneclient/v3/contrib/oauth1/__init__.py -> build/lib/keystoneclient/v3/contrib/oauth1
+    creating build/lib/keystoneclient/tests/generic
+    copying keystoneclient/tests/generic/test_client.py -> build/lib/keystoneclient/tests/generic
+    copying keystoneclient/tests/generic/test_shell.py -> build/lib/keystoneclient/tests/generic
+    copying keystoneclient/tests/generic/__init__.py -> build/lib/keystoneclient/tests/generic
+    creating build/lib/keystoneclient/contrib/ec2
+    copying keystoneclient/contrib/ec2/utils.py -> build/lib/keystoneclient/contrib/ec2
+    copying keystoneclient/contrib/ec2/__init__.py -> build/lib/keystoneclient/contrib/ec2
+    copying keystoneclient/tests/client_fixtures.py -> build/lib/keystoneclient/tests
+    copying keystoneclient/tests/test_auth_token_middleware.py -> build/lib/keystoneclient/tests
+    copying keystoneclient/tests/test_base.py -> build/lib/keystoneclient/tests
+    copying keystoneclient/tests/test_cms.py -> build/lib/keystoneclient/tests
+    copying keystoneclient/tests/test_discovery.py -> build/lib/keystoneclient/tests
+    copying keystoneclient/tests/test_ec2utils.py -> build/lib/keystoneclient/tests
+    copying keystoneclient/tests/test_fixtures.py -> build/lib/keystoneclient/tests
+    copying keystoneclient/tests/test_http.py -> build/lib/keystoneclient/tests
+    copying keystoneclient/tests/test_https.py -> build/lib/keystoneclient/tests
+    copying keystoneclient/tests/test_keyring.py -> build/lib/keystoneclient/tests
+    copying keystoneclient/tests/test_memcache_crypt.py -> build/lib/keystoneclient/tests
+    copying keystoneclient/tests/test_s3_token_middleware.py -> build/lib/keystoneclient/tests
+    copying keystoneclient/tests/test_session.py -> build/lib/keystoneclient/tests
+    copying keystoneclient/tests/test_shell.py -> build/lib/keystoneclient/tests
+    copying keystoneclient/tests/test_utils.py -> build/lib/keystoneclient/tests
+    copying keystoneclient/tests/utils.py -> build/lib/keystoneclient/tests
+    copying keystoneclient/tests/__init__.py -> build/lib/keystoneclient/tests
+    creating build/lib/keystoneclient/contrib/revoke
+    copying keystoneclient/contrib/revoke/model.py -> build/lib/keystoneclient/contrib/revoke
+    copying keystoneclient/contrib/revoke/__init__.py -> build/lib/keystoneclient/contrib/revoke
+    creating build/lib/keystoneclient/tests/apiclient
+    copying keystoneclient/tests/apiclient/test_exceptions.py -> build/lib/keystoneclient/tests/apiclient
+    copying keystoneclient/tests/apiclient/__init__.py -> build/lib/keystoneclient/tests/apiclient
+    copying keystoneclient/contrib/auth/__init__.py -> build/lib/keystoneclient/contrib/auth
+    copying keystoneclient/v3/contrib/endpoint_filter.py -> build/lib/keystoneclient/v3/contrib
+    copying keystoneclient/v3/contrib/endpoint_policy.py -> build/lib/keystoneclient/v3/contrib
+    copying keystoneclient/v3/contrib/trusts.py -> build/lib/keystoneclient/v3/contrib
+    copying keystoneclient/v3/contrib/__init__.py -> build/lib/keystoneclient/v3/contrib
+    copying keystoneclient/openstack/__init__.py -> build/lib/keystoneclient/openstack
+    copying keystoneclient/access.py -> build/lib/keystoneclient
+    copying keystoneclient/adapter.py -> build/lib/keystoneclient
+    copying keystoneclient/base.py -> build/lib/keystoneclient
+    copying keystoneclient/baseclient.py -> build/lib/keystoneclient
+    copying keystoneclient/client.py -> build/lib/keystoneclient
+    copying keystoneclient/discover.py -> build/lib/keystoneclient
+    copying keystoneclient/exceptions.py -> build/lib/keystoneclient
+    copying keystoneclient/httpclient.py -> build/lib/keystoneclient
+    copying keystoneclient/i18n.py -> build/lib/keystoneclient
+    copying keystoneclient/service_catalog.py -> build/lib/keystoneclient
+    copying keystoneclient/session.py -> build/lib/keystoneclient
+    copying keystoneclient/shell.py -> build/lib/keystoneclient
+    copying keystoneclient/utils.py -> build/lib/keystoneclient
+    copying keystoneclient/_discover.py -> build/lib/keystoneclient
+    copying keystoneclient/__init__.py -> build/lib/keystoneclient
+    running egg_info
+    writing requirements to python_keystoneclient.egg-info/requires.txt
+    writing python_keystoneclient.egg-info/PKG-INFO
+    writing top-level names to python_keystoneclient.egg-info/top_level.txt
+    writing dependency_links to python_keystoneclient.egg-info/dependency_links.txt
+    writing entry points to python_keystoneclient.egg-info/entry_points.txt
+    [pbr] Reusing existing SOURCES.txt
+    creating build/lib/keystoneclient/tests/v3/examples
+    creating build/lib/keystoneclient/tests/v3/examples/xml
+    copying keystoneclient/tests/v3/examples/xml/ADFS_RequestSecurityTokenResponse.xml -> build/lib/keystoneclient/tests/v3/examples/xml
+    copying keystoneclient/tests/v3/examples/xml/ADFS_fault.xml -> build/lib/keystoneclient/tests/v3/examples/xml
+    creating build/lib/keystoneclient/locale
+    copying keystoneclient/locale/keystoneclient.pot -> build/lib/keystoneclient/locale
+    running install_lib
+    creating /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient
+    copying build/lib/keystoneclient/access.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient
+    copying build/lib/keystoneclient/adapter.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient
+    creating /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/apiclient
+    copying build/lib/keystoneclient/apiclient/exceptions.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/apiclient
+    copying build/lib/keystoneclient/apiclient/__init__.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/apiclient
+    creating /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/auth
+    copying build/lib/keystoneclient/auth/base.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/auth
+    copying build/lib/keystoneclient/auth/cli.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/auth
+    copying build/lib/keystoneclient/auth/conf.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/auth
+    creating /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/auth/identity
+    copying build/lib/keystoneclient/auth/identity/base.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/auth/identity
+    creating /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/auth/identity/generic
+    copying build/lib/keystoneclient/auth/identity/generic/base.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/auth/identity/generic
+    copying build/lib/keystoneclient/auth/identity/generic/password.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/auth/identity/generic
+    copying build/lib/keystoneclient/auth/identity/generic/token.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/auth/identity/generic
+    copying build/lib/keystoneclient/auth/identity/generic/__init__.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/auth/identity/generic
+    copying build/lib/keystoneclient/auth/identity/v2.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/auth/identity
+    copying build/lib/keystoneclient/auth/identity/v3.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/auth/identity
+    copying build/lib/keystoneclient/auth/identity/__init__.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/auth/identity
+    copying build/lib/keystoneclient/auth/token_endpoint.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/auth
+    copying build/lib/keystoneclient/auth/__init__.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/auth
+    copying build/lib/keystoneclient/base.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient
+    copying build/lib/keystoneclient/baseclient.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient
+    copying build/lib/keystoneclient/client.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient
+    creating /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/common
+    copying build/lib/keystoneclient/common/cms.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/common
+    copying build/lib/keystoneclient/common/__init__.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/common
+    creating /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/contrib
+    creating /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/contrib/auth
+    creating /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/contrib/auth/v3
+    copying build/lib/keystoneclient/contrib/auth/v3/saml2.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/contrib/auth/v3
+    copying build/lib/keystoneclient/contrib/auth/v3/__init__.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/contrib/auth/v3
+    copying build/lib/keystoneclient/contrib/auth/__init__.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/contrib/auth
+    creating /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/contrib/bootstrap
+    copying build/lib/keystoneclient/contrib/bootstrap/shell.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/contrib/bootstrap
+    copying build/lib/keystoneclient/contrib/bootstrap/__init__.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/contrib/bootstrap
+    creating /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/contrib/ec2
+    copying build/lib/keystoneclient/contrib/ec2/utils.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/contrib/ec2
+    copying build/lib/keystoneclient/contrib/ec2/__init__.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/contrib/ec2
+    creating /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/contrib/revoke
+    copying build/lib/keystoneclient/contrib/revoke/model.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/contrib/revoke
+    copying build/lib/keystoneclient/contrib/revoke/__init__.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/contrib/revoke
+    copying build/lib/keystoneclient/contrib/__init__.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/contrib
+    copying build/lib/keystoneclient/discover.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient
+    copying build/lib/keystoneclient/exceptions.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient
+    creating /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/fixture
+    copying build/lib/keystoneclient/fixture/discovery.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/fixture
+    copying build/lib/keystoneclient/fixture/exception.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/fixture
+    copying build/lib/keystoneclient/fixture/v2.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/fixture
+    copying build/lib/keystoneclient/fixture/v3.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/fixture
+    copying build/lib/keystoneclient/fixture/__init__.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/fixture
+    creating /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/generic
+    copying build/lib/keystoneclient/generic/client.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/generic
+    copying build/lib/keystoneclient/generic/shell.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/generic
+    copying build/lib/keystoneclient/generic/__init__.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/generic
+    copying build/lib/keystoneclient/httpclient.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient
+    copying build/lib/keystoneclient/i18n.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient
+    creating /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/locale
+    copying build/lib/keystoneclient/locale/keystoneclient.pot -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/locale
+    creating /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/middleware
+    copying build/lib/keystoneclient/middleware/auth_token.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/middleware
+    copying build/lib/keystoneclient/middleware/memcache_crypt.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/middleware
+    copying build/lib/keystoneclient/middleware/s3_token.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/middleware
+    copying build/lib/keystoneclient/middleware/__init__.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/middleware
+    creating /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/openstack
+    creating /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/openstack/common
+    creating /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/openstack/common/apiclient
+    copying build/lib/keystoneclient/openstack/common/apiclient/auth.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/openstack/common/apiclient
+    copying build/lib/keystoneclient/openstack/common/apiclient/base.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/openstack/common/apiclient
+    copying build/lib/keystoneclient/openstack/common/apiclient/client.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/openstack/common/apiclient
+    copying build/lib/keystoneclient/openstack/common/apiclient/exceptions.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/openstack/common/apiclient
+    copying build/lib/keystoneclient/openstack/common/apiclient/fake_client.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/openstack/common/apiclient
+    copying build/lib/keystoneclient/openstack/common/apiclient/utils.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/openstack/common/apiclient
+    copying build/lib/keystoneclient/openstack/common/apiclient/__init__.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/openstack/common/apiclient
+    copying build/lib/keystoneclient/openstack/common/memorycache.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/openstack/common
+    copying build/lib/keystoneclient/openstack/common/uuidutils.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/openstack/common
+    copying build/lib/keystoneclient/openstack/common/_i18n.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/openstack/common
+    copying build/lib/keystoneclient/openstack/common/__init__.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/openstack/common
+    copying build/lib/keystoneclient/openstack/__init__.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/openstack
+    copying build/lib/keystoneclient/service_catalog.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient
+    copying build/lib/keystoneclient/session.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient
+    copying build/lib/keystoneclient/shell.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient
+    creating /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests
+    creating /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/apiclient
+    copying build/lib/keystoneclient/tests/apiclient/test_exceptions.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/apiclient
+    copying build/lib/keystoneclient/tests/apiclient/__init__.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/apiclient
+    creating /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/auth
+    copying build/lib/keystoneclient/tests/auth/test_cli.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/auth
+    copying build/lib/keystoneclient/tests/auth/test_conf.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/auth
+    copying build/lib/keystoneclient/tests/auth/test_identity_common.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/auth
+    copying build/lib/keystoneclient/tests/auth/test_identity_v2.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/auth
+    copying build/lib/keystoneclient/tests/auth/test_identity_v3.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/auth
+    copying build/lib/keystoneclient/tests/auth/test_password.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/auth
+    copying build/lib/keystoneclient/tests/auth/test_token.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/auth
+    copying build/lib/keystoneclient/tests/auth/test_token_endpoint.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/auth
+    copying build/lib/keystoneclient/tests/auth/utils.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/auth
+    copying build/lib/keystoneclient/tests/auth/__init__.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/auth
+    copying build/lib/keystoneclient/tests/client_fixtures.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests
+    creating /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/generic
+    copying build/lib/keystoneclient/tests/generic/test_client.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/generic
+    copying build/lib/keystoneclient/tests/generic/test_shell.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/generic
+    copying build/lib/keystoneclient/tests/generic/__init__.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/generic
+    copying build/lib/keystoneclient/tests/test_auth_token_middleware.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests
+    copying build/lib/keystoneclient/tests/test_base.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests
+    copying build/lib/keystoneclient/tests/test_cms.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests
+    copying build/lib/keystoneclient/tests/test_discovery.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests
+    copying build/lib/keystoneclient/tests/test_ec2utils.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests
+    copying build/lib/keystoneclient/tests/test_fixtures.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests
+    copying build/lib/keystoneclient/tests/test_http.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests
+    copying build/lib/keystoneclient/tests/test_https.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests
+    copying build/lib/keystoneclient/tests/test_keyring.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests
+    copying build/lib/keystoneclient/tests/test_memcache_crypt.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests
+    copying build/lib/keystoneclient/tests/test_s3_token_middleware.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests
+    copying build/lib/keystoneclient/tests/test_session.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests
+    copying build/lib/keystoneclient/tests/test_shell.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests
+    copying build/lib/keystoneclient/tests/test_utils.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests
+    copying build/lib/keystoneclient/tests/utils.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests
+    creating /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/v2_0
+    copying build/lib/keystoneclient/tests/v2_0/client_fixtures.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/v2_0
+    copying build/lib/keystoneclient/tests/v2_0/test_access.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/v2_0
+    copying build/lib/keystoneclient/tests/v2_0/test_auth.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/v2_0
+    copying build/lib/keystoneclient/tests/v2_0/test_client.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/v2_0
+    copying build/lib/keystoneclient/tests/v2_0/test_discovery.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/v2_0
+    copying build/lib/keystoneclient/tests/v2_0/test_ec2.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/v2_0
+    copying build/lib/keystoneclient/tests/v2_0/test_endpoints.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/v2_0
+    copying build/lib/keystoneclient/tests/v2_0/test_extensions.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/v2_0
+    copying build/lib/keystoneclient/tests/v2_0/test_roles.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/v2_0
+    copying build/lib/keystoneclient/tests/v2_0/test_services.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/v2_0
+    copying build/lib/keystoneclient/tests/v2_0/test_service_catalog.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/v2_0
+    copying build/lib/keystoneclient/tests/v2_0/test_shell.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/v2_0
+    copying build/lib/keystoneclient/tests/v2_0/test_tenants.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/v2_0
+    copying build/lib/keystoneclient/tests/v2_0/test_tokens.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/v2_0
+    copying build/lib/keystoneclient/tests/v2_0/test_users.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/v2_0
+    copying build/lib/keystoneclient/tests/v2_0/utils.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/v2_0
+    copying build/lib/keystoneclient/tests/v2_0/__init__.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/v2_0
+    creating /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/v3
+    copying build/lib/keystoneclient/tests/v3/client_fixtures.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/v3
+    creating /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/v3/examples
+    creating /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/v3/examples/xml
+    copying build/lib/keystoneclient/tests/v3/examples/xml/ADFS_fault.xml -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/v3/examples/xml
+    copying build/lib/keystoneclient/tests/v3/examples/xml/ADFS_RequestSecurityTokenResponse.xml -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/v3/examples/xml
+    copying build/lib/keystoneclient/tests/v3/saml2_fixtures.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/v3
+    copying build/lib/keystoneclient/tests/v3/test_access.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/v3
+    copying build/lib/keystoneclient/tests/v3/test_auth.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/v3
+    copying build/lib/keystoneclient/tests/v3/test_auth_saml2.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/v3
+    copying build/lib/keystoneclient/tests/v3/test_client.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/v3
+    copying build/lib/keystoneclient/tests/v3/test_credentials.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/v3
+    copying build/lib/keystoneclient/tests/v3/test_discover.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/v3
+    copying build/lib/keystoneclient/tests/v3/test_domains.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/v3
+    copying build/lib/keystoneclient/tests/v3/test_endpoints.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/v3
+    copying build/lib/keystoneclient/tests/v3/test_endpoint_filter.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/v3
+    copying build/lib/keystoneclient/tests/v3/test_endpoint_policy.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/v3
+    copying build/lib/keystoneclient/tests/v3/test_federation.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/v3
+    copying build/lib/keystoneclient/tests/v3/test_groups.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/v3
+    copying build/lib/keystoneclient/tests/v3/test_oauth1.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/v3
+    copying build/lib/keystoneclient/tests/v3/test_policies.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/v3
+    copying build/lib/keystoneclient/tests/v3/test_projects.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/v3
+    copying build/lib/keystoneclient/tests/v3/test_regions.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/v3
+    copying build/lib/keystoneclient/tests/v3/test_roles.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/v3
+    copying build/lib/keystoneclient/tests/v3/test_role_assignments.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/v3
+    copying build/lib/keystoneclient/tests/v3/test_services.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/v3
+    copying build/lib/keystoneclient/tests/v3/test_service_catalog.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/v3
+    copying build/lib/keystoneclient/tests/v3/test_tokens.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/v3
+    copying build/lib/keystoneclient/tests/v3/test_trusts.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/v3
+    copying build/lib/keystoneclient/tests/v3/test_users.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/v3
+    copying build/lib/keystoneclient/tests/v3/utils.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/v3
+    copying build/lib/keystoneclient/tests/v3/__init__.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/v3
+    copying build/lib/keystoneclient/tests/__init__.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests
+    copying build/lib/keystoneclient/utils.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient
+    creating /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/v2_0
+    copying build/lib/keystoneclient/v2_0/client.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/v2_0
+    copying build/lib/keystoneclient/v2_0/ec2.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/v2_0
+    copying build/lib/keystoneclient/v2_0/endpoints.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/v2_0
+    copying build/lib/keystoneclient/v2_0/extensions.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/v2_0
+    copying build/lib/keystoneclient/v2_0/roles.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/v2_0
+    copying build/lib/keystoneclient/v2_0/services.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/v2_0
+    copying build/lib/keystoneclient/v2_0/shell.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/v2_0
+    copying build/lib/keystoneclient/v2_0/tenants.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/v2_0
+    copying build/lib/keystoneclient/v2_0/tokens.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/v2_0
+    copying build/lib/keystoneclient/v2_0/users.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/v2_0
+    copying build/lib/keystoneclient/v2_0/__init__.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/v2_0
+    creating /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/v3
+    copying build/lib/keystoneclient/v3/client.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/v3
+    creating /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/v3/contrib
+    copying build/lib/keystoneclient/v3/contrib/endpoint_filter.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/v3/contrib
+    copying build/lib/keystoneclient/v3/contrib/endpoint_policy.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/v3/contrib
+    creating /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/v3/contrib/federation
+    copying build/lib/keystoneclient/v3/contrib/federation/base.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/v3/contrib/federation
+    copying build/lib/keystoneclient/v3/contrib/federation/core.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/v3/contrib/federation
+    copying build/lib/keystoneclient/v3/contrib/federation/domains.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/v3/contrib/federation
+    copying build/lib/keystoneclient/v3/contrib/federation/identity_providers.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/v3/contrib/federation
+    copying build/lib/keystoneclient/v3/contrib/federation/mappings.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/v3/contrib/federation
+    copying build/lib/keystoneclient/v3/contrib/federation/projects.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/v3/contrib/federation
+    copying build/lib/keystoneclient/v3/contrib/federation/protocols.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/v3/contrib/federation
+    copying build/lib/keystoneclient/v3/contrib/federation/__init__.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/v3/contrib/federation
+    creating /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/v3/contrib/oauth1
+    copying build/lib/keystoneclient/v3/contrib/oauth1/access_tokens.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/v3/contrib/oauth1
+    copying build/lib/keystoneclient/v3/contrib/oauth1/auth.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/v3/contrib/oauth1
+    copying build/lib/keystoneclient/v3/contrib/oauth1/consumers.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/v3/contrib/oauth1
+    copying build/lib/keystoneclient/v3/contrib/oauth1/core.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/v3/contrib/oauth1
+    copying build/lib/keystoneclient/v3/contrib/oauth1/request_tokens.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/v3/contrib/oauth1
+    copying build/lib/keystoneclient/v3/contrib/oauth1/utils.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/v3/contrib/oauth1
+    copying build/lib/keystoneclient/v3/contrib/oauth1/__init__.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/v3/contrib/oauth1
+    copying build/lib/keystoneclient/v3/contrib/trusts.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/v3/contrib
+    copying build/lib/keystoneclient/v3/contrib/__init__.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/v3/contrib
+    copying build/lib/keystoneclient/v3/credentials.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/v3
+    copying build/lib/keystoneclient/v3/domains.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/v3
+    copying build/lib/keystoneclient/v3/endpoints.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/v3
+    copying build/lib/keystoneclient/v3/groups.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/v3
+    copying build/lib/keystoneclient/v3/policies.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/v3
+    copying build/lib/keystoneclient/v3/projects.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/v3
+    copying build/lib/keystoneclient/v3/regions.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/v3
+    copying build/lib/keystoneclient/v3/roles.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/v3
+    copying build/lib/keystoneclient/v3/role_assignments.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/v3
+    copying build/lib/keystoneclient/v3/services.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/v3
+    copying build/lib/keystoneclient/v3/tokens.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/v3
+    copying build/lib/keystoneclient/v3/users.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/v3
+    copying build/lib/keystoneclient/v3/__init__.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/v3
+    copying build/lib/keystoneclient/_discover.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient
+    copying build/lib/keystoneclient/__init__.py -> /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/access.py to access.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/adapter.py to adapter.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/apiclient/exceptions.py to exceptions.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/apiclient/__init__.py to __init__.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/auth/base.py to base.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/auth/cli.py to cli.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/auth/conf.py to conf.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/auth/identity/base.py to base.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/auth/identity/generic/base.py to base.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/auth/identity/generic/password.py to password.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/auth/identity/generic/token.py to token.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/auth/identity/generic/__init__.py to __init__.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/auth/identity/v2.py to v2.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/auth/identity/v3.py to v3.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/auth/identity/__init__.py to __init__.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/auth/token_endpoint.py to token_endpoint.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/auth/__init__.py to __init__.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/base.py to base.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/baseclient.py to baseclient.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/client.py to client.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/common/cms.py to cms.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/common/__init__.py to __init__.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/contrib/auth/v3/saml2.py to saml2.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/contrib/auth/v3/__init__.py to __init__.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/contrib/auth/__init__.py to __init__.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/contrib/bootstrap/shell.py to shell.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/contrib/bootstrap/__init__.py to __init__.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/contrib/ec2/utils.py to utils.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/contrib/ec2/__init__.py to __init__.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/contrib/revoke/model.py to model.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/contrib/revoke/__init__.py to __init__.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/contrib/__init__.py to __init__.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/discover.py to discover.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/exceptions.py to exceptions.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/fixture/discovery.py to discovery.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/fixture/exception.py to exception.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/fixture/v2.py to v2.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/fixture/v3.py to v3.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/fixture/__init__.py to __init__.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/generic/client.py to client.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/generic/shell.py to shell.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/generic/__init__.py to __init__.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/httpclient.py to httpclient.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/i18n.py to i18n.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/middleware/auth_token.py to auth_token.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/middleware/memcache_crypt.py to memcache_crypt.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/middleware/s3_token.py to s3_token.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/middleware/__init__.py to __init__.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/openstack/common/apiclient/auth.py to auth.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/openstack/common/apiclient/base.py to base.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/openstack/common/apiclient/client.py to client.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/openstack/common/apiclient/exceptions.py to exceptions.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/openstack/common/apiclient/fake_client.py to fake_client.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/openstack/common/apiclient/utils.py to utils.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/openstack/common/apiclient/__init__.py to __init__.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/openstack/common/memorycache.py to memorycache.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/openstack/common/uuidutils.py to uuidutils.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/openstack/common/_i18n.py to _i18n.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/openstack/common/__init__.py to __init__.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/openstack/__init__.py to __init__.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/service_catalog.py to service_catalog.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/session.py to session.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/shell.py to shell.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/apiclient/test_exceptions.py to test_exceptions.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/apiclient/__init__.py to __init__.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/auth/test_cli.py to test_cli.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/auth/test_conf.py to test_conf.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/auth/test_identity_common.py to test_identity_common.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/auth/test_identity_v2.py to test_identity_v2.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/auth/test_identity_v3.py to test_identity_v3.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/auth/test_password.py to test_password.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/auth/test_token.py to test_token.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/auth/test_token_endpoint.py to test_token_endpoint.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/auth/utils.py to utils.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/auth/__init__.py to __init__.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/client_fixtures.py to client_fixtures.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/generic/test_client.py to test_client.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/generic/test_shell.py to test_shell.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/generic/__init__.py to __init__.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/test_auth_token_middleware.py to test_auth_token_middleware.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/test_base.py to test_base.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/test_cms.py to test_cms.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/test_discovery.py to test_discovery.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/test_ec2utils.py to test_ec2utils.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/test_fixtures.py to test_fixtures.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/test_http.py to test_http.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/test_https.py to test_https.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/test_keyring.py to test_keyring.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/test_memcache_crypt.py to test_memcache_crypt.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/test_s3_token_middleware.py to test_s3_token_middleware.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/test_session.py to test_session.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/test_shell.py to test_shell.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/test_utils.py to test_utils.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/utils.py to utils.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/v2_0/client_fixtures.py to client_fixtures.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/v2_0/test_access.py to test_access.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/v2_0/test_auth.py to test_auth.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/v2_0/test_client.py to test_client.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/v2_0/test_discovery.py to test_discovery.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/v2_0/test_ec2.py to test_ec2.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/v2_0/test_endpoints.py to test_endpoints.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/v2_0/test_extensions.py to test_extensions.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/v2_0/test_roles.py to test_roles.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/v2_0/test_services.py to test_services.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/v2_0/test_service_catalog.py to test_service_catalog.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/v2_0/test_shell.py to test_shell.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/v2_0/test_tenants.py to test_tenants.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/v2_0/test_tokens.py to test_tokens.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/v2_0/test_users.py to test_users.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/v2_0/utils.py to utils.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/v2_0/__init__.py to __init__.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/v3/client_fixtures.py to client_fixtures.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/v3/saml2_fixtures.py to saml2_fixtures.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/v3/test_access.py to test_access.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/v3/test_auth.py to test_auth.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/v3/test_auth_saml2.py to test_auth_saml2.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/v3/test_client.py to test_client.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/v3/test_credentials.py to test_credentials.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/v3/test_discover.py to test_discover.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/v3/test_domains.py to test_domains.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/v3/test_endpoints.py to test_endpoints.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/v3/test_endpoint_filter.py to test_endpoint_filter.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/v3/test_endpoint_policy.py to test_endpoint_policy.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/v3/test_federation.py to test_federation.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/v3/test_groups.py to test_groups.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/v3/test_oauth1.py to test_oauth1.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/v3/test_policies.py to test_policies.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/v3/test_projects.py to test_projects.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/v3/test_regions.py to test_regions.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/v3/test_roles.py to test_roles.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/v3/test_role_assignments.py to test_role_assignments.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/v3/test_services.py to test_services.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/v3/test_service_catalog.py to test_service_catalog.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/v3/test_tokens.py to test_tokens.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/v3/test_trusts.py to test_trusts.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/v3/test_users.py to test_users.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/v3/utils.py to utils.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/v3/__init__.py to __init__.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/tests/__init__.py to __init__.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/utils.py to utils.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/v2_0/client.py to client.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/v2_0/ec2.py to ec2.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/v2_0/endpoints.py to endpoints.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/v2_0/extensions.py to extensions.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/v2_0/roles.py to roles.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/v2_0/services.py to services.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/v2_0/shell.py to shell.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/v2_0/tenants.py to tenants.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/v2_0/tokens.py to tokens.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/v2_0/users.py to users.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/v2_0/__init__.py to __init__.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/v3/client.py to client.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/v3/contrib/endpoint_filter.py to endpoint_filter.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/v3/contrib/endpoint_policy.py to endpoint_policy.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/v3/contrib/federation/base.py to base.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/v3/contrib/federation/core.py to core.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/v3/contrib/federation/domains.py to domains.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/v3/contrib/federation/identity_providers.py to identity_providers.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/v3/contrib/federation/mappings.py to mappings.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/v3/contrib/federation/projects.py to projects.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/v3/contrib/federation/protocols.py to protocols.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/v3/contrib/federation/__init__.py to __init__.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/v3/contrib/oauth1/access_tokens.py to access_tokens.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/v3/contrib/oauth1/auth.py to auth.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/v3/contrib/oauth1/consumers.py to consumers.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/v3/contrib/oauth1/core.py to core.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/v3/contrib/oauth1/request_tokens.py to request_tokens.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/v3/contrib/oauth1/utils.py to utils.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/v3/contrib/oauth1/__init__.py to __init__.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/v3/contrib/trusts.py to trusts.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/v3/contrib/__init__.py to __init__.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/v3/credentials.py to credentials.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/v3/domains.py to domains.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/v3/endpoints.py to endpoints.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/v3/groups.py to groups.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/v3/policies.py to policies.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/v3/projects.py to projects.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/v3/regions.py to regions.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/v3/roles.py to roles.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/v3/role_assignments.py to role_assignments.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/v3/services.py to services.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/v3/tokens.py to tokens.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/v3/users.py to users.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/v3/__init__.py to __init__.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/_discover.py to _discover.pyc
+    byte-compiling /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/keystoneclient/__init__.py to __init__.pyc
+    running install_egg_info
+    Copying python_keystoneclient.egg-info to /home/Administrator/python-workspace/openstack-devel/stagingenv/lib/python2.7/site-packages/python_keystoneclient-0.11.2.43.gf8f81bb-py2.7.egg-info
+    running install_scripts
+    Installing keystone script to /home/Administrator/python-workspace/openstack-devel/stagingenv/bin
+    (stagingenv)
+    Administrator@lenovo-9d779749 ~/github.com/openstack/python-keystoneclient
+    $ which keystone
+    /home/Administrator/python-workspace/openstack-devel/stagingenv/bin/keystone
+
+Exit virtualenv
+^^^^^^^^^^^^^^^
+*bash*::
+
+    (stagingenv)
+    Administrator@lenovo-9d779749 ~/github.com/openstack/python-keystoneclient
+    $ deactivate
 
