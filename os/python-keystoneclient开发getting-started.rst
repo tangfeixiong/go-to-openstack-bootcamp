@@ -12,17 +12,17 @@ Community Resources
     * `github.com`_ - https://github.com/openstack/python-keystoneclient
     * openstack.org - http://git.openstack.org/cgit/
 2. Bug Report
-	* launchpad.net - https://launchpad.net/python-keystoneclient
+    * launchpad.net - https://launchpad.net/python-keystoneclient
 3. Developer Documentation
-	* http://docs.openstack.org/developer/keystone/
-	* wiki - https://wiki.openstack.org/wiki/Keystone
-	
-	.. _github.com: https://github.com/
+    * http://docs.openstack.org/developer/keystone/
+    * wiki - https://wiki.openstack.org/wiki/Keystone
+    
+    .. _github.com: https://github.com/
 
 示例 - git clone 
 ^^^^^^^^^^^^^^^^
-bash: 
-.. code:: bash
+*bash*  
+.. code:: bash 
 Administrator@lenovo-9d779749 ~/python-workspace/openstack-devel$
 git clone https://github.com/openstack/python-keystoneclient.git
 
@@ -84,7 +84,7 @@ if __name__ == "__main__":
     sys.exit(main())
 
 
-	
+    
 Developer Documentation
 -----------------------
 
@@ -102,9 +102,9 @@ Developing With Keystone
 ------------------------
 * Pre-requisite
     install Python 2.6/2.7 
-	install Phthon Utilities:
-	    1. pip
-		2. virtualenv
+    install Phthon Utilities:
+        1. pip
+        2. virtualenv
 * Test
 Administrator@lenovo-9d779749 ~/python-workspace/openstack-devel/keystone-2014.2
 $ pip install tox
