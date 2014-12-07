@@ -21,7 +21,7 @@ Community Resources
 
 示例 - git clone 
 ^^^^^^^^^^^^^^^^
-bash::
+bash: .. code::
 Administrator@lenovo-9d779749 ~/python-workspace/openstack-devel$
 git clone https://github.com/openstack/python-keystoneclient.git
 
