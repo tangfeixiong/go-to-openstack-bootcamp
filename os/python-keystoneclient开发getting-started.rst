@@ -1,5 +1,5 @@
-OpenStack Python-KeystoneClient开发getting started
-==================================================
+OpenStack python-keystoneclient开发 - getting started
+=====================================================
 Pre-requisite
 -------------
 1. Linux （以下为cygwin模拟环境）
@@ -29,7 +29,7 @@ Community Resources
 
 Staging
 -------
-# 使用tox将keystone client安装到默认的virtuaenv，后面有tox的较详细的安装和设置章节
+#. 使用tox将keystone client安装到默认的virtuaenv，后面有tox的较详细的安装和设置章节
 *bash*
     .. code:: bash
     Administrator@lenovo-9d779749 ~/github.com/openstack/python-keystoneclient
@@ -122,7 +122,7 @@ Staging
 	
 	ERROR:   py27: commands failed
 
-# 切换到tox创建的virtualenv，操作keystone client命令
+#. 切换到tox创建的virtualenv，操作keystone client命令
 *bash*
     .. code:: bash
 	Administrator@lenovo-9d779749 ~/github.com/openstack/python-keystoneclient
