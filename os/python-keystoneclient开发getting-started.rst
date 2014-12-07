@@ -1,5 +1,5 @@
-OpenStack python-keystoneclient开发 - getting started
-=====================================================
+OpenStack python-keystoneclient开发 getting started
+===================================================
 Pre-requisite
 -------------
 1. Linux (以下为cygwin模拟环境)
