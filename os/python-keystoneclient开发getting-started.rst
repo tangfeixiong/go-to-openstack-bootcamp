@@ -12,6 +12,8 @@ OpenStack python-keystoneclient开发 getting started
 * :ref:`aboutpypi`
 * :ref:`aboutvirtualenv`
 
+.. contents::
+
 .. _prerequisite:
 Pre-requisite
 -------------
@@ -33,10 +35,9 @@ Community Resources
     
     .. _github.com: https://github.com/
 
-示例 - git clone 
+示例 git clone 
 ^^^^^^^^^^^^^^^^
-*bash*  
-.. code:: 
+*bash* _`.. code::` 
     Administrator@lenovo-9d779749 ~/python-workspace/openstack-devel$
     git clone https://github.com/openstack/python-keystoneclient.git
 
