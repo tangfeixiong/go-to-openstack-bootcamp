@@ -2,14 +2,12 @@ OpenStack python-keystoneclient开发 getting started
 ===================================================
 .. contents::
 
-.. _prerequisite:
 Pre-requisite
 -------------
 1. Linux (以下为cygwin模拟环境)
 2. Python (包括开发环境和工具，如pip，virtualenv)
 3. Git
 
-.. _communityresources:
 Community Resources
 -------------------
 1. Repositories
@@ -32,7 +30,6 @@ Community Resources
     Administrator@lenovo-9d779749 ~/python-workspace/openstack-devel
     $ git clone https://github.com/openstack/python-keystoneclient.git
 
-.. _staging:
 安装Staging环境
 ---------------
 * 使用tox将keystone client安装到默认的virtuaenv，后面有tox的较详细的安装和设置章节
@@ -102,10 +99,9 @@ Community Resources
     /home/Administrator/github.com/openstack/python-keystoneclient/.tox/py27/bin/keystone
 
 
-.. _gettingstarted:
 开发第一步
 ----------
-.. _appentry:
+
 Keystone Client代码入口
 ^^^^^^^^^^^^^^^^^^^^^^^
 * main函数
@@ -145,3 +141,180 @@ Keystone Client代码入口
 
     if __name__ == "__main__":
         sys.exit(main())
+
+* keystoneclient包和shell模块
+*bash*::
+
+    (py27)
+    Administrator@lenovo-9d779749 ~/github.com/openstack/python-keystoneclient
+    $ ls .tox/py27/lib/python2.7/site-packages/
+    Babel-1.3-py2.7.egg-info           oslo.config-1.5.0-py2.7.egg-info
+    Crypto                             oslo.i18n-1.1.0-py2.7-nspkg.pth
+    Jinja2-2.7.3-py2.7.egg-info        oslo.i18n-1.1.0-py2.7.egg-info
+    MarkupSafe-0.23-py2.7.egg-info     oslo.serialization-1.1.0-py2.7-nspkg.pth
+    Pygments-2.0.1-py2.7.egg-info      oslo.serialization-1.1.0-py2.7.egg-info
+    Sphinx-1.2.3-py2.7.egg-info        oslo.utils-1.1.0-py2.7-nspkg.pth
+    WebOb-1.4-py2.7.egg-info           oslo.utils-1.1.0-py2.7.egg-info
+    _markerlib                         oslosphinx
+    argparse-1.2.2-py2.7.egg-info      oslosphinx-2.3.0-py2.7.egg-info
+    argparse.py                        oslotest
+    argparse.pyc                       oslotest-1.3.0-py2.7.egg-info
+    babel                              pbr
+    coverage                           pbr-0.10.0-py2.7.egg-info
+    coverage-3.7.1-py2.7.egg-info      pep8-1.5.6-py2.7.egg-info
+    discover-0.4.0-py2.7.egg-info      pep8.py
+    discover.py                        pep8.pyc
+    discover.pyc                       pip
+    docutils                           pip-1.5.6-py2.7.egg-info
+    docutils-0.12-py2.7.egg-info       pkg_resources.py
+    easy-install.pth                   pkg_resources.pyc
+    easy_install.py                    prettytable-0.7.2-py2.7.egg-info
+    easy_install.pyc                   prettytable.py
+    extras                             prettytable.pyc
+    extras-0.0.3-py2.7.egg-info        pycrypto-2.6.1-py2.7.egg-info
+    fixtures                           pyflakes
+    fixtures-1.0.0-py2.7.egg-info      pyflakes-0.8.1-py2.7.egg-info
+    flake8                             pygments
+    flake8-2.1.0-py2.7.egg-info        python-keystoneclient.egg-link
+    hacking                            python_mimeparse-0.1.4-py2.7.egg-info
+    hacking-0.9.5-py2.7.egg-info       python_subunit-1.0.0-py2.7.egg-info
+    iso8601                            pytz
+    iso8601-0.1.10-py2.7.egg-info      pytz-2014.10-py2.7.egg-info
+    jinja2                             requests
+    keyring                            requests-2.5.0-py2.7.egg-info
+    keyring-4.0-py2.7.egg-info         requests_mock
+    lxml                               requests_mock-0.5.1-py2.7.egg-info
+    lxml-3.4.1-py2.7.egg-info          setuptools
+    markupsafe                         setuptools-0.9.8-py2.7.egg-info
+    mccabe-0.2.1-py2.7.egg-info        six-1.8.0-py2.7.egg-info
+    mccabe.py                          six.py
+    mccabe.pyc                         six.pyc
+    mimeparse.py                       sphinx
+    mimeparse.pyc                      stevedore
+    mock-1.0.1-py2.7.egg-info          stevedore-1.1.0-py2.7.egg-info
+    mock.py                            subunit
+    mock.pyc                           testrepository
+    mox3                               testrepository-0.0.20-py2.7.egg-info
+    mox3-0.7.0-py2.7.egg-info          testresources
+    netaddr                            testresources-0.2.7-py2.7.egg-info
+    netaddr-0.7.12-py2.7.egg-info      testscenarios
+    netifaces-0.10.4-py2.7.egg-info    testscenarios-0.4-py2.7.egg-info
+    netifaces.dll                      testtools
+    oauthlib                           testtools-1.5.0-py2.7.egg-info
+    oauthlib-0.7.2-py2.7.egg-info      unittest2
+    oslo                               unittest2-0.8.0-py2.7.egg-info
+    oslo.config-1.5.0-py2.7-nspkg.pth  webob
+    (py27)
+    Administrator@lenovo-9d779749 ~/github.com/openstack/python-keystoneclient
+    $ cat .tox/py27/lib/python2.7/site-packages/python-keystoneclient.egg-link
+    /home/Administrator/github.com/openstack/python-keystoneclient
+    Administrator@lenovo-9d779749 ~/github.com/openstack/python-keystoneclient
+    (py27)
+    $ ls keystoneclient/
+    __init__.py    auth            discover.py     i18n.pyc             shell.pyc
+    __init__.pyc   base.py         discover.pyc    locale               tests
+    _discover.py   base.pyc        exceptions.py   middleware           utils.py
+    _discover.pyc  baseclient.py   exceptions.pyc  openstack            utils.pyc
+    access.py      baseclient.pyc  fixture         service_catalog.py   v2_0
+    access.pyc     client.py       generic         service_catalog.pyc  v3
+    adapter.py     client.pyc      httpclient.py   session.py
+    adapter.pyc    common          httpclient.pyc  session.pyc
+    apiclient      contrib         i18n.py         shell.py
+
+* shell.py的main函数和OpenStackIdentityShell类，类方法main()
+*bash*::
+
+    (py27)
+    Administrator@lenovo-9d779749 ~/github.com/openstack/python-keystoneclient
+    $ cat keystoneclient/shell.py
+    ...
+
+    class OpenStackIdentityShell(object):
+
+        def __init__(self, parser_class=argparse.ArgumentParser):
+            self.parser_class = parser_class
+
+        ...
+
+        def main(self, argv):
+            
+            ...
+
+            # Handle top-level --help/-h before attempting to parse
+            # a command off the command line
+            if not argv or options.help:
+                self.do_help(options)
+                return 0
+
+            # Parse args again and call whatever callback was selected
+            args = subcommand_parser.parse_args(argv)
+
+            # Short-circuit and deal with help command right away.
+            if args.func == self.do_help:
+                self.do_help(args)
+                return 0
+            elif args.func == self.do_bash_completion:
+                self.do_bash_completion(args)
+                return 0
+
+            if args.debug:
+                logging_level = logging.DEBUG
+                iso_logger = logging.getLogger('iso8601')
+                iso_logger.setLevel('WARN')
+            else:
+                logging_level = logging.WARNING
+
+            logging.basicConfig(level=logging_level)
+
+            ...
+
+            if utils.isunauthenticated(args.func):
+                self.cs = shell_generic.CLIENT_CLASS(endpoint=args.os_auth_url,
+                                                     cacert=args.os_cacert,
+                                                     key=args.os_key,
+                                                     cert=args.os_cert,
+                                                     insecure=args.insecure,
+                                                     timeout=args.timeout)
+            else:
+                self.auth_check(args)
+                token = None
+                if args.os_token and args.os_endpoint:
+                    token = args.os_token
+                api_version = options.os_identity_api_version
+                self.cs = self.get_api_class(api_version)(
+                    username=args.os_username,
+                    tenant_name=args.os_tenant_name,
+                    tenant_id=args.os_tenant_id,
+                    token=token,
+                    endpoint=args.os_endpoint,
+                    password=args.os_password,
+                    auth_url=args.os_auth_url,
+                    region_name=args.os_region_name,
+                    cacert=args.os_cacert,
+                    key=args.os_key,
+                    cert=args.os_cert,
+                    insecure=args.insecure,
+                    debug=args.debug,
+                    use_keyring=args.os_cache,
+                    force_new_token=args.force_new_token,
+                    stale_duration=args.stale_duration,
+                    timeout=args.timeout)
+
+            try:
+                args.func(self.cs, args)
+            except exc.Unauthorized:
+                raise exc.CommandError("Invalid OpenStack Identity credentials.")
+            except exc.AuthorizationFailure:
+                raise exc.CommandError("Unable to authorize user")
+
+        ......
+        
+    def main():
+        try:
+            OpenStackIdentityShell().main(sys.argv[1:])
+
+        except Exception as e:
+            print(encodeutils.safe_encode(six.text_type(e)), file=sys.stderr)
+            sys.exit(1)
+
+    ...
