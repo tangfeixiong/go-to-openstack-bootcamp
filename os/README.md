@@ -1,11 +1,12 @@
 # OpenStack 学习笔记
 
-1 笔记
+1. 笔记
   * [Manually Setup Python 2.7.8 for CentOS 6.5](/os/devel-env.rst)
+  * [OpenStack devel installation - DevStack automation]
   * [OpenStack租户网络简明设置](/os/tenant-networking-zh.rst)
-  * [OpenStack python-keystoneclient开发, getting started](/os/python-keystoneclient开发getting-started.rst)
+  * [python-keystoneclient开发 - getting started](/os/python-keystoneclient开发getting-started.rst)
 
-2 参考
+2. 参考
   - [OpenStack Documentation](http://docs.openstack.org/)
   - [OpenStack wiki](https://wiki.openstack.org/wiki/Main_Page)
   - [OpenStack developer](http://docs.openstack.org/developer/openstack-projects.html)
