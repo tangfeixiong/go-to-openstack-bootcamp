@@ -2,7 +2,7 @@ OpenStack python-keystoneclient开发 - getting started
 =====================================================
 Pre-requisite
 -------------
-1. Linux （以下为cygwin模拟环境）
+1. Linux (以下为cygwin模拟环境)
 2. Python
 3. Git
 
@@ -22,7 +22,7 @@ Community Resources
 示例 - git clone 
 ^^^^^^^^^^^^^^^^
 *bash*  
-    .. code:: bash 
+.. code:: 
     Administrator@lenovo-9d779749 ~/python-workspace/openstack-devel$
     git clone https://github.com/openstack/python-keystoneclient.git
 
@@ -30,8 +30,7 @@ Community Resources
 Staging
 -------
 #. 使用tox将keystone client安装到默认的virtuaenv，后面有tox的较详细的安装和设置章节
-*bash*
-.. code:: bash
+*bash*  .. code::
     Administrator@lenovo-9d779749 ~/github.com/openstack/python-keystoneclient
     $ tox -e py27
     py27 create: /home/Administrator/github.com/openstack/python-keystoneclient/.tox/py27
