@@ -14,11 +14,20 @@ Community Resources
 -------------------
 	1. Repositories
 		* `github.com`_ - https://github.com/openstack/python-keystoneclient
-		* openstack.org - http://git.openstack.org/cgit/
+		* `openstack.org`_ - http://git.openstack.org/cgit/
 	2. Bug Report
-		* launchpad.net - https://launchpad.net/python-keystoneclient
+		* `launchpad.net`_ - https://launchpad.net/python-keystoneclient
 	3. Developer Documentation
-		* http://docs.openstack.org/developer/keystone/
-		* wiki - https://wiki.openstack.org/wiki/Keystone
+		* keystone docs - http://docs.openstack.org/developer/keystone/
+		* keystone wiki - https://wiki.openstack.org/wiki/Keystone
 		
 	.. _github.com: https://github.com/
+    .. _openstack.org: https://www.openstack.org/
+	.. _launchpad.net: https://www.launchpad.net/
+
+示例 git clone 
+^^^^^^^^^^^^^^^^
+    *bash* _`.. code::` 
+    Administrator@lenovo-9d779749 ~/python-workspace/openstack-devel$
+    git clone https://github.com/openstack/python-keystoneclient.git
+	
