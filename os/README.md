@@ -12,6 +12,7 @@
   - [OpenStack Documentation](http://docs.openstack.org/)
     - [wiki](https://wiki.openstack.org/wiki/Main_Page)
     - [developer](http://docs.openstack.org/developer/openstack-projects.html)
+    - [git](http://git.openstack.org/cgit)
   - [OpenStack in Github](https://github.com/openstack/)
   - [OpenStack in Launchpad](https://launchpad.net/openstack)
   - [OpenStack in Red Hat community](https://openstack.redhat.com/Main_Page)
