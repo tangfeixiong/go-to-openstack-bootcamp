@@ -36,7 +36,7 @@ Community Resources
 安装Staging环境
 ---------------
 * 使用tox将keystone client安装到默认的virtuaenv，后面有tox的较详细的安装和设置章节
-    *bash*
+*bash*
     .. code::
     Administrator@lenovo-9d779749 ~/github.com/openstack/python-keystoneclient
     $ tox -e py27
@@ -86,4 +86,18 @@ Community Resources
     ERROR: InvocationError: '/home/Administrator/github.com/openstack/python-keystoneclient/.tox/py27/bin/python setup.py testr --testr-args='
     ___________________________________ summary ____________________________________
     ERROR:   py27: commands failed
-        
+
+#. 切换到tox创建的virtualenv，操作keystone client命令
+*bash*
+    .. code:: bash
+    Administrator@lenovo-9d779749 ~/github.com/openstack/python-keystoneclient
+    $ . .tox/py27/bin/activate
+    (py27)
+    Administrator@lenovo-9d779749 ~/github.com/openstack/python-keystoneclient
+    $ keystone --version
+    0.11.2.43
+    (py27)
+    Administrator@lenovo-9d779749 ~/github.com/openstack/python-keystoneclient
+    $ which keystone
+    /home/Administrator/github.com/openstack/python-keystoneclient/.tox/py27/bin/keystone
+
