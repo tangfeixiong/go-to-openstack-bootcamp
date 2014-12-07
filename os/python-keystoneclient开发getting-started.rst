@@ -27,8 +27,8 @@ Community Resources
 
 示例 git clone 
 ^^^^^^^^^^^^^^^^
-*bash* 
-    .. code::
+*bash*::
+
     Administrator@lenovo-9d779749 ~/python-workspace/openstack-devel
     $ git clone https://github.com/openstack/python-keystoneclient.git
 
@@ -36,7 +36,7 @@ Community Resources
 安装Staging环境
 ---------------
 * 使用tox将keystone client安装到默认的virtuaenv，后面有tox的较详细的安装和设置章节
-*bash* .. code::
+*bash*::
 
     Administrator@lenovo-9d779749 ~/github.com/openstack/python-keystoneclient
     $ tox -e py27
@@ -88,8 +88,8 @@ Community Resources
     ERROR:   py27: commands failed
 
 * 切换到tox创建的virtualenv，操作keystone client命令
-*bash*
-    .. code:: bash
+*bash*::
+
     Administrator@lenovo-9d779749 ~/github.com/openstack/python-keystoneclient
     $ . .tox/py27/bin/activate
     (py27)
@@ -101,3 +101,47 @@ Community Resources
     $ which keystone
     /home/Administrator/github.com/openstack/python-keystoneclient/.tox/py27/bin/keystone
 
+
+.. _gettingstarted:
+开发第一步
+----------
+.. _appentry:
+Keystone Client代码入口
+^^^^^^^^^^^^^^^^^^^^^^^
+* main函数
+*bash*::
+
+    (py27)
+    Administrator@lenovo-9d779749 ~/github.com/openstack/python-keystoneclient
+    $ ls .tox/py27/bin/
+    activate               pip2.7                 sphinx-build
+    activate.csh           pybabel                sphinx-quickstart
+    activate.fish          pyflakes               subunit-1to2
+    activate_this.py       pygmentize             subunit-2to1
+    coverage               python                 subunit-filter
+    coverage-2.7           python2                subunit-ls
+    coverage2              python2.7              subunit-notify
+    discover               rst2html.py            subunit-output
+    easy_install           rst2latex.py           subunit-stats
+    easy_install-2.7       rst2man.py             subunit-tags
+    flake8                 rst2odt.py             subunit2csv
+    keyring                rst2odt_prepstyles.py  subunit2gtk
+    keystone               rst2pseudoxml.py       subunit2junitxml
+    netaddr                rst2s5.py              subunit2pyunit
+    oslo-config-generator  rst2xetex.py           tap2subunit
+    oslo_debug_helper      rst2xml.py             testr
+    pep8                   rstpep2html.py         unit2
+    pip                    sphinx-apidoc
+    pip2                   sphinx-autogen
+    (py27)
+    Administrator@lenovo-9d779749 ~/github.com/openstack/python-keystoneclient
+    $ cat .tox/py27/bin/keystone
+    #!/home/Administrator/github.com/openstack/python-keystoneclient/.tox/py27/bin/python2.7
+    # PBR Generated from u'console_scripts'
+
+    import sys
+
+    from keystoneclient.shell import main
+
+    if __name__ == "__main__":
+        sys.exit(main())
