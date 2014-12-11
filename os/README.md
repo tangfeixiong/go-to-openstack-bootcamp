@@ -5,6 +5,7 @@
   * [OpenStack租户网络简明设置](/os/tenant-networking-zh.rst)
   * [Manually Setup Python 2.7.8 for CentOS 6.5](/os/devel-env.rst)
   * [python-keystoneclient开发 - getting started](/os/python-keystoneclient开发getting-started.rst)
+  * [python-keystoneclient开发 - setup Windows XP devel](/os/windows-xp设置python-openstack-client开发环境.rst)
 
 2. Forward & Share
 

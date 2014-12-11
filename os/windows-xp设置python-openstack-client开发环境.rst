@@ -42,7 +42,7 @@
 
 安装pip
 -------
-pip用于在线安装Pypi管理的开发工具（API，SDK等）
+pip用于在线安装Pypi仓库里的开发工具（API，SDK等）
 
 * 参考
     https://pip.pypa.io/en/latest/installing.html
@@ -61,6 +61,14 @@ pip用于在线安装Pypi管理的开发工具（API，SDK等）
     F:\Python27>python G:\_python_tool\io.pypa.pip\get-pip.py
     Requirement already up-to-date: pip in f:\python27\lib\site-packages
     Cleaning up...
+	
+运行中会出现如下错误：UnicodeDecodeError: ‘ascii’ codec can’t decode byte 0xe5 in position 108: ordinal not in range(128).
+解决方法参考：
+    http://blog.csdn.net/mindmb/article/details/7898528
+	
+	http://blog.sina.com.cn/s/blog_6c39196501013s5b.html
+
+在出现错误的文件设置utf-8编码
 
 或运行pip-1.5.6.win-*32/64bit*-py2.7.exe，安装pip.exe程序(pip命令行工具），安装后 <batch>::
 
@@ -98,13 +106,23 @@ pip用于在线安装Pypi管理的开发工具（API，SDK等）
 	2014-12-10  13:16               642 pybabel.exe.manifest
 				  24 个文件      1,975,918 字节
 				   2 个目录  1,984,135,168 可用字节
-    	
-OpenStack开发环境
------------------
+
+运行pip时的错误信息 (batch)::
+
+    F:\Python27\Scripts>pip
+    Traceback (most recent call last):
+      File "C:\Python27\Scripts\pip-script.py", line 5, in <module>
+        from pkg_resources import load_entry_point
+    ImportError: No module named pkg_resources
+
+原因待研究	
+
+设置OpenStack开发环境
+---------------------
 以keystone client为例
 
 * 安装python-keystoneclient API
-安装失败，原因是pypi在美国，下载失败
+安装失败，原因是pypi在美国，下载超时
 <batch>::
 
 	F:\Python27\Scripts>pip install python-keystoneclient
