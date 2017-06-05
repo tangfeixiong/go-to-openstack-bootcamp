@@ -1,0 +1,48 @@
+// Inspired from https://github.com/philips/grpc-gateway-example
+
+syntax = "proto3";
+package echopb;
+
+import "google/api/annotations.proto";
+
+import "data.proto";
+
+message EchoMessage {
+ string value = 1;
+}
+
+service EchoService {
+  rpc Echo(EchoMessage) returns (EchoMessage) {
+    option (google.api.http) = {
+      post: "/v1/echo"
+      body: "*"
+    };
+  }
+
+  // admin (e.g. DevOps) to register external networking (public net/subnet and router)
+
+  // admin (e.g. head referee) to create battlefield
+  rpc AdminSharedNetworkCreation(OpenstackNeutronNetRequestData) returns (OpenstackNeutronNetResponseData) {
+    option (google.api.http) = {
+      post: "/v1/battlefields"
+      body: "*"  
+    };  
+  }
+
+  // user (e.g. registered user) to establish combatroom
+  rpc ApplyConsoleIntoDnatWithNetworkAndMachine(ConsoleResourceRequestData) returns (ConsoleResourceResponseData) {
+    option (google.api.http) = {
+      post: "/v1/combatrooms"
+      body: "*"
+    };
+  }
+ 
+  // user (e.g. registered user) to establish targetdrone
+  rpc OrderTargetDroneIntoDefenseFortification(DefensiveDroneRequestData) returns (DefensiveDroneResponseData) {
+    option (google.api.http) = {
+      post: "/v1/defensivedrones"
+      body: "*"  
+    };
+  }
+
+}

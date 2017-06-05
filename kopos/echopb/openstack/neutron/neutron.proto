@@ -1,0 +1,158 @@
+// tangfeixiong <tangfx128@gmail.com>
+
+syntax = "proto3";
+package echopb.openstack.neutron;
+
+// option go_package = "neutron";
+
+import "google/protobuf/any.proto";
+
+message NetworkExternal {
+    Network network = 1;
+    bool external = 2;
+}
+
+message FloatingIP {
+    string id = 1;
+    string floating_network_id = 2;
+    string floating_ip = 3;
+    string port_id = 4;
+    string fixed_ip = 5;
+    string tenant_id = 6;
+    string status = 7;
+    string router_id = 8;
+}
+
+message Router {
+    message GatewayInfo {
+        string network_id = 1;
+    }
+    message Route {
+        string next_hop = 1;
+        string destination_cidr = 2;
+    }
+    string status =1;
+    GatewayInfo gateway_info = 2;
+    bool admin_state_up = 3;
+    bool distributed = 4;
+    string name = 5;
+    string id = 6;
+    string tenant_id = 7;
+    repeated Route routes = 8;
+}
+
+message InterfaceInfo {
+    string subnet_id = 1;
+    string port_id = 2;
+    string id = 3;
+    string tenant_id = 4;
+}
+
+message PortBinding {
+    Port port = 1;
+    string host_id = 2;
+    map<string, google.protobuf.Any> vif_details = 3;
+    string vif_type = 4;
+    string vnic_type = 5;
+    map<string, string> profile = 6;
+}
+
+message NetworkExtAttrs {
+    message Segment {
+        string physical_network = 1;
+        string network_type = 2;
+        string segmentation_id = 3;
+    }
+    
+    string id = 1;
+    string name = 2;
+    bool admin_state_up = 3;
+    string status = 4;
+    repeated Subnet subnets = 5;
+    string tenant_id = 6;
+    bool shared = 7;
+    string network_type = 8;
+    string physical_network = 9;
+    string segmentation_id = 10;
+    repeated Segment segments = 11;
+}
+
+message SecGroup {
+    string id = 1;
+    string name = 2;
+    string description = 3;
+    repeated SecGroupRule rules = 4;
+    string tenant_id = 5;
+}
+
+message SecGroupRule {
+    string id = 1;
+    string direction = 2;
+    string ether_type = 3;
+    string sec_group_id = 4;
+    int32 port_range_min = 5;
+    int32 port_range_max = 6;
+    string protocol = 7;
+    string remote_group_id = 8;
+    string remote_ip_prefix = 9;
+    string tenant_id = 10;
+}
+
+message Network {
+    string id = 1;
+    string name = 2;
+    bool admin_state_up = 3;
+    string status = 4;
+    repeated Subnet subnets = 5;
+    string tenant_id = 6;
+    bool shared = 7;
+}
+
+message Port {
+    message IP {
+        string subnet_id = 1;
+        string ip_address = 2;
+    }
+    
+    message AddressPair {
+        string ip_address = 1;
+        string mac_address = 2;
+    }
+    
+    string id = 1;
+    string network_id = 2;
+    string name = 3;
+    bool admin_state_up = 4;
+    string status = 5;
+    string mac_address = 6;
+    repeated IP fixed_ips = 7;
+    string tenant_id = 8;
+    string device_owner = 9;
+    repeated string security_groups = 10;
+    string device_id = 11;
+    repeated AddressPair allowed_address_pairs = 12;
+}
+
+message Subnet {
+    message HostRoute {
+        string destination_cidr = 1;
+        string next_hop = 2;
+    }
+    
+    message AllocationPool {
+        string start = 1;
+        string end = 2;
+    }
+
+    string id = 1;
+    string network_id = 2;
+    string name = 3;
+    int32 ipversion = 4;
+    string cidr = 5;
+    string gateway_ip = 6;
+    repeated string dns_name_servers = 7;
+    repeated AllocationPool allocation_pools = 8;
+    repeated HostRoute host_routes = 9; 
+    bool enabledhcp = 10;
+    string tenant_id = 11;
+}

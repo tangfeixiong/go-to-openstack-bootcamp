@@ -1,0 +1,42 @@
+// tangfeixiong <tangfx128@gmail.com>
+
+syntax = "proto3";
+package echopb;
+
+import "github.com/tangfeixiong/go-to-openstack-bootcamp/kopos/echopb/openstack/neutron/neutron.proto";
+
+message OpenstackNeutronNetRequestData {
+  string id = 1;
+  string name = 2;
+  echopb.openstack.neutron.Router router = 3;
+  echopb.openstack.neutron.Network network = 4;
+}
+
+message OpenstackNeutronNetResponseData {
+  string id = 1;
+  string name = 2;
+  echopb.openstack.neutron.Router router = 3;
+  echopb.openstack.neutron.Network network = 4;
+  echopb.openstack.neutron.InterfaceInfo interface_info = 5;
+  string gateway_network_id = 6;
+}
+
+message ConsoleResourceRequestData {
+    string id = 1;
+    string name = 2;
+}
+
+message ConsoleResourceResponseData {
+    string id = 1;
+    string name = 2;
+}
+
+message DefensiveDroneRequestData {
+    string id = 1;
+    string name = 2;
+}
+
+message DefensiveDroneResponseData {
+    string id = 1;
+    string name = 2;
+}

@@ -1,0 +1,392 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "service.proto",
+    "version": "version not set"
+  },
+  "schemes": [
+    "http",
+    "https"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/v1/battlefields": {
+      "post": {
+        "summary": "admin (e.g. head referee) to create battlefield",
+        "operationId": "AdminSharedNetworkCreation",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/echopbOpenstackNeutronNetResponseData"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/echopbOpenstackNeutronNetRequestData"
+            }
+          }
+        ],
+        "tags": [
+          "EchoService"
+        ]
+      }
+    },
+    "/v1/combatrooms": {
+      "post": {
+        "summary": "user (e.g. registered user) to establish combatroom",
+        "operationId": "ApplyConsoleIntoDnatWithNetworkAndMachine",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/echopbConsoleResourceResponseData"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/echopbConsoleResourceRequestData"
+            }
+          }
+        ],
+        "tags": [
+          "EchoService"
+        ]
+      }
+    },
+    "/v1/defensivedrones": {
+      "post": {
+        "summary": "user (e.g. registered user) to establish targetdrone",
+        "operationId": "OrderTargetDroneIntoDefenseFortification",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/echopbDefensiveDroneResponseData"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/echopbDefensiveDroneRequestData"
+            }
+          }
+        ],
+        "tags": [
+          "EchoService"
+        ]
+      }
+    },
+    "/v1/echo": {
+      "post": {
+        "operationId": "Echo",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/echopbEchoMessage"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/echopbEchoMessage"
+            }
+          }
+        ],
+        "tags": [
+          "EchoService"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "RouterGatewayInfo": {
+      "type": "object",
+      "properties": {
+        "network_id": {
+          "type": "string"
+        }
+      }
+    },
+    "RouterRoute": {
+      "type": "object",
+      "properties": {
+        "next_hop": {
+          "type": "string"
+        },
+        "destination_cidr": {
+          "type": "string"
+        }
+      }
+    },
+    "SubnetAllocationPool": {
+      "type": "object",
+      "properties": {
+        "start": {
+          "type": "string"
+        },
+        "end": {
+          "type": "string"
+        }
+      }
+    },
+    "SubnetHostRoute": {
+      "type": "object",
+      "properties": {
+        "destination_cidr": {
+          "type": "string"
+        },
+        "next_hop": {
+          "type": "string"
+        }
+      }
+    },
+    "echopbConsoleResourceRequestData": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      }
+    },
+    "echopbConsoleResourceResponseData": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      }
+    },
+    "echopbDefensiveDroneRequestData": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      }
+    },
+    "echopbDefensiveDroneResponseData": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      }
+    },
+    "echopbEchoMessage": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "string"
+        }
+      }
+    },
+    "echopbOpenstackNeutronNetRequestData": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "router": {
+          "$ref": "#/definitions/neutronRouter"
+        },
+        "network": {
+          "$ref": "#/definitions/neutronNetwork"
+        }
+      }
+    },
+    "echopbOpenstackNeutronNetResponseData": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "router": {
+          "$ref": "#/definitions/neutronRouter"
+        },
+        "network": {
+          "$ref": "#/definitions/neutronNetwork"
+        },
+        "interface_info": {
+          "$ref": "#/definitions/neutronInterfaceInfo"
+        },
+        "gateway_network_id": {
+          "type": "string"
+        }
+      }
+    },
+    "neutronInterfaceInfo": {
+      "type": "object",
+      "properties": {
+        "subnet_id": {
+          "type": "string"
+        },
+        "port_id": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "tenant_id": {
+          "type": "string"
+        }
+      }
+    },
+    "neutronNetwork": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "admin_state_up": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "status": {
+          "type": "string"
+        },
+        "subnets": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/neutronSubnet"
+          }
+        },
+        "tenant_id": {
+          "type": "string"
+        },
+        "shared": {
+          "type": "boolean",
+          "format": "boolean"
+        }
+      }
+    },
+    "neutronRouter": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string"
+        },
+        "gateway_info": {
+          "$ref": "#/definitions/RouterGatewayInfo"
+        },
+        "admin_state_up": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "distributed": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "name": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "tenant_id": {
+          "type": "string"
+        },
+        "routes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/RouterRoute"
+          }
+        }
+      }
+    },
+    "neutronSubnet": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "network_id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "ipversion": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "cidr": {
+          "type": "string"
+        },
+        "gateway_ip": {
+          "type": "string"
+        },
+        "dns_name_servers": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "allocation_pools": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/SubnetAllocationPool"
+          }
+        },
+        "host_routes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/SubnetHostRoute"
+          }
+        },
+        "enabledhcp": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "tenant_id": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}
