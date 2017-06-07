@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: bootcamp
+  name: bootcamp
+  namespace: default
+spec:
+  clusterIP: None
+  ports:
+    - name: kopos
+      port: 10000 # this Service's port (cluster-internal IP clusterIP)
+      targetPort: 10000 # pods expose this port
+      # Kubernetes master will allocate a port from a flag-configured range (default: 30000-32767),
+      # or we can set a specific port number (in our case).
+      # Each node will proxy 32514 port (the same port number on every node) into this service.
+      # Note that this Service will be visible as both NodeIP:nodePort and clusterIp:port
+      nodePort: 31000
+  selector: # exposes any pods with the following labels as a service
+    app: bootcamp
+  type: ClusterIP # NodePort

@@ -1,0 +1,61 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    app: bootcamp
+  name: bootcamp
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bootcamp
+  strategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: bootcamp
+    spec:
+      containers:
+      - name: bootcamp
+        image: tangfeixiong/go-to-openstack-bootcamp:canary
+        env:
+        - name: OS_USERNAME
+          value: admin
+        - name: OS_PASSWORD
+          value: <secret>
+        - name: OS_REGIN_NAME
+          value: regionOne
+        - name: OS_CACERT
+          value: /srv/openstack/server.cert
+        # For v2
+        - name: OS_TENANT_NAME
+          value: admin
+        - name: OS_AUTH_URL
+          value: http://localhost:35357/v2.0
+        - name: OS_TENANT_ID
+          value: <id>
+        # For V3
+        - name: OS_PROJECT_DOMAIN_NAME
+          value: default
+        - name: OS_USER_DOMAIN_NAME
+          value: default
+        - name: OS_PROJECT_NAME
+          value: admin
+        - name: OS_AUTH_URL
+          value: http://controller:35357/v3
+        - name: OS_IDENTITY_API_VERSION
+          value: '3'
+        - name: OS_IMAGE_API_VERSION
+          value: '2'
+        ports:
+        - containerPort: 10000
+          hostPort: 10000
+        volumeMounts:
+        - mountPath: /etc/ssl/certs
+          name: etcsslcerts
+      volumes:
+      - name: etcsslcerts
+        hostPath:
+          path: /etc/ssl/certs
