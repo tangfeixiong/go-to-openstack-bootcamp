@@ -55,6 +55,11 @@ func (m *myService) ApplyConsoleIntoDnatWithNetworkAndMachine(ctx context.Contex
 	return new(pb.ConsoleResourceResponseData), nil
 }
 
+func (m *myService) OrderTargetDroneIntoTrainee(ctx context.Context, req *pb.TraineeDroneRequestData) (*pb.TraineeDroneResponseData, error) {
+	fmt.Printf("rpc OrderTargetDroneIntoTrainee(%v)\n", req)
+	return new(pb.TraineeDroneResponseData), nil
+}
+
 func (m *myService) OrderTargetDroneIntoDefenseFortification(ctx context.Context, req *pb.DefensiveDroneRequestData) (*pb.DefensiveDroneResponseData, error) {
 	fmt.Printf("rpc OrderTargetDroneIntoDefenseFortification(%v)\n", req)
 	return new(pb.DefensiveDroneResponseData), nil

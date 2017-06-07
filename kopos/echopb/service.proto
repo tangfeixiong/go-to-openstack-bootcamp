@@ -37,7 +37,15 @@ service EchoService {
     };
   }
  
-  // user (e.g. registered user) to establish targetdrone
+  // user (e.g. registered user) to order targetdrone for training
+  rpc OrderTargetDroneIntoTrainee(TraineeDroneRequestData) returns (TraineeDroneResponseData) {
+    option (google.api.http) = {
+      post: "/v1/bootcamp/traineedrones"
+      body: "*"  
+    };
+  }
+ 
+  // user (e.g. registered user) to establish defensive drone into battlefield
   rpc OrderTargetDroneIntoDefenseFortification(DefensiveDroneRequestData) returns (DefensiveDroneResponseData) {
     option (google.api.http) = {
       post: "/v1/defensivedrones"

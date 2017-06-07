@@ -45,6 +45,33 @@ swagger = `{
         ]
       }
     },
+    "/v1/bootcamp/traineedrones": {
+      "post": {
+        "summary": "user (e.g. registered user) to order targetdrone for training",
+        "operationId": "OrderTargetDroneIntoTrainee",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/echopbTraineeDroneResponseData"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/echopbTraineeDroneRequestData"
+            }
+          }
+        ],
+        "tags": [
+          "EchoService"
+        ]
+      }
+    },
     "/v1/combatrooms": {
       "post": {
         "summary": "user (e.g. registered user) to establish combatroom",
@@ -74,7 +101,7 @@ swagger = `{
     },
     "/v1/defensivedrones": {
       "post": {
-        "summary": "user (e.g. registered user) to establish targetdrone",
+        "summary": "user (e.g. registered user) to establish defensive drone into battlefield",
         "operationId": "OrderTargetDroneIntoDefenseFortification",
         "responses": {
           "200": {
@@ -256,6 +283,28 @@ swagger = `{
           "$ref": "#/definitions/neutronInterfaceInfo"
         },
         "gateway_network_id": {
+          "type": "string"
+        }
+      }
+    },
+    "echopbTraineeDroneRequestData": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      }
+    },
+    "echopbTraineeDroneResponseData": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
           "type": "string"
         }
       }

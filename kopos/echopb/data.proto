@@ -31,6 +31,16 @@ message ConsoleResourceResponseData {
     string name = 2;
 }
 
+message TraineeDroneRequestData {
+    string id = 1;
+    string name = 2;
+}
+
+message TraineeDroneResponseData {
+    string id = 1;
+    string name = 2;
+}
+
 message DefensiveDroneRequestData {
     string id = 1;
     string name = 2;

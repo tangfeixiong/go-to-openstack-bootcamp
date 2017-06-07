@@ -60,6 +60,78 @@ github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger
 
 ### Generate stub of *Protobuf*, *gRPC* and *gRPC-gateway*
 
+Vagrant up (with synced-folder)
+```
+fanhonglingdeMacBook-Pro:trusty64 fanhongling$ vagrant up
+Bringing machine 'default' up with 'virtualbox' provider...
+==> default: Checking if box 'ubuntu/trusty64' is up to date...
+==> default: A newer version of the box 'ubuntu/trusty64' is available! You currently
+==> default: have version '20160122.0.0'. The latest is version '20170602.0.0'. Run
+==> default: `vagrant box update` to update.
+==> default: Clearing any previously set forwarded ports...
+==> default: Clearing any previously set network interfaces...
+==> default: Preparing network interfaces based on configuration...
+    default: Adapter 1: nat
+    default: Adapter 2: hostonly
+==> default: Forwarding ports...
+    default: 6443 (guest) => 6443 (host) (adapter 1)
+    default: 22 (guest) => 2222 (host) (adapter 1)
+==> default: Running 'pre-boot' VM customizations...
+==> default: Booting VM...
+==> default: Waiting for machine to boot. This may take a few minutes...
+    default: SSH address: 127.0.0.1:2222
+    default: SSH username: vagrant
+    default: SSH auth method: private key
+    default: Warning: Remote connection disconnect. Retrying...
+    default: Warning: Remote connection disconnect. Retrying...
+==> default: Machine booted and ready!
+==> default: Checking for guest additions in VM...
+==> default: Configuring and enabling network interfaces...
+==> default: Mounting shared folders...
+    default: /vagrant => /Users/fanhongling/https%3A%2F%2Fwww.vagrantup.com/https%3A%2F%2Fatlas.hashicorp.com/boxes/ubuntu/trusty64
+    default: /Users/fanhongling/go/src => /Users/fanhongling/go/src
+    default: /Users/fanhongling/go/pkg => /Users/fanhongling/go/pkg
+    default: /Users/fanhongling/Downloads/workspace => /Users/fanhongling/Downloads/workspace
+    default: /Users/fanhongling/Downloads/99-mirror => /Users/fanhongling/Downloads/99-mirror
+    default: /Users/fanhongling/Downloads/go-openshift/pkg => /Users/fanhongling/Downloads/go-openshift/pkg
+    default: /Users/fanhongling/Downloads/go-openshift/src => /Users/fanhongling/Downloads/go-openshift/src
+    default: /Users/fanhongling/Downloads/go-kubernetes/src => /Users/fanhongling/Downloads/go-kubernetes/src
+    default: /Users/fanhongling/Downloads/go-kubernetes/pkg => /Users/fanhongling/Downloads/go-kubernetes/pkg
+==> default: Machine already provisioned. Run `vagrant provision` or use the `--provision`
+==> default: flag to force provisioning. Provisioners marked to run always will still run.
+fanhonglingdeMacBook-Pro:trusty64 fanhongling$ ssh vagrant@172.17.4.200
+vagrant@172.17.4.200's password: 
+Welcome to Ubuntu 14.04.5 LTS (GNU/Linux 3.13.0-76-generic x86_64)
+
+ * Documentation:  https://help.ubuntu.com/
+
+  System information as of Wed Jun  7 12:40:07 UTC 2017
+
+  System load:  0.55               Users logged in:        0
+  Usage of /:   93.0% of 39.34GB   IP address for eth0:    10.0.2.15
+  Memory usage: 3%                 IP address for eth1:    172.17.4.200
+  Swap usage:   0%                 IP address for docker0: 172.18.0.1
+  Processes:    120
+
+  => / is using 93.0% of 39.34GB
+
+  Graph this data and manage this system at:
+    https://landscape.canonical.com/
+
+  Get cloud support with Ubuntu Advantage Cloud Guest:
+    http://www.ubuntu.com/business/services/cloud
+
+51 packages can be updated.
+31 updates are security updates.
+
+New release '16.04.2 LTS' available.
+Run 'do-release-upgrade' to upgrade to it.
+
+
+Last login: Sun Jun  4 06:27:37 2017 from 172.17.4.1
+vagrant@vagrant-ubuntu-trusty-64:~$ cd /Users/fanhongling/Downloads/workspace/src/github.com/tangfeixiong/go-to-openstack-bootcamp/kopos/echopb/
+```
+
 Protocol buffer
 ```
 vagrant@vagrant-ubuntu-trusty-64:/Users/fanhongling/Downloads/workspace/src/github.com/tangfeixiong/go-to-openstack-bootcamp/kopos/echopb$ make openstack/neutron
@@ -73,20 +145,20 @@ go generate .
 
 For gRPC and gRPC-gateway
 ```
-vagrant@vagrant-ubuntu-trusty-64:/Users/fanhongling/Downloads/workspace/src/github.com/tangfeixiong/go-to-openstack-bootcamp/kopos/echopb$ make
+vagrant@vagrant-ubuntu-trusty-64:/Users/fanhongling/Downloads/workspace/src/github.com/tangfeixiong/go-to-openstack-bootcamp/kopos/echopb$ make all
 protoc -I/usr/local/include -I. \
-		-I/Users/fanhongling/Downloads/workspace/src \
-		-I/Users/fanhongling/Downloads/workspace/src/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis \
+		-I/Users/fanhongling/Downloads/go-kubernetes:/Users/fanhongling/Downloads/go-openshift:/Users/fanhongling/Downloads/workspace/src \
+		-I/Users/fanhongling/Downloads/go-kubernetes:/Users/fanhongling/Downloads/go-openshift:/Users/fanhongling/Downloads/workspace/src/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis \
 		--go_out=plugins=grpc:. \
 		service.proto data.proto
 protoc -I/usr/local/include -I. \
-		-I/Users/fanhongling/Downloads/workspace/src \
-		-I/Users/fanhongling/Downloads/workspace/src/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis \
+		-I/Users/fanhongling/Downloads/go-kubernetes:/Users/fanhongling/Downloads/go-openshift:/Users/fanhongling/Downloads/workspace/src \
+		-I/Users/fanhongling/Downloads/go-kubernetes:/Users/fanhongling/Downloads/go-openshift:/Users/fanhongling/Downloads/workspace/src/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis \
 		--grpc-gateway_out=logtostderr=true:. \
 		service.proto
 protoc -I/usr/local/include -I. \
-		-I/Users/fanhongling/Downloads/workspace/src \
-		-I/Users/fanhongling/Downloads/workspace/src/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis \
+		-I/Users/fanhongling/Downloads/go-kubernetes:/Users/fanhongling/Downloads/go-openshift:/Users/fanhongling/Downloads/workspace/src \
+		-I/Users/fanhongling/Downloads/go-kubernetes:/Users/fanhongling/Downloads/go-openshift:/Users/fanhongling/Downloads/workspace/src/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis \
 		--swagger_out=logtostderr=true:. \
 		service.proto
 go generate .
