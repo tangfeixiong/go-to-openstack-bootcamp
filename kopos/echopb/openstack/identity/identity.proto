@@ -1,0 +1,50 @@
+// tangfeixiong <tangfx128@gmail.com>
+
+syntax = "proto3";
+package echopb.openstack.identity;
+
+option go_package = "openstack/identity";
+
+// import "google/protobuf/timestamp.proto";
+
+// Token provides only the most basic information related to an authentication token.
+message Token {
+	// ID provides the primary means of identifying a user to the OpenStack API.
+	// OpenStack defines this field as an opaque value, so do not depend on its content.
+	// It is safe, however, to compare for equality.
+	string id = 1;
+
+	// ExpiresAt provides a timestamp in ISO 8601 format, indicating when the authentication token becomes invalid.
+	// After this point in time, future API requests made using this authentication token will respond with errors.
+	// Either the caller will need to reauthenticate manually, or more preferably, the caller should exploit automatic re-authentication.
+	// See the AuthOptions structure for more details.
+	// google.protobuf.Timestamp expires_at = 2;
+    string expires_at = 2;
+
+	// Tenant provides information about the tenant to which this token grants access.
+	Tenant tenant = 3;
+}
+
+// Tenant is a grouping of users in the identity service.
+message Tenant {
+	// ID is a unique identifier for this tenant.
+	string id = 1;
+
+	// Name is a friendlier user-facing name for this tenant.
+	string name = 2;
+
+	// Description is a human-readable explanation of this Tenant's purpose.
+	string description = 3;
+
+	// Enabled indicates whether or not a tenant is active.
+	bool enabled = 4;
+}
+
+message PasswordCredentialsV2 {
+	string username = 1;
+	string password = 2;
+}
+
+message TokenCredentialsV2 {
+	string id = 1;
+}

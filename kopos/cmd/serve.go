@@ -10,16 +10,21 @@ import (
 	"mime"
 	"net"
 	"net/http"
+	"os"
+	"path"
 	"strings"
+	"sync"
 
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/philips/go-bindata-assetfs"
 	"github.com/spf13/cobra"
+	_ "github.com/spf13/pflag"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 
 	pb "github.com/tangfeixiong/go-to-openstack-bootcamp/kopos/echopb"
+	pbos "github.com/tangfeixiong/go-to-openstack-bootcamp/kopos/echopb/openstack"
 	"github.com/tangfeixiong/go-to-openstack-bootcamp/kopos/pkg/osctl"
 	"github.com/tangfeixiong/go-to-openstack-bootcamp/kopos/pkg/ui/data/swagger"
 )
@@ -29,44 +34,127 @@ var serveCmd = &cobra.Command{
 	Use:   "serve",
 	Short: "Launches the example webserver on https://localhost:10000",
 	Run: func(cmd *cobra.Command, args []string) {
+		//		seed := pflag.Bool("seed", false, "Only pretend to seed.")
+		//		pflag.Lookup("seed").NoOptDefVal = "false"
+		//		if *seed {
+		//			go func() {
+		//				seedinit()
+		//				seedmain()
+		//			}()
+		//		}
+
+		go func() {
+			wg.Add(1)
+			defer wg.Done()
+			vulnerable(0)
+		}()
+		go func() {
+			wg.Add(1)
+			defer wg.Done()
+			vulnerable(1)
+		}()
+
 		serve()
+		wg.Wait()
 	},
 }
 
+var wg sync.WaitGroup
+
 func init() {
 	RootCmd.AddCommand(serveCmd)
+	// bridge glog with pflag
+	GLog(RootCmd.PersistentFlags())
 }
 
-type myService struct{}
+type myService struct {
+	config *osctl.CounterConfig
+}
+
+func (m *myService) DiscoverNetworks(ctx context.Context, in *pbos.NetworkDiscoveryReqRespData) (*pbos.NetworkDiscoveryReqRespData, error) {
+	return osctl.InfraRes().Credential(m.config).DiscoverNetworks(in)
+}
+
+func (m *myService) DiscoverSubnets(ctx context.Context, in *pbos.SubnetDiscoveryReqRespData) (*pbos.SubnetDiscoveryReqRespData, error) {
+	return osctl.InfraRes().Credential(m.config).DiscoverSubnets(in)
+}
+
+func (m *myService) EstablishNetworkLandscape(ctx context.Context, req *pbos.OpenstackNeutronLandscapeReqRespData) (*pbos.OpenstackNeutronLandscapeReqRespData, error) {
+	return osctl.InfraRes().Credential(m.config).CreateNetworkingLandscape(req)
+}
+
+func (m *myService) DiscoverImages(ctx context.Context, in *pbos.ImageDiscoveryReqRespData) (*pbos.ImageDiscoveryReqRespData, error) {
+	return osctl.InfraRes().Credential(m.config).DiscoverImages(in)
+}
+
+func (m *myService) DiscoverImageDetailed(ctx context.Context, in *pbos.Image) (*pbos.Image, error) {
+	return osctl.InfraRes().Credential(m.config).DiscoverImageDetailed(in)
+}
+
+func (m *myService) SearchImageDetails(ctx context.Context, in *pbos.Image) (*pbos.Image, error) {
+	return osctl.InfraRes().Credential(m.config).DiscoverImageDetails(in)
+}
+
+func (m *myService) DiscoverFlavors(ctx context.Context, in *pbos.FlavorDiscoveryReqRespData) (*pbos.FlavorDiscoveryReqRespData, error) {
+	return osctl.InfraRes().Credential(m.config).DiscoverFlavors(in)
+}
+
+func (m *myService) DiscoverFlavorDetailed(ctx context.Context, in *pbos.Flavor) (*pbos.Flavor, error) {
+	return osctl.InfraRes().Credential(m.config).DiscoverFlavorDetailed(in)
+}
+
+func (m *myService) SearchFlavorDetails(ctx context.Context, in *pbos.Flavor) (*pbos.Flavor, error) {
+	return osctl.InfraRes().Credential(m.config).DiscoverFlavorDetails(in)
+}
+
+func (m *myService) DiscoverMachines(ctx context.Context, in *pbos.MachineDiscoveryReqRespData) (*pbos.MachineDiscoveryReqRespData, error) {
+	return osctl.InfraRes().Credential(m.config).DiscoverMachines(in)
+}
+
+func (m *myService) DestroyMachines(ctx context.Context, in *pbos.MachineDestroyReqRespData) (*pbos.MachineDestroyReqRespData, error) {
+	return osctl.InfraRes().Credential(m.config).DestroyMachines(in)
+}
+
+func (m *myService) RebootMachines(ctx context.Context, in *pbos.MachineRebootReqRespData) (*pbos.MachineRebootReqRespData, error) {
+	return osctl.InfraRes().Credential(m.config).RebootMachines(in)
+}
+
+func (m *myService) BootVirtualMachines(ctx context.Context, in *pbos.OpenstackNovaBootReqRespData) (*pbos.OpenstackNovaBootReqRespData, error) {
+	return osctl.InfraRes().Credential(m.config).BootVirtualMachines(in)
+}
 
 func (m *myService) Echo(c context.Context, s *pb.EchoMessage) (*pb.EchoMessage, error) {
 	fmt.Printf("rpc request Echo(%q)\n", s.Value)
 	return s, nil
 }
 
-func (m *myService) AdminSharedNetworkCreation(ctx context.Context, req *pb.OpenstackNeutronNetRequestData) (*pb.OpenstackNeutronNetResponseData, error) {
-	fmt.Printf("rpc AdminSharedNetworkCreation(%v)\n", req)
+func (m *myService) ValidateToken(ctx context.Context, req *pbos.TokenReqRespData) (*pbos.TokenReqRespData, error) {
+	return osctl.InfraRes().Credential(m.config).ValidateToken(req)
+}
+
+func (m *myService) AdminSharedNetworkCreation(ctx context.Context, req *pbos.OpenstackNeutronNetRequestData) (*pbos.OpenstackNeutronNetResponseData, error) {
 	osctl.Admin().CreateSharedNet("Name", "TenantID", "subnetCIDR", "GatewayIP", "Description")
-	return new(pb.OpenstackNeutronNetResponseData), nil
+	return new(pbos.OpenstackNeutronNetResponseData), nil
 }
 
-func (m *myService) ApplyConsoleIntoDnatWithNetworkAndMachine(ctx context.Context, req *pb.ConsoleResourceRequestData) (*pb.ConsoleResourceResponseData, error) {
+func (m *myService) ApplyConsoleIntoDnatWithNetworkAndMachine(ctx context.Context, req *pbos.ConsoleResourceRequestData) (*pbos.ConsoleResourceResponseData, error) {
 	fmt.Printf("rpc ApplyConsoleIntoDnatWithNetworkAndMachine(%v)\n", req)
-	return new(pb.ConsoleResourceResponseData), nil
+	return new(pbos.ConsoleResourceResponseData), nil
 }
 
-func (m *myService) OrderTargetDroneIntoTrainee(ctx context.Context, req *pb.TraineeDroneRequestData) (*pb.TraineeDroneResponseData, error) {
+func (m *myService) OrderTargetDroneIntoTrainee(ctx context.Context, req *pbos.TraineeDroneRequestData) (*pbos.TraineeDroneResponseData, error) {
 	fmt.Printf("rpc OrderTargetDroneIntoTrainee(%v)\n", req)
-	return new(pb.TraineeDroneResponseData), nil
+	return new(pbos.TraineeDroneResponseData), nil
 }
 
-func (m *myService) OrderTargetDroneIntoDefenseFortification(ctx context.Context, req *pb.DefensiveDroneRequestData) (*pb.DefensiveDroneResponseData, error) {
+func (m *myService) OrderTargetDroneIntoDefenseFortification(ctx context.Context, req *pbos.DefensiveDroneRequestData) (*pbos.DefensiveDroneResponseData, error) {
 	fmt.Printf("rpc OrderTargetDroneIntoDefenseFortification(%v)\n", req)
-	return new(pb.DefensiveDroneResponseData), nil
+	return new(pbos.DefensiveDroneResponseData), nil
 }
 
 func newServer() *myService {
-	return new(myService)
+	// return new(myService)
+	return &myService{osctl.NewCounterConfig()}
 }
 
 // grpcHandlerFunc returns an http.Handler that delegates to grpcServer on incoming gRPC
@@ -146,5 +234,114 @@ func serve() {
 		log.Fatal("ListenAndServe: ", err)
 	}
 
+	return
+}
+
+func vulnerable(index int) {
+	hosts := []string{"localhost:10002", ":10001"}
+	if v, ok := os.LookupEnv("GRPC_PORT_OSBOOTCAMP"); ok && 0 != len(v) {
+		if strings.Contains(v, ":") {
+			hosts[0] = v
+		} else {
+			hosts[0] = "localhost:" + v
+		}
+	}
+	if v, ok := os.LookupEnv("HTTP_PORT_OSBOOTCAMP"); ok && 0 != len(v) {
+		if strings.Contains(v, ":") {
+			hosts[1] = v
+		} else {
+			hosts[1] = ":" + v
+		}
+	}
+
+	switch index {
+	case 0:
+		s := grpc.NewServer()
+		pb.RegisterEchoServiceServer(s, newServer())
+
+		l, err := net.Listen("tcp", hosts[0])
+		if err != nil {
+			panic(err)
+		}
+
+		fmt.Printf("grpc on host: %s\n", hosts[0])
+		if err := s.Serve(l); nil != err {
+			panic(err)
+		}
+	default:
+		ctx := context.Background()
+		ctx, cancel := context.WithCancel(ctx)
+		defer cancel()
+
+		mux := http.NewServeMux()
+
+		dopts := []grpc.DialOption{grpc.WithInsecure()}
+
+		gwmux := runtime.NewServeMux()
+		if err := pb.RegisterEchoServiceHandlerFromEndpoint(ctx, gwmux, hosts[0], dopts); err != nil {
+			fmt.Printf("serve: %v\n", err)
+			return
+		}
+
+		mux.Handle("/", gwmux)
+
+		fmt.Printf("http on host: %s\n", hosts[1])
+		if err := http.ListenAndServe(hosts[1], allowCORS(mux)); nil != err {
+			fmt.Fprintf(os.Stderr, "Server died: %s\n", err)
+		}
+
+		//	lstn, err := net.Listen("tcp", hosts[1])
+		//	if nil != err {
+		//		panic(err)
+		//	}
+
+		//	srv := &http.Server{
+		//		Addr: hosts[1],
+		//		// Handler: grpcHandlerFunc(grpcServer, mux),
+		//		Handler: mux,
+		//	}
+
+		//	if err := srv.Serve(lstn); nil != err {
+		//		fmt.Fprintf(os.Stderr, "Server died: %s\n", err)
+		//	}
+	}
+}
+
+// allowCORS allows Cross Origin Resoruce Sharing from any origin.
+// Don't do this without consideration in production systems.
+func allowCORS(h http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if origin := r.Header.Get("Origin"); origin != "" {
+			w.Header().Set("Access-Control-Allow-Origin", origin)
+			if r.Method == "OPTIONS" && r.Header.Get("Access-Control-Request-Method") != "" {
+				preflightHandler(w, r)
+				return
+			}
+		}
+		h.ServeHTTP(w, r)
+	})
+}
+
+var swaggerDir string = "examples/examplepb"
+
+func serveSwagger2(w http.ResponseWriter, r *http.Request) {
+	if !strings.HasSuffix(r.URL.Path, ".swagger.json") {
+		// glog.Errorf("Not Found: %s", r.URL.Path)
+		http.NotFound(w, r)
+		return
+	}
+
+	// glog.Infof("Serving %s", r.URL.Path)
+	p := strings.TrimPrefix(r.URL.Path, "/swagger/")
+	p = path.Join(swaggerDir, p)
+	http.ServeFile(w, r, p)
+}
+
+func preflightHandler(w http.ResponseWriter, r *http.Request) {
+	headers := []string{"Content-Type", "Accept"}
+	w.Header().Set("Access-Control-Allow-Headers", strings.Join(headers, ","))
+	methods := []string{"GET", "HEAD", "POST", "PUT", "DELETE"}
+	w.Header().Set("Access-Control-Allow-Methods", strings.Join(methods, ","))
+	// glog.Infof("preflight request for %s", r.URL.Path)
 	return
 }

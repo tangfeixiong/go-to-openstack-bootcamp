@@ -11,9 +11,11 @@ import (
 	computeimages "github.com/gophercloud/gophercloud/openstack/compute/v2/images"
 	"github.com/gophercloud/gophercloud/openstack/compute/v2/servers"
 	"github.com/gophercloud/gophercloud/openstack/identity/v2/tenants"
+	"github.com/gophercloud/gophercloud/openstack/identity/v2/tokens"
 	"github.com/gophercloud/gophercloud/openstack/identity/v2/users"
 	"github.com/gophercloud/gophercloud/openstack/identity/v3/projects"
 	"github.com/gophercloud/gophercloud/openstack/imageservice/v2/images"
+	"github.com/gophercloud/gophercloud/openstack/networking/v2/extensions/layer3/floatingips"
 	"github.com/gophercloud/gophercloud/openstack/networking/v2/extensions/layer3/routers"
 	"github.com/gophercloud/gophercloud/openstack/networking/v2/extensions/security/groups"
 	"github.com/gophercloud/gophercloud/openstack/networking/v2/extensions/security/rules"
@@ -31,11 +33,113 @@ type InfraProvider struct {
 	lasterr          error
 }
 
-func (provider *InfraProvider) createNetwork(name, tenantid string, adminstateup, shared bool) (*networks.Network, error) {
-	if nil != provider.lasterr {
-		return nil, provider.lasterr
+func (provider *InfraProvider) gainNetworks() ([]networks.Network, error) {
+	client, err := openstack.NewNetworkV2(provider.providerclient, gophercloud.EndpointOpts{
+		Region: os.Getenv("OS_REGION_NAME"),
+	})
+	if nil != err {
+		glog.Errorf("Could not reap network service: %v", err)
+		return nil, err
+	}
+	glog.V(5).Infof("Succeeded to reap network serivce: %v%v", client.Endpoint, client.ResourceBase)
+
+	status_fake := "ACTIVE"
+	name_fake := "fake network name"
+	adminStateUp := false
+	tenantId := "fake project id"
+	shared_fake := false
+	id_fake := "fake network id"
+	marker_fake := "00000000-0000-0000-0000-000000000000"
+	limit_fake := 0
+	sortKey := "ID"
+	sortDir := "ASC"
+
+	opts := networks.ListOpts{
+		Status:       status_fake,
+		Name:         name_fake,
+		AdminStateUp: &adminStateUp,
+		TenantID:     tenantId,
+		Shared:       &shared_fake,
+		ID:           id_fake,
+		Marker:       marker_fake,
+		Limit:        limit_fake,
+		SortKey:      sortKey,
+		SortDir:      sortDir,
+	}
+	glog.V(9).Infoln(opts)
+
+	resp, err := networks.List(client, nil).AllPages()
+	if nil != err {
+		glog.Errorf("Could not reap network-list capability: %v", err)
+		return nil, err
+	}
+	glog.V(5).Infof("Succeeded to reap network-list capability: %v", resp)
+
+	result, err := networks.ExtractNetworks(resp)
+	if nil != err {
+		glog.Errorf("Could not unmarshall networks result: %v", err)
+		return nil, err
+	}
+	glog.V(5).Infof("Succeeded to unmarshall networks result: %v", result)
+
+	return result, nil
+}
+
+func (provider *InfraProvider) searchNetworks(name string) ([]networks.Network, error) {
+	client, err := openstack.NewNetworkV2(provider.providerclient, gophercloud.EndpointOpts{
+		Region: os.Getenv("OS_REGION_NAME"),
+	})
+	if nil != err {
+		glog.Errorf("Could not reap network service: %v", err)
+		return nil, err
+	}
+	glog.V(5).Infof("Succeeded to reap network serivce: %v%v", client.Endpoint, client.ResourceBase)
+
+	status_fake := "ACTIVE"
+	name_fake := "fake network name"
+	adminStateUp := false
+	tenantId := "fake project id"
+	shared_fake := false
+	id_fake := "fake network id"
+	marker_fake := "00000000-0000-0000-0000-000000000000"
+	limit_fake := 0
+	sortKey := "ID"
+	sortDir := "ASC"
+
+	opts := networks.ListOpts{
+		Status:       status_fake,
+		Name:         name_fake,
+		AdminStateUp: &adminStateUp,
+		TenantID:     tenantId,
+		Shared:       &shared_fake,
+		ID:           id_fake,
+		Marker:       marker_fake,
+		Limit:        limit_fake,
+		SortKey:      sortKey,
+		SortDir:      sortDir,
+	}
+	opts = networks.ListOpts{
+		Name: name,
 	}
 
+	resp, err := networks.List(client, opts).AllPages()
+	if nil != err {
+		glog.Errorf("Could not reap network-list capability: %v", err)
+		return nil, err
+	}
+	glog.V(5).Infof("Succeeded to reap network-list capability: %v", resp)
+
+	result, err := networks.ExtractNetworks(resp)
+	if nil != err {
+		glog.Errorf("Could not unmarshall networks result: %v", err)
+		return nil, err
+	}
+	glog.V(5).Infof("Succeeded to unmarshall networks result: %v", result)
+
+	return result, nil
+}
+
+func (provider *InfraProvider) createNetwork(name, tenantid string, adminstateup, shared bool) (*networks.Network, error) {
 	client, err := openstack.NewNetworkV2(provider.providerclient, gophercloud.EndpointOpts{
 		Region: os.Getenv("OS_REGION_NAME"),
 	})
@@ -43,17 +147,17 @@ func (provider *InfraProvider) createNetwork(name, tenantid string, adminstateup
 		glog.Errorf("Could not reap neutron service: %v", err)
 		return nil, err
 	}
-	glog.V(5).Infof("Reap neutron serivce endpoint: %v%v", client.Endpoint, client.ResourceBase)
+	glog.V(5).Infof("Succeeded to reap neutron serivce endpoint: %v%v", client.Endpoint, client.ResourceBase)
 
 	adminStateUp := true
-	nameFake := "virtual network"
-	sharedFake := true
+	name_fake := "virtual network"
+	shared_fake := true
 	tenantId := "00000000-0000-0000-0000-000000000000"
 
 	opts := networks.CreateOpts{
 		AdminStateUp: &adminStateUp,
-		Name:         nameFake,
-		Shared:       &sharedFake,
+		Name:         name_fake,
+		Shared:       &shared_fake,
 		TenantID:     tenantId,
 	}
 	opts = networks.CreateOpts{
@@ -73,11 +177,219 @@ func (provider *InfraProvider) createNetwork(name, tenantid string, adminstateup
 	return resp, nil
 }
 
-func (provider *InfraProvider) createSubnet(networkid, cidr, name, tenantid string, allocationpools []subnets.AllocationPool, gatewayip string, ipversion gophercloud.IPVersion, enabledhcp bool, dnsnameservers []string, hostroutes []subnets.HostRoute) (*subnets.Subnet, error) {
-	if nil != provider.lasterr {
-		return nil, provider.lasterr
+func (provider *InfraProvider) queryNetwork(id string) (*networks.Network, error) {
+	client, err := openstack.NewNetworkV2(provider.providerclient, gophercloud.EndpointOpts{
+		Region: os.Getenv("OS_REGION_NAME"),
+	})
+	if nil != err {
+		glog.Errorf("Could not reap network service: %v", err)
+		return nil, err
+	}
+	glog.V(5).Infof("Reap network serivce endpoint: %v%v", client.Endpoint, client.ResourceBase)
+
+	resp, err := networks.Get(client, id).Extract()
+	if nil != err {
+		glog.Errorf("Could not reap network-show interface: %v", err)
+		return nil, err
+	}
+	glog.V(5).Infof("Succeeded to reap network-show interface: %v", resp)
+
+	return resp, nil
+}
+
+func (provider *InfraProvider) identifyNetwork(name string) (*string, error) {
+	client, err := openstack.NewNetworkV2(provider.providerclient, gophercloud.EndpointOpts{
+		Region: os.Getenv("OS_REGION_NAME"),
+	})
+	if nil != err {
+		glog.Errorf("Could not reap network service: %v", err)
+		return nil, err
+	}
+	glog.V(5).Infof("Reap network serivce endpoint: %v%v", client.Endpoint, client.ResourceBase)
+
+	resp, err := networks.IDFromName(client, name)
+	if nil != err {
+		glog.Errorf("Could not reap network-list interface: %v", err)
+		return nil, err
+	}
+	glog.V(5).Infof("Succeeded to reap network-list interface: %v", resp)
+
+	return &resp, nil
+}
+
+func (provider *InfraProvider) gainSubnets() ([]subnets.Subnet, error) {
+	client, err := openstack.NewNetworkV2(provider.providerclient, gophercloud.EndpointOpts{
+		Region: os.Getenv("OS_REGION_NAME"),
+	})
+	if nil != err {
+		glog.Errorf("Could not reap network service: %v", err)
+		return nil, err
+	}
+	glog.V(5).Infof("Succeeded to reap network serivce: %v%v", client.Endpoint, client.ResourceBase)
+
+	name_fake := "fake subnet name"
+	enableDHCP := true
+	networkId := "fake network id"
+	tenantId := "fake project id"
+	ipVersion := int(gophercloud.IPv4)
+	gatewayIp := "0.0.0.1"
+	cidr_fake := "0.0.0.0/0"
+	id_fake := "fake subnet id"
+	limit_fake := 0
+	marker_fake := "00000000-0000-0000-0000-000000000000"
+	sortKey := "ID"
+	sortDir := "ASC"
+
+	opts := subnets.ListOpts{
+		Name:       name_fake,
+		EnableDHCP: &enableDHCP,
+		NetworkID:  networkId,
+		TenantID:   tenantId,
+		IPVersion:  ipVersion,
+		GatewayIP:  gatewayIp,
+		CIDR:       cidr_fake,
+		ID:         id_fake,
+		Limit:      limit_fake,
+		Marker:     marker_fake,
+		SortKey:    sortKey,
+		SortDir:    sortDir,
+	}
+	glog.V(9).Infoln(opts)
+
+	resp, err := subnets.List(client, nil).AllPages()
+	if nil != err {
+		glog.Errorf("Could not reap subnet-list capability: %v", err)
+		return nil, err
+	}
+	glog.V(5).Infof("Succeeded to reap subnet-list capability: %v", resp)
+
+	result, err := subnets.ExtractSubnets(resp)
+	if nil != err {
+		glog.Errorf("Could not unmarshall subnets result: %v", err)
+		return nil, err
+	}
+	glog.V(5).Infof("Succeeded to unmarshall subnets result: %v", result)
+
+	return result, nil
+}
+
+func (provider *InfraProvider) searchSubnet(name string) ([]subnets.Subnet, error) {
+	client, err := openstack.NewNetworkV2(provider.providerclient, gophercloud.EndpointOpts{
+		Region: os.Getenv("OS_REGION_NAME"),
+	})
+	if nil != err {
+		glog.Errorf("Could not reap network service: %v", err)
+		return nil, err
+	}
+	glog.V(5).Infof("Succeeded to reap network serivce: %v%v", client.Endpoint, client.ResourceBase)
+
+	name_fake := "fake subnet name"
+	enableDHCP := true
+	networkId := "fake network id"
+	tenantId := "fake project id"
+	ipVersion := int(gophercloud.IPv4)
+	gatewayIp := "0.0.0.1"
+	cidr_fake := "0.0.0.0/0"
+	id_fake := "fake subnet id"
+	limit_fake := 0
+	marker_fake := "00000000-0000-0000-0000-000000000000"
+	sortKey := "ID"
+	sortDir := "ASC"
+
+	opts := subnets.ListOpts{
+		Name:       name_fake,
+		EnableDHCP: &enableDHCP,
+		NetworkID:  networkId,
+		TenantID:   tenantId,
+		IPVersion:  ipVersion,
+		GatewayIP:  gatewayIp,
+		CIDR:       cidr_fake,
+		ID:         id_fake,
+		Limit:      limit_fake,
+		Marker:     marker_fake,
+		SortKey:    sortKey,
+		SortDir:    sortDir,
+	}
+	opts = subnets.ListOpts{
+		Name: name,
 	}
 
+	resp, err := subnets.List(client, opts).AllPages()
+	if nil != err {
+		glog.Errorf("Could not reap subnet-list capability: %v", err)
+		return nil, err
+	}
+	glog.V(5).Infof("Succeeded to reap subnet-list capability: %v", resp)
+
+	result, err := subnets.ExtractSubnets(resp)
+	if nil != err {
+		glog.Errorf("Could not unmarshall subnets result: %v", err)
+		return nil, err
+	}
+	glog.V(5).Infof("Succeeded to unmarshall subnets result: %v", result)
+
+	return result, nil
+}
+
+func (provider *InfraProvider) searchSubnets(networkid string) ([]subnets.Subnet, error) {
+	client, err := openstack.NewNetworkV2(provider.providerclient, gophercloud.EndpointOpts{
+		Region: os.Getenv("OS_REGION_NAME"),
+	})
+	if nil != err {
+		glog.Errorf("Could not reap networking service: %v", err)
+		return nil, err
+	}
+	glog.V(5).Infof("Succeeded to reap networking serivce: %v%v", client.Endpoint, client.ResourceBase)
+
+	name_fake := "fake subnet name"
+	enableDHCP := true
+	networkId := "fake network id"
+	tenantId := "fake project id"
+	ipVersion := int(gophercloud.IPv4)
+	gatewayIp := "0.0.0.1"
+	cidr_fake := "0.0.0.0/0"
+	id_fake := "fake subnet id"
+	limit_fake := 0
+	marker_fake := "00000000-0000-0000-0000-000000000000"
+	sortKey := "ID"
+	sortDir := "ASC"
+
+	opts := subnets.ListOpts{
+		Name:       name_fake,
+		EnableDHCP: &enableDHCP,
+		NetworkID:  networkId,
+		TenantID:   tenantId,
+		IPVersion:  ipVersion,
+		GatewayIP:  gatewayIp,
+		CIDR:       cidr_fake,
+		ID:         id_fake,
+		Limit:      limit_fake,
+		Marker:     marker_fake,
+		SortKey:    sortKey,
+		SortDir:    sortDir,
+	}
+	opts = subnets.ListOpts{
+		NetworkID: networkid,
+	}
+
+	resp, err := subnets.List(client, opts).AllPages()
+	if nil != err {
+		glog.Errorf("Could not reap subnet list capability: %v", err)
+		return nil, err
+	}
+	glog.V(5).Infof("Succeeded to reap subnet list capability: %v", resp)
+
+	result, err := subnets.ExtractSubnets(resp)
+	if nil != err {
+		glog.Errorf("Could not reap subnets unmarshall capability: %v", err)
+		return nil, err
+	}
+	glog.V(5).Infof("Succeeded to reap subnets unmarshall capability: %v", result)
+
+	return result, nil
+}
+
+func (provider *InfraProvider) createSubnet(networkid, cidr, name, tenantid string, allocationpools []subnets.AllocationPool, gatewayip string, ipversion gophercloud.IPVersion, enabledhcp bool, dnsnameservers []string, hostroutes []subnets.HostRoute) (*subnets.Subnet, error) {
 	client, err := openstack.NewNetworkV2(provider.providerclient, gophercloud.EndpointOpts{
 		Region: os.Getenv("OS_REGION_NAME"),
 	})
@@ -125,19 +437,89 @@ func (provider *InfraProvider) createSubnet(networkid, cidr, name, tenantid stri
 
 	subnet, err := subnets.Create(client, opts).Extract()
 	if nil != err {
-		glog.Errorf("Could not create neutron subnet: %v", err)
+		glog.Errorf("Could not reap subnet-create interface: %v", err)
 		return nil, err
 	}
-	glog.V(5).Infof("Succeeded to a new neutron subnet: %v", subnet)
+	glog.V(5).Infof("Succeeded to resp subnet-create interface: %v", subnet)
 
 	return subnet, nil
 }
 
-func (provider *InfraProvider) createRouter(name string, adminstateup, distributed bool, tenantid string, gatewayinfo routers.GatewayInfo) (*routers.Router, error) {
-	if nil != provider.lasterr {
-		return nil, provider.lasterr
+func (provider *InfraProvider) identifySubnet(name string) (*string, error) {
+	client, err := openstack.NewNetworkV2(provider.providerclient, gophercloud.EndpointOpts{
+		Region: os.Getenv("OS_REGION_NAME"),
+	})
+	if nil != err {
+		glog.Errorf("Could not reap networking service: %v", err)
+		return nil, err
+	}
+	glog.V(5).Infof("Reap networking serivce endpoint: %v%v", client.Endpoint, client.ResourceBase)
+
+	resp, err := subnets.IDFromName(client, name)
+	if nil != err {
+		glog.Errorf("Could not reap subnet-list interface: %v", err)
+		return nil, err
+	}
+	glog.V(5).Infof("Succeeded to reap subnet-list interface: %v", resp)
+
+	return &resp, nil
+}
+
+func (provider *InfraProvider) searchRouters(name string) ([]routers.Router, error) {
+	client, err := openstack.NewNetworkV2(provider.providerclient, gophercloud.EndpointOpts{
+		Region: os.Getenv("OS_REGION_NAME"),
+	})
+	if nil != err {
+		glog.Errorf("Could not reap network service: %v", err)
+		return nil, err
+	}
+	glog.V(5).Infof("Succeeded to reap network serivce: %v%v", client.Endpoint, client.ResourceBase)
+
+	id_fake := "fake subnet id"
+	name_fake := "fake subnet name"
+	adminStateUp := false
+	distributed_fake := false
+	status_fake := "ACTIVE"
+	tenantId := "fake project id"
+	limit_fake := 0
+	marker_fake := "00000000-0000-0000-0000-000000000000"
+	sortKey := "ID"
+	sortDir := "ASC"
+
+	opts := routers.ListOpts{
+		ID:           id_fake,
+		Name:         name_fake,
+		AdminStateUp: &adminStateUp,
+		Distributed:  &distributed_fake,
+		Status:       status_fake,
+		TenantID:     tenantId,
+		Limit:        limit_fake,
+		Marker:       marker_fake,
+		SortKey:      sortKey,
+		SortDir:      sortDir,
+	}
+	opts = routers.ListOpts{
+		Name: name,
 	}
 
+	resp, err := routers.List(client, opts).AllPages()
+	if nil != err {
+		glog.Errorf("Could not reap router-list capability: %v", err)
+		return nil, err
+	}
+	glog.V(5).Infof("Succeeded to reap router-list capability: %v", resp)
+
+	result, err := routers.ExtractRouters(resp)
+	if nil != err {
+		glog.Errorf("Could not unmarshall routers result: %v", err)
+		return nil, err
+	}
+	glog.V(5).Infof("Succeeded to unmarshall routers result: %v", result)
+
+	return result, nil
+}
+
+func (provider *InfraProvider) createRouter(name string, adminstateup, distributed bool, tenantid string, gatewayinfo routers.GatewayInfo) (*routers.Router, error) {
 	client, err := openstack.NewNetworkV2(provider.providerclient, gophercloud.EndpointOpts{
 		Region: os.Getenv("OS_REGION_NAME"),
 	})
@@ -147,16 +529,16 @@ func (provider *InfraProvider) createRouter(name string, adminstateup, distribut
 	}
 	glog.V(5).Infof("Reap neutron serivce endpoint: %v%v", client.Endpoint, client.ResourceBase)
 
-	nameFake := "virtual router"
+	name_fake := "virtual router"
 	adminStateUp := false
-	distributedFake := false
+	distributed_fake := false
 	tenantId := "00000000-0000-0000-0000-000000000000"
 	gatewayInfo := routers.GatewayInfo{NetworkID: "00000000-0000-0000-0000-000000000000"}
 
 	opts := routers.CreateOpts{
-		Name:         nameFake,
+		Name:         name_fake,
 		AdminStateUp: &adminStateUp,
-		Distributed:  &distributedFake,
+		Distributed:  &distributed_fake,
 		TenantID:     tenantId,
 		GatewayInfo:  &gatewayInfo,
 	}
@@ -165,7 +547,9 @@ func (provider *InfraProvider) createRouter(name string, adminstateup, distribut
 		AdminStateUp: &adminstateup,
 		Distributed:  &distributed,
 		TenantID:     tenantid,
-		GatewayInfo:  &gatewayinfo,
+	}
+	if 0 != len(gatewayinfo.NetworkID) {
+		opts.GatewayInfo = &gatewayinfo
 	}
 
 	router, err := routers.Create(client, opts).Extract()
@@ -178,11 +562,7 @@ func (provider *InfraProvider) createRouter(name string, adminstateup, distribut
 	return router, nil
 }
 
-func (provider *InfraProvider) upstreamRouter(networkid, name string, adminstateup, distributed bool, gatewayinfo routers.GatewayInfo, routes []routers.Route) (*routers.Router, error) {
-	if nil != provider.lasterr {
-		return nil, provider.lasterr
-	}
-
+func (provider *InfraProvider) upstreamRouter(id, name string, adminstateup, distributed bool, gatewayinfo routers.GatewayInfo, routes []routers.Route) (*routers.Router, error) {
 	client, err := openstack.NewNetworkV2(provider.providerclient, gophercloud.EndpointOpts{
 		Region: os.Getenv("OS_REGION_NAME"),
 	})
@@ -192,28 +572,28 @@ func (provider *InfraProvider) upstreamRouter(networkid, name string, adminstate
 	}
 	glog.V(5).Infof("Reap neutron serivce endpoint: %v%v", client.Endpoint, client.ResourceBase)
 
-	nameFake := "required"
+	name_fake := "required"
 	adminStateUp := false
-	distributedFake := false
+	distributed_fake := false
 	gatewayInfo := routers.GatewayInfo{NetworkID: "required"}
-	routesFake := []routers.Route{{NextHop: "ip addr", DestinationCIDR: "ip range"}}
+	routes_fake := []routers.Route{{NextHop: "ip addr", DestinationCIDR: "ip range"}}
 
 	opts := routers.UpdateOpts{
-		Name:         nameFake,
+		Name:         name_fake,
 		AdminStateUp: &adminStateUp,
-		Distributed:  &distributedFake,
+		Distributed:  &distributed_fake,
 		GatewayInfo:  &gatewayInfo,
-		Routes:       routesFake,
+		Routes:       routes_fake,
 	}
 	opts = routers.UpdateOpts{
-		Name:         name,
-		AdminStateUp: &adminstateup,
-		Distributed:  &distributed,
-		GatewayInfo:  &gatewayinfo,
-		Routes:       routes,
+		// Name: name,
+		// AdminStateUp: &adminstateup,
+		// Distributed:  &distributed,
+		GatewayInfo: &gatewayinfo,
+		// Routes:       routes,
 	}
 
-	resp, err := routers.Update(client, networkid, opts).Extract()
+	resp, err := routers.Update(client, id, opts).Extract()
 	if nil != err {
 		glog.Errorf("Could not modify neutron router: %v", err)
 		return nil, err
@@ -223,11 +603,130 @@ func (provider *InfraProvider) upstreamRouter(networkid, name string, adminstate
 	return resp, nil
 }
 
-func (provider *InfraProvider) createPort(networkid, name string, adminstateup bool, macaddress string, fixedips []ports.IP, deviceid, deviceowner, tenantid string, securitygroups []string, allowedaddresspairs []ports.AddressPair) (*ports.Port, error) {
-	if nil != provider.lasterr {
-		return nil, provider.lasterr
+func (provider *InfraProvider) gainFloatingIps() ([]floatingips.FloatingIP, error) {
+	client, err := openstack.NewNetworkV2(provider.providerclient, gophercloud.EndpointOpts{
+		Region: os.Getenv("OS_REGION_NAME"),
+	})
+	if nil != err {
+		glog.Errorf("Could not reap neutron service: %v", err)
+		return nil, err
+	}
+	glog.V(5).Infof("Reap neutron serivce endpoint: %v%v", client.Endpoint, client.ResourceBase)
+
+	id_fake := "The id"
+	floatingNetworkId := "network id"
+	floatingIp := "ip"
+	portId := "port id"
+	fixedIp := "ip"
+	tenantId := "fake"
+	limit_fake := 0
+	marker_fake := "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF"
+	sortKey := "ID"
+	sortDir := "ASC"
+	routerId := "fake"
+
+	opts := floatingips.ListOpts{
+		ID:                id_fake,
+		FloatingNetworkID: floatingNetworkId,
+		FloatingIP:        floatingIp,
+		PortID:            portId,
+		FixedIP:           fixedIp,
+		TenantID:          tenantId,
+		Limit:             limit_fake,
+		Marker:            marker_fake,
+		SortKey:           sortKey,
+		SortDir:           sortDir,
+		RouterID:          routerId,
+	}
+	opts = floatingips.ListOpts{
+		SortDir: sortDir,
 	}
 
+	result, err := floatingips.List(client, opts).AllPages()
+	if nil != err {
+		glog.Errorf("Could not reap networking floatingips capability: %v", err)
+		return nil, err
+	}
+	glog.V(5).Infof("Succeeded to reap networking floating capability: %v", result)
+
+	resp, err := floatingips.ExtractFloatingIPs(result)
+	if nil != err {
+		glog.Errorf("Could not reap networking floatingips marshall: %v", err)
+		return nil, err
+	}
+	glog.V(5).Infof("Succeeded to reap networking floating marshall: %v", resp)
+
+	return resp, nil
+}
+
+func (provider *InfraProvider) createFloatingIp(floatingnetworkid, floatingip, portid, fixedip, tenantid string) (*floatingips.FloatingIP, error) {
+	client, err := openstack.NewNetworkV2(provider.providerclient, gophercloud.EndpointOpts{
+		Region: os.Getenv("OS_REGION_NAME"),
+	})
+	if nil != err {
+		glog.Errorf("Could not reap neutron service: %v", err)
+		return nil, err
+	}
+	glog.V(5).Infof("Reap neutron serivce endpoint: %v%v", client.Endpoint, client.ResourceBase)
+
+	floatingNetworkId := "required"
+	floatingIp := "optional"
+	portId := "required"
+	fixedIp := "optional"
+	tenantId := "optional"
+
+	opts := floatingips.CreateOpts{
+		FloatingNetworkID: floatingNetworkId,
+		FloatingIP:        floatingIp,
+		PortID:            portId,
+		FixedIP:           fixedIp,
+		TenantID:          tenantId,
+	}
+	opts = floatingips.CreateOpts{
+		FloatingNetworkID: floatingnetworkid,
+		PortID:            portid,
+	}
+	if 0 != len(floatingip) {
+		opts.FloatingIP = floatingip
+	}
+	if 0 != len(fixedip) {
+		opts.FixedIP = fixedip
+	}
+	if 0 != len(tenantid) {
+		opts.TenantID = tenantid
+	}
+
+	result, err := floatingips.Create(client, opts).Extract()
+	if nil != err {
+		glog.Errorf("Could not reap networking floatingips capability: %v", err)
+		return nil, err
+	}
+	glog.V(5).Infof("Succeeded to reap networking floating capability: %v", result)
+
+	return result, nil
+}
+
+func (provider *InfraProvider) queryFloatingIp(id string) (*floatingips.FloatingIP, error) {
+	client, err := openstack.NewNetworkV2(provider.providerclient, gophercloud.EndpointOpts{
+		Region: os.Getenv("OS_REGION_NAME"),
+	})
+	if nil != err {
+		glog.Errorf("Could not reap neutron service: %v", err)
+		return nil, err
+	}
+	glog.V(5).Infof("Reap neutron serivce endpoint: %v%v", client.Endpoint, client.ResourceBase)
+
+	result, err := floatingips.Get(client, id).Extract()
+	if nil != err {
+		glog.Errorf("Could not reap networking floatingips capability: %v", err)
+		return nil, err
+	}
+	glog.V(5).Infof("Succeeded to reap networking floating capability: %v", result)
+
+	return result, nil
+}
+
+func (provider *InfraProvider) createPort(networkid, name string, adminstateup bool, macaddress string, fixedips []ports.IP, deviceid, deviceowner, tenantid string, securitygroups []string, allowedaddresspairs []ports.AddressPair) (*ports.Port, error) {
 	client, err := openstack.NewNetworkV2(provider.providerclient, gophercloud.EndpointOpts{
 		Region: os.Getenv("OS_REGION_NAME"),
 	})
@@ -261,16 +760,34 @@ func (provider *InfraProvider) createPort(networkid, name string, adminstateup b
 		AllowedAddressPairs: allowedAddressPairs,
 	}
 	opts = ports.CreateOpts{
-		NetworkID:           networkid,
-		Name:                name,
-		AdminStateUp:        &adminstateup,
-		MACAddress:          macaddress,
-		FixedIPs:            fixedips,
-		DeviceID:            deviceid,
-		DeviceOwner:         deviceowner,
-		TenantID:            tenantid,
-		SecurityGroups:      securitygroups,
-		AllowedAddressPairs: allowedaddresspairs,
+		NetworkID: networkid,
+	}
+	if 0 != len(name) {
+		opts.Name = name
+	}
+	if !adminstateup {
+		opts.AdminStateUp = &adminstateup
+	}
+	if 0 != len(macaddress) {
+		opts.MACAddress = macaddress
+	}
+	if 0 != len(fixedips) {
+		opts.FixedIPs = fixedips
+	}
+	if 0 != len(deviceid) {
+		opts.DeviceID = deviceid
+	}
+	if 0 != len(deviceowner) {
+		opts.DeviceOwner = deviceowner
+	}
+	if 0 != len(tenantid) {
+		opts.TenantID = tenantid
+	}
+	if 0 != len(securitygroups) {
+		opts.SecurityGroups = securitygroups
+	}
+	if 0 != len(allowedaddresspairs) {
+		opts.AllowedAddressPairs = allowedaddresspairs
 	}
 
 	port, err := ports.Create(client, opts).Extract()
@@ -283,11 +800,28 @@ func (provider *InfraProvider) createPort(networkid, name string, adminstateup b
 	return port, nil
 }
 
-func (provider *InfraProvider) plugRouterIntoSubnet(routerid, portid string) (*routers.InterfaceInfo, error) {
-	if nil != provider.lasterr {
-		return nil, provider.lasterr
+func (provider *InfraProvider) queryPort(id string) (*ports.Port, error) {
+	client, err := openstack.NewNetworkV2(provider.providerclient, gophercloud.EndpointOpts{
+		Region: os.Getenv("OS_REGION_NAME"),
+	})
+	if nil != err {
+		glog.Errorf("Could not reap neutron service: %v", err)
+		return nil, err
 	}
+	glog.V(5).Infof("Reap neutron serivce endpoint: %v%v", client.Endpoint, client.ResourceBase)
 
+	result, err := ports.Get(client, id).Extract()
+	if nil != err {
+		glog.Errorf("Could not reap networking port creation capability: %v", err)
+		return nil, err
+	}
+	glog.V(5).Infof("Succeeded to reap networking port creation capability: %v", result)
+
+	return result, nil
+}
+
+func (provider *InfraProvider) plugRouterIntoSubnet(routerid, portid string) (*routers.InterfaceInfo, error) {
+	glog.Infof("Invoke add router interface: router=%v, port=%v", routerid, portid)
 	client, err := openstack.NewNetworkV2(provider.providerclient, gophercloud.EndpointOpts{
 		Region: os.Getenv("OS_REGION_NAME"),
 	})
@@ -298,22 +832,19 @@ func (provider *InfraProvider) plugRouterIntoSubnet(routerid, portid string) (*r
 	glog.V(5).Infof("Reap neutron serivce endpoint: %v%v", client.Endpoint, client.ResourceBase)
 
 	ifinfo, err := routers.AddInterface(client, routerid, routers.AddInterfaceOpts{
-		PortID: portid,
+		SubnetID: "",
+		PortID:   portid,
 	}).Extract()
 	if nil != err {
-		glog.Errorf("Could not create neutron interface: %v", err)
+		glog.Errorf("Could not reap router interface creation: %v", err)
 		return nil, err
 	}
-	glog.V(5).Infof("Succeeded to a new neutron interface: %v", ifinfo)
+	glog.V(5).Infof("Succeeded to reap router interface creation: %v", ifinfo)
 
 	return ifinfo, nil
 }
 
 func (provider *InfraProvider) createSecurityGroup(name, tenantid, description string) (*groups.SecGroup, error) {
-	if nil != provider.lasterr {
-		return nil, provider.lasterr
-	}
-
 	client, err := openstack.NewNetworkV2(provider.providerclient, gophercloud.EndpointOpts{
 		Region: os.Getenv("OS_REGION_NAME"),
 	})
@@ -337,11 +868,47 @@ func (provider *InfraProvider) createSecurityGroup(name, tenantid, description s
 	return secgroup, nil
 }
 
-func (provider *InfraProvider) createSecGroupRule(direction rules.RuleDirection, ethertype rules.RuleEtherType, secgroupid string, portrangemax, portrangemin int, protocol rules.RuleProtocol, remotegroupid, remoteipprefix, tenantid string) (*rules.SecGroupRule, error) {
-	if nil != provider.lasterr {
-		return nil, provider.lasterr
+func (provider *InfraProvider) querySecurityGroup(id string) (*groups.SecGroup, error) {
+	client, err := openstack.NewNetworkV2(provider.providerclient, gophercloud.EndpointOpts{
+		Region: os.Getenv("OS_REGION_NAME"),
+	})
+	if nil != err {
+		glog.Errorf("Could not reap neutron service: %v", err)
+		return nil, err
 	}
+	glog.V(5).Infof("Reap neutron serivce endpoint: %v%v", client.Endpoint, client.ResourceBase)
 
+	result, err := groups.Get(client, id).Extract()
+	if nil != err {
+		glog.Errorf("Could not reap networking query capability: %v", err)
+		return nil, err
+	}
+	glog.V(5).Infof("Succeeded to a resp networking query capability: %v", result)
+
+	return result, nil
+}
+
+func (provider *InfraProvider) identifySecurityGroup(name string) (*string, error) {
+	client, err := openstack.NewNetworkV2(provider.providerclient, gophercloud.EndpointOpts{
+		Region: os.Getenv("OS_REGION_NAME"),
+	})
+	if nil != err {
+		glog.Errorf("Could not reap neutron service: %v", err)
+		return nil, err
+	}
+	glog.V(5).Infof("Reap neutron serivce endpoint: %v%v", client.Endpoint, client.ResourceBase)
+
+	result, err := groups.IDFromName(client, name)
+	if nil != err {
+		glog.Errorf("Could not reap networking query capability: %v", err)
+		return nil, err
+	}
+	glog.V(5).Infof("Succeeded to a resp networking query capability: %v", result)
+
+	return &result, nil
+}
+
+func (provider *InfraProvider) createSecGroupRule(direction rules.RuleDirection, ethertype rules.RuleEtherType, secgroupid string, portrangemax, portrangemin int, protocol rules.RuleProtocol, remotegroupid, remoteipprefix, tenantid string) (*rules.SecGroupRule, error) {
 	client, err := openstack.NewNetworkV2(provider.providerclient, gophercloud.EndpointOpts{
 		Region: os.Getenv("OS_REGION_NAME"),
 	})
@@ -372,10 +939,6 @@ func (provider *InfraProvider) createSecGroupRule(direction rules.RuleDirection,
 }
 
 func (provider *InfraProvider) gainImages() ([]images.Image, error) {
-	if nil != provider.lasterr {
-		return nil, provider.lasterr
-	}
-
 	client, err := openstack.NewImageServiceV2(provider.providerclient, gophercloud.EndpointOpts{
 		Region: os.Getenv("OS_REGION_NAME"),
 	})
@@ -385,61 +948,56 @@ func (provider *InfraProvider) gainImages() ([]images.Image, error) {
 	}
 	glog.V(5).Infof("Reap glance serivce endpoint: %v%v", client.Endpoint, client.ResourceBase)
 
-	limit := 0
-	marker := "00000000-0000-0000-0000-000000000000"
-	nameFake := "search condition"
-	visibility := images.ImageVisibilityPublic
+	limit_fake := 0
+	marker_fake := "00000000-0000-0000-0000-000000000000"
+	name_fake := "search condition"
+	visibility_fake := images.ImageVisibilityPublic
 	memberStatus := images.ImageMemberStatusAll
-	ownerFake := "uploader"
-	status := images.ImageStatusActive
+	owner_fake := "uploader"
+	status_fake := images.ImageStatusActive
 	sizeMin := int64(100)
 	sizeMax := int64(10000)
 	sortKey := "id"
 	sortDir := "ASC"
-	tagFake := ""
+	tag_fake := ""
 
 	opts := images.ListOpts{
-		Limit:        limit,
-		Marker:       marker,
-		Name:         nameFake,
-		Visibility:   visibility,
+		Limit:        limit_fake,
+		Marker:       marker_fake,
+		Name:         name_fake,
+		Visibility:   visibility_fake,
 		MemberStatus: memberStatus,
-		Owner:        ownerFake,
-		Status:       status,
+		Owner:        owner_fake,
+		Status:       status_fake,
 		SizeMin:      sizeMin,
 		SizeMax:      sizeMax,
 		SortKey:      sortKey,
 		SortDir:      sortDir,
-		Tag:          tagFake,
+		Tag:          tag_fake,
 	}
-	opts = images.ListOpts{
-		Visibility:   visibility,
-		MemberStatus: memberStatus,
-		Status:       status,
-	}
+	glog.V(9).Info(opts)
+	// opts = images.ListOpts{
+	// 	Status: status_fake,
+	// }
 
-	result, err := images.List(client, opts).AllPages()
+	result, err := images.List(client, nil).AllPages()
 	if nil != err {
-		glog.Errorf("Could not reap glance search interface: %v", err)
+		glog.Errorf("Could not reap image list interface: %v", err)
 		return nil, err
 	}
-	glog.V(5).Infof("Succeeded to reap glance search interface: %v", result)
+	glog.V(5).Infof("Succeeded to reap image list interface: %v", result)
 
 	images, err := images.ExtractImages(result)
 	if nil != err {
-		glog.Errorf("Could not reap glance search interface: %v", err)
+		glog.Errorf("Could not reap image list capability: %v", err)
 		return nil, err
 	}
-	glog.V(5).Infof("Succeeded to reap glance search interface: %v", images)
+	glog.V(5).Infof("Succeeded to reap image list capability: %v", images)
 
 	return images, nil
 }
 
 func (provider *InfraProvider) searchImages(name string) ([]images.Image, error) {
-	if nil != provider.lasterr {
-		return nil, provider.lasterr
-	}
-
 	client, err := openstack.NewImageServiceV2(provider.providerclient, gophercloud.EndpointOpts{
 		Region: os.Getenv("OS_REGION_NAME"),
 	})
@@ -449,20 +1007,38 @@ func (provider *InfraProvider) searchImages(name string) ([]images.Image, error)
 	}
 	glog.V(5).Infof("Reap glance serivce endpoint: %v%v", client.Endpoint, client.ResourceBase)
 
-	resp, err := images.List(client, images.ListOpts{
-		// Limit:      limit,
-		// Marker:      marker,
+	limit_fake := 0
+	marker_fake := "00000000-0000-0000-0000-000000000000"
+	name_fake := "search condition"
+	visibility_fake := images.ImageVisibilityPublic
+	memberStatus := images.ImageMemberStatusAll
+	owner_fake := "uploader"
+	status_fake := images.ImageStatusActive
+	sizeMin := int64(100)
+	sizeMax := int64(10000)
+	sortKey := "id"
+	sortDir := "ASC"
+	tag_fake := ""
+
+	opts := images.ListOpts{
+		Limit:        limit_fake,
+		Marker:       marker_fake,
+		Name:         name_fake,
+		Visibility:   visibility_fake,
+		MemberStatus: memberStatus,
+		Owner:        owner_fake,
+		Status:       status_fake,
+		SizeMin:      sizeMin,
+		SizeMax:      sizeMax,
+		SortKey:      sortKey,
+		SortDir:      sortDir,
+		Tag:          tag_fake,
+	}
+	opts = images.ListOpts{
 		Name: name,
-		// Visibility:   images.ImageVisibilityPublic,
-		// MemberStatus: images.ImageMemberStatusAll,
-		// Owner:       owner,
-		// Status: images.ImageStatusActive,
-		// SizeMin: sizemin,
-		// SizeMax: sizemax,
-		// SortKey: sortkey,
-		// SortDir: sortdir,
-		// Tag:       tag,
-	}).AllPages()
+	}
+
+	resp, err := images.List(client, opts).AllPages()
 	if nil != err {
 		glog.Errorf("Could not reap glance search interface: %v", err)
 		return nil, err
@@ -471,19 +1047,15 @@ func (provider *InfraProvider) searchImages(name string) ([]images.Image, error)
 
 	result, err := images.ExtractImages(resp)
 	if nil != err {
-		glog.Errorf("Could not reap glance search interface: %v", err)
+		glog.Errorf("Could not complete glance search capability: %v", err)
 		return nil, err
 	}
-	glog.V(5).Infof("Succeeded to reap glance search interface: %v", result)
+	glog.V(5).Infof("Succeeded to glance search capability: %v", result)
 
 	return result, nil
 }
 
 func (provider *InfraProvider) queryImage(id string) (*images.Image, error) {
-	if nil != provider.lasterr {
-		return nil, provider.lasterr
-	}
-
 	client, err := openstack.NewImageServiceV2(provider.providerclient, gophercloud.EndpointOpts{
 		Region: os.Getenv("OS_REGION_NAME"),
 	})
@@ -495,19 +1067,47 @@ func (provider *InfraProvider) queryImage(id string) (*images.Image, error) {
 
 	result, err := images.Get(client, id).Extract()
 	if nil != err {
-		glog.Errorf("Could not reap glance reap interface: %v", err)
+		glog.Errorf("Could not complete glance get capability: %v", err)
 		return nil, err
 	}
-	glog.V(5).Infof("Succeeded to reap glance reap interface: %v", result)
+	glog.V(5).Infof("Succeeded to glance get capability: %v", result)
 
 	return result, nil
 }
 
-func (provider *InfraProvider) gainComputeImages() ([]computeimages.Image, error) {
-	if nil != provider.lasterr {
-		return nil, provider.lasterr
+func (provider *InfraProvider) identifyImage(name string) (*string, error) {
+	client, err := openstack.NewImageServiceV2(provider.providerclient, gophercloud.EndpointOpts{
+		Region: os.Getenv("OS_REGION_NAME"),
+	})
+	if nil != err {
+		glog.Errorf("Could not reap image service: %v", err)
+		return nil, err
 	}
+	glog.V(5).Infof("Reap image serivce endpoint: %v%v", client.Endpoint, client.ResourceBase)
 
+	result, err := images.List(client, images.ListOpts{
+		Name: name,
+	}).AllPages()
+	if nil != err {
+		glog.Errorf("Could not reap image search capability: %v", err)
+		return nil, err
+	}
+	glog.V(5).Infof("Succeeded to reap image search capability: %v", result)
+
+	resp, err := images.ExtractImages(result)
+	if nil != err {
+		glog.Errorf("Could not reap image search capability: %v", err)
+		return nil, err
+	}
+	glog.V(5).Infof("Succeeded to reap image search capability: %v", resp)
+	if 0 == len(resp) {
+		return nil, fmt.Errorf("No existed")
+	}
+	id := resp[0].ID
+	return &id, nil
+}
+
+func (provider *InfraProvider) gainComputeImages() ([]computeimages.Image, error) {
 	client, err := openstack.NewComputeV2(provider.providerclient, gophercloud.EndpointOpts{
 		Region: os.Getenv("OS_REGION_NAME"),
 	})
@@ -517,7 +1117,7 @@ func (provider *InfraProvider) gainComputeImages() ([]computeimages.Image, error
 	}
 	glog.V(5).Infof("Reap glance serivce endpoint: %v%v", client.Endpoint, client.ResourceBase)
 
-	kind := "SERVER" // "BASE" "SERVER" "ALL"
+	// kind := "SERVER" // "BASE" "SERVER" "ALL"
 	result, err := computeimages.ListDetail(client, computeimages.ListOpts{
 		// ChangesSince: changesince,
 		// Limit:      limit,
@@ -525,7 +1125,7 @@ func (provider *InfraProvider) gainComputeImages() ([]computeimages.Image, error
 		// Name: name,
 		// Server:       server,
 		Status: string(images.ImageStatusActive),
-		Type:   kind,
+		// Type:   kind,
 	}).AllPages()
 	if nil != err {
 		glog.Errorf("Could not reap compute/images search interface: %v", err)
@@ -544,10 +1144,6 @@ func (provider *InfraProvider) gainComputeImages() ([]computeimages.Image, error
 }
 
 func (provider *InfraProvider) searchComputeImages(name string) ([]computeimages.Image, error) {
-	if nil != provider.lasterr {
-		return nil, provider.lasterr
-	}
-
 	client, err := openstack.NewComputeV2(provider.providerclient, gophercloud.EndpointOpts{
 		Region: os.Getenv("OS_REGION_NAME"),
 	})
@@ -584,10 +1180,6 @@ func (provider *InfraProvider) searchComputeImages(name string) ([]computeimages
 }
 
 func (provider *InfraProvider) queryComputeImage(id string) (*computeimages.Image, error) {
-	if nil != provider.lasterr {
-		return nil, provider.lasterr
-	}
-
 	client, err := openstack.NewComputeV2(provider.providerclient, gophercloud.EndpointOpts{
 		Region: os.Getenv("OS_REGION_NAME"),
 	})
@@ -607,11 +1199,7 @@ func (provider *InfraProvider) queryComputeImage(id string) (*computeimages.Imag
 	return result, nil
 }
 
-func (provider *InfraProvider) reapFlavors() ([]flavors.Flavor, error) {
-	if nil != provider.lasterr {
-		return nil, provider.lasterr
-	}
-
+func (provider *InfraProvider) gainFlavors() ([]flavors.Flavor, error) {
 	client, err := openstack.NewComputeV2(provider.providerclient, gophercloud.EndpointOpts{
 		Region: os.Getenv("OS_REGION_NAME"),
 	})
@@ -655,10 +1243,6 @@ func (provider *InfraProvider) reapFlavors() ([]flavors.Flavor, error) {
 }
 
 func (provider *InfraProvider) queryFlavor(id string) (*flavors.Flavor, error) {
-	if nil != provider.lasterr {
-		return nil, provider.lasterr
-	}
-
 	client, err := openstack.NewComputeV2(provider.providerclient, gophercloud.EndpointOpts{
 		Region: os.Getenv("OS_REGION_NAME"),
 	})
@@ -679,10 +1263,6 @@ func (provider *InfraProvider) queryFlavor(id string) (*flavors.Flavor, error) {
 }
 
 func (provider *InfraProvider) identifyFlavor(name string) (*string, error) {
-	if nil != provider.lasterr {
-		return nil, provider.lasterr
-	}
-
 	client, err := openstack.NewComputeV2(provider.providerclient, gophercloud.EndpointOpts{
 		Region: os.Getenv("OS_REGION_NAME"),
 	})
@@ -702,11 +1282,7 @@ func (provider *InfraProvider) identifyFlavor(name string) (*string, error) {
 	return &result, nil
 }
 
-func (provider *InfraProvider) reapMachines() ([]servers.Server, error) {
-	if nil != provider.lasterr {
-		return nil, provider.lasterr
-	}
-
+func (provider *InfraProvider) gainMachines() ([]servers.Server, error) {
 	client, err := openstack.NewComputeV2(provider.providerclient, gophercloud.EndpointOpts{
 		Region: os.Getenv("OS_REGION_NAME"),
 	})
@@ -757,10 +1333,6 @@ func (provider *InfraProvider) reapMachines() ([]servers.Server, error) {
 }
 
 func (provider *InfraProvider) searchMachines(name string) ([]servers.Server, error) {
-	if nil != provider.lasterr {
-		return nil, provider.lasterr
-	}
-
 	client, err := openstack.NewComputeV2(provider.providerclient, gophercloud.EndpointOpts{
 		Region: os.Getenv("OS_REGION_NAME"),
 	})
@@ -813,11 +1385,7 @@ func (provider *InfraProvider) searchMachines(name string) ([]servers.Server, er
 	return result, nil
 }
 
-func (provider *InfraProvider) createMachine(name, imagename, flavorname string, networks []servers.Network) (*servers.Server, error) {
-	if nil != provider.lasterr {
-		return nil, provider.lasterr
-	}
-
+func (provider *InfraProvider) createMachine(name, imageid, imagename, flavorid, flavorname string, securitygroups []string, userdata []byte, networks []servers.Network, personality servers.Personality, adminpass, accessipv4 string) (*servers.Server, error) {
 	client, err := openstack.NewComputeV2(provider.providerclient, gophercloud.EndpointOpts{
 		Region: os.Getenv("OS_REGION_NAME"),
 	})
@@ -827,50 +1395,68 @@ func (provider *InfraProvider) createMachine(name, imagename, flavorname string,
 	}
 	glog.V(5).Infof("Reap compute serivce endpoint: %v%v", client.Endpoint, client.ResourceBase)
 
-	nameFake := "new vm name"
-	imageref := "00000000-0000-0000-0000-000000000000"
+	name_fake := "new vm name"
+	imageRef := "00000000-0000-0000-0000-000000000000"
 	imageName := "cirros"
-	flavorref := "00000000-0000-0000-0000-000000000000"
-	flavorName := "small"
+	flavorRef := "00000000-0000-0000-0000-000000000000"
+	flavorName := "m1.small"
 	securityGroups := []string{"default", "customization"}
 	userData := []byte("/bin/cat /etc/OS-RELEASE")
-	availabilityzone := "no zone"
-	networksFake := []servers.Network{{
+	availabilityZone := "no zone"
+	networks_fake := []servers.Network{{
 		UUID:    "", // Required unless Port is provided
 		Port:    "00000000-0000-0000-0000-000000000000",
 		FixedIP: "optional, maybe using DHCP",
 	}}
-	metadata := map[string]string{"key": "value"}
-	personality := []*servers.File{&servers.File{Path: "path-to-injected-file", Contents: []byte("contents-of-injected-file")}}
+	metadata_fake := map[string]string{"key": "value"}
+	personality_fake := []*servers.File{&servers.File{Path: "path-to-injected-file", Contents: []byte("contents-of-injected-file")}}
 	configDrive := false
-	adminpass := "secret"
-	accessipv4 := "0.0.0.0"
-	accessipv6 := "::0"
+	adminPass := "secret"
+	accessIpv4 := "0.0.0.0"
+	accessIpv6 := "::"
+	serviceClient := client
 
 	opts := servers.CreateOpts{
-		Name:             nameFake,
-		ImageRef:         imageref,
+		Name:             name_fake,
+		ImageRef:         imageRef,
 		ImageName:        imageName,
-		FlavorRef:        flavorref,
+		FlavorRef:        flavorRef,
 		FlavorName:       flavorName,
 		SecurityGroups:   securityGroups,
 		UserData:         userData,
-		AvailabilityZone: availabilityzone,
-		Networks:         networksFake,
-		Metadata:         metadata,
-		Personality:      personality,
+		AvailabilityZone: availabilityZone,
+		Networks:         networks_fake,
+		Metadata:         metadata_fake,
+		Personality:      personality_fake,
 		ConfigDrive:      &configDrive,
-		AdminPass:        adminpass,
-		AccessIPv4:       accessipv4,
-		AccessIPv6:       accessipv6,
-		ServiceClient:    client,
+		AdminPass:        adminPass,
+		AccessIPv4:       accessIpv4,
+		AccessIPv6:       accessIpv6,
+		ServiceClient:    serviceClient,
 	}
 	opts = servers.CreateOpts{
 		Name:          name,
+		ImageRef:      imageid,
 		ImageName:     imagename,
+		FlavorRef:     flavorid,
 		FlavorName:    flavorname,
 		Networks:      networks,
 		ServiceClient: client,
+	}
+	if 0 != len(securitygroups) {
+		opts.SecurityGroups = securitygroups
+	}
+	if 0 != len(userdata) {
+		opts.UserData = userdata
+	}
+	if 0 != len(personality) {
+		opts.Personality = personality
+	}
+	if 0 != len(adminpass) {
+		opts.AdminPass = adminpass
+	}
+	if 0 != len(accessipv4) {
+		opts.AccessIPv4 = accessipv4
 	}
 
 	result, err := servers.Create(client, opts).Extract()
@@ -884,10 +1470,6 @@ func (provider *InfraProvider) createMachine(name, imagename, flavorname string,
 }
 
 func (provider *InfraProvider) deleteMachine(id string) error {
-	if nil != provider.lasterr {
-		return provider.lasterr
-	}
-
 	client, err := openstack.NewComputeV2(provider.providerclient, gophercloud.EndpointOpts{
 		Region: os.Getenv("OS_REGION_NAME"),
 	})
@@ -906,10 +1488,6 @@ func (provider *InfraProvider) deleteMachine(id string) error {
 }
 
 func (provider *InfraProvider) queryMachine(id string) (*servers.Server, error) {
-	if nil != provider.lasterr {
-		return nil, provider.lasterr
-	}
-
 	client, err := openstack.NewComputeV2(provider.providerclient, gophercloud.EndpointOpts{
 		Region: os.Getenv("OS_REGION_NAME"),
 	})
@@ -929,11 +1507,33 @@ func (provider *InfraProvider) queryMachine(id string) (*servers.Server, error) 
 	return resp, nil
 }
 
-func (provider *InfraProvider) searchMachine(name string) ([]servers.Server, error) {
-	if nil != provider.lasterr {
-		return nil, provider.lasterr
+func (provider *InfraProvider) restartMachine(id string, rebootmethod servers.RebootMethod) error {
+	client, err := openstack.NewComputeV2(provider.providerclient, gophercloud.EndpointOpts{
+		Region: os.Getenv("OS_REGION_NAME"),
+	})
+	if nil != err {
+		glog.Errorf("Could not reap compute service: %v", err)
+		return err
 	}
+	glog.V(5).Infof("Reap compute serivce endpoint: %v%v", client.Endpoint, client.ResourceBase)
 
+	rebootMethod := servers.SoftReboot
+
+	opts := &servers.RebootOpts{
+		Type: rebootMethod,
+	}
+	opts.Type = rebootmethod
+
+	if err := servers.Reboot(client, id, opts).ExtractErr(); nil != err {
+		glog.Errorf("Could not reap compute/servers reboot capability: %v", err)
+		return err
+	}
+	glog.V(5).Infof("Succeeded to reap compute/servers reboot capability")
+
+	return nil
+}
+
+func (provider *InfraProvider) searchMachine(name string) ([]servers.Server, error) {
 	client, err := openstack.NewComputeV2(provider.providerclient, gophercloud.EndpointOpts{
 		Region: os.Getenv("OS_REGION_NAME"),
 	})
@@ -986,35 +1586,27 @@ func (provider *InfraProvider) searchMachine(name string) ([]servers.Server, err
 	return result, nil
 }
 
-func (provider *InfraProvider) identifyMachine(name string) (string, error) {
-	if nil != provider.lasterr {
-		return "", provider.lasterr
-	}
-
+func (provider *InfraProvider) identifyMachine(name string) (*string, error) {
 	client, err := openstack.NewComputeV2(provider.providerclient, gophercloud.EndpointOpts{
 		Region: os.Getenv("OS_REGION_NAME"),
 	})
 	if nil != err {
 		glog.Errorf("Could not reap compute service: %v", err)
-		return "", err
+		return nil, err
 	}
 	glog.V(5).Infof("Reap compute serivce endpoint: %v%v", client.Endpoint, client.ResourceBase)
 
-	resp, err := servers.IDFromName(client, name)
+	result, err := servers.IDFromName(client, name)
 	if nil != err {
 		glog.Errorf("Could not reap compute/servers search capability: %v", err)
-		return "", err
+		return nil, err
 	}
-	glog.V(5).Infof("Succeeded to reap compute/servers search capability: %v", resp)
+	glog.V(5).Infof("Succeeded to reap compute/servers search capability: %v", result)
 
-	return resp, nil
+	return &result, nil
 }
 
 func (provider *InfraProvider) reapUsers() ([]users.User, error) {
-	if nil != provider.lasterr {
-		return nil, provider.lasterr
-	}
-
 	chosen, _, err := utils.ChooseVersion(provider.providerclient, []*utils.Version{
 		{ID: "v2.0", Priority: 20, Suffix: "/v2.0/"},
 		{ID: "v3.0", Priority: 30, Suffix: "/v3/"},
@@ -1058,10 +1650,6 @@ func (provider *InfraProvider) reapUsers() ([]users.User, error) {
 }
 
 func (provider *InfraProvider) createUser(username, tenantid string, enabled bool, email string) (*users.User, error) {
-	if nil != provider.lasterr {
-		return nil, provider.lasterr
-	}
-
 	chosen, _, err := utils.ChooseVersion(provider.providerclient, []*utils.Version{
 		{ID: "v2.0", Priority: 20, Suffix: "/v2.0/"},
 		{ID: "v3.0", Priority: 30, Suffix: "/v3/"},
@@ -1103,10 +1691,6 @@ func (provider *InfraProvider) createUser(username, tenantid string, enabled boo
 }
 
 func (provider *InfraProvider) reapTenantsOrProjects() ([]tenants.Tenant, []projects.Project, error) {
-	if nil != provider.lasterr {
-		return nil, nil, provider.lasterr
-	}
-
 	chosen, _, err := utils.ChooseVersion(provider.providerclient, []*utils.Version{
 		{ID: "v2.0", Priority: 20, Suffix: "/v2.0/"},
 		{ID: "v3.0", Priority: 30, Suffix: "/v3/"},
@@ -1195,10 +1779,6 @@ func (provider *InfraProvider) reapTenantsOrProjects() ([]tenants.Tenant, []proj
 }
 
 func (provider *InfraProvider) searchProject(name string) ([]tenants.Tenant, []projects.Project, error) {
-	if nil != provider.lasterr {
-		return nil, nil, provider.lasterr
-	}
-
 	chosen, _, err := utils.ChooseVersion(provider.providerclient, []*utils.Version{
 		{ID: "v2.0", Priority: 20, Suffix: "/v2.0/"},
 		{ID: "v3.0", Priority: 30, Suffix: "/v3/"},
@@ -1295,10 +1875,6 @@ func (provider *InfraProvider) searchProject(name string) ([]tenants.Tenant, []p
 }
 
 func (provider *InfraProvider) queryProject(id string) (*tenants.Tenant, *projects.Project, error) {
-	if nil != provider.lasterr {
-		return nil, nil, provider.lasterr
-	}
-
 	chosen, _, err := utils.ChooseVersion(provider.providerclient, []*utils.Version{
 		{ID: "v2.0", Priority: 20, Suffix: "/v2.0/"},
 		{ID: "v3.0", Priority: 30, Suffix: "/v3/"},
@@ -1335,10 +1911,6 @@ func (provider *InfraProvider) queryProject(id string) (*tenants.Tenant, *projec
 }
 
 func (provider *InfraProvider) createProject(domainid string, enabled, isdomain bool, name, parentid, description string) (*tenants.Tenant, *projects.Project, error) {
-	if nil != provider.lasterr {
-		return nil, nil, provider.lasterr
-	}
-
 	chosen, _, err := utils.ChooseVersion(provider.providerclient, []*utils.Version{
 		{ID: "v2.0", Priority: 20, Suffix: "/v2.0/"},
 		{ID: "v3.0", Priority: 30, Suffix: "/v3/"},
@@ -1388,6 +1960,26 @@ func (provider *InfraProvider) createProject(domainid string, enabled, isdomain 
 		// The switch statement must be out of date from the versions list.
 		return nil, nil, fmt.Errorf("Unrecognized identity version: %s", chosen.ID)
 	}
+}
+
+func (provider *InfraProvider) validateToken(id string) (*tokens.Token, error) {
+	client, err := openstack.NewIdentityV2(provider.providerclient, gophercloud.EndpointOpts{
+		Region: os.Getenv("OS_REGION_NAME"),
+	})
+	if nil != err {
+		glog.Errorf("Could not reap identity service: %v", err)
+		return nil, err
+	}
+	glog.V(5).Infof("Reap identity serivce endpoint: %v%v", client.Endpoint, client.ResourceBase)
+
+	resp, err := tokens.Get(client, id).ExtractToken()
+	if nil != err {
+		glog.Errorf("Could not reap identity query capability: %v", err)
+		return nil, err
+	}
+	glog.V(5).Infof("Succeeded to reap identity query capability: %v", resp)
+
+	return resp, nil
 }
 
 /*

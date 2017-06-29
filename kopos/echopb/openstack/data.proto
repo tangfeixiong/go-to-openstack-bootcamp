@@ -1,0 +1,290 @@
+// tangfeixiong <tangfx128@gmail.com>
+
+syntax = "proto3";
+package echopb.openstack;
+
+import "openstack/neutron/neutron.proto";
+import "openstack/nova/nova.proto";
+import "openstack/identity/identity.proto";
+import "openstack/image.proto";
+
+// Network data structure, as input/output argument
+//
+// status: means 'ACTIVE', ...
+// networks: return value, all of networks information 
+message NetworkDiscoveryReqRespData {
+    string status = 1;
+    repeated neutron.Network networks = 2;
+}
+
+// Subnet data structure, as input/output argument
+//
+// network_id: search condition
+// subnets: return value, all of subnets information 
+message SubnetDiscoveryReqRespData {
+    string network_id = 1;
+    repeated neutron.Subnet subnets = 2;
+}
+
+message IdNamePair {
+    string id = 1;
+    string name = 2;
+}
+
+// Image data structure, as input/output argument
+//
+// status: means 'queued', 'saving', 'active', ...
+// visibility: means 'public', 'shared', 'community', ...
+// member_status: means 'accepted', 'all', ...
+// images: return value, all of images Information
+message ImageDiscoveryReqRespData {
+    string status = 1;
+    string visibility = 2;
+    string member_status = 3;
+    repeated Image images = 4;
+}
+
+// Flavor data structure, as input/output argument
+//
+// access_type: means 'public', ...
+// flavors: return value, all of flavors information 
+message FlavorDiscoveryReqRespData {
+    string access_type = 1;
+    repeated nova.Flavor flavors = 2;
+}
+
+// Machine data structure, as input/output argument
+//
+// status: means 'ACTIVE', ...
+// flavors: return value, all of flavors information 
+message MachineDiscoveryReqRespData {
+    string status = 1;
+    repeated nova.Server vms = 2;
+}
+
+// Machine data structure, as input/output argument
+//
+// id: required if name is empty
+// name: required if id is empty
+// state_: return value
+message MachineDestroyReqRespData {
+    repeated IdNamePair vms = 1;
+    int32 state_code = 2;
+    string state_message = 3;
+}
+
+// Machine data structure, as input/output argument
+//
+// id: required if name is empty
+// name: required if id is empty
+// state_: return value
+message MachineRebootReqRespData {
+    repeated IdNamePair vms = 1;
+    int32 state_code = 2;
+    string state_message = 3;
+}
+
+// Flavor records represent (virtual) hardware configurations for server resources in a region.
+message Flavor {
+	// The Id field contains the flavor's unique identifier.
+	// For example, this identifier will be useful when specifying which hardware configuration to use for a new server instance.
+	// ID string json:"id"
+	string id = 1;
+	// The Disk and RA< fields provide a measure of storage space offered by the flavor, in GB and MB, respectively.
+	// Disk int json:"disk"
+	// RAM  int json:"ram"
+	int32 disk = 2;
+	int32 ram = 3;
+	// The Name field provides a human-readable moniker for the flavor.
+	// Name       string  json:"name"
+	// RxTxFactor float64 json:"rxtx_factor"
+	string name = 4;
+	double rxtx_factor = 5;
+	// Swap indicates how much space is reserved for swap.
+	// If not provided, this field will be set to 0.
+	// Swap int json:"swap"
+	int32 swap = 6;
+	// VCPUs indicates how many (virtual) CPUs are available for this flavor.
+	// VCPUs int json:"vcpus"
+	int32 vcpus = 7;
+	// IsPublic indicates whether the flavor is public.
+	// IsPublic bool json:"is_public"
+	bool is_public = 8;
+}
+
+// Booting machines data structure, used as input/output argument.
+//
+// For request, only 'flavor', 'image', 'count', 'secgroups', 'networks' are required
+// As response, provide 'servers' with additonal 'port', 'floatingip' relations
+message OpenstackNovaBootReqRespData {
+    // Flavor id, command line 'openstack flavor list' or 'nova flavor-list' to get alls
+    // Required if 'flavor_name' is not provided
+    string flavor_id = 1;
+
+    // Flavor name
+    // Required if 'flavor_id' is not provided
+    string flavor_name = 2;
+
+    // Image id, command line 'openstack image list' or 'glance image-list' to get alls
+    // Required if 'image_name' is not provided
+    string image_id = 3;
+
+    // Image name
+    // Required if 'image_id' is not provided
+    string image_name = 4;
+
+    // Min count, the minimized machines to boot
+    // Optional, the default just one machine, must less or equal than 'max_count'
+    int32 min_count = 5;
+
+    // Max count, the maxmized machines to boot
+    // Optional, the default just one machine, must greater or equal than 'min_count'
+    int32 max_count = 6;
+
+    // Security Groups Information, array of ID/Name pairs
+    // Optional, nova will using 'default' secgroup
+    repeated SecGroupInfo secgroups_info = 7;
+
+    // User data to inject into booting
+    // Optional
+    bytes user_data = 8;
+
+    // The internal network that machine should boot into
+    // Required, if 'network_name' is not provided
+    string network_id = 9;
+
+    // The internal network that machine should boot into
+    // Required alternatively for 'network_id'
+    string network_name = 10;
+
+    // The external network that floating ip should generate into
+    // Required, if 'floating_network_name' is not provided
+    string floating_network_id = 11;
+
+    // The internal network that machine should boot into
+    // Required alternatively for 'floating_network_id'
+    string floating_network_name = 12;
+
+    // The upload file (bytes) inject into booting
+    // Optional 
+    repeated nova.File personality = 13;
+    
+    // State code, return non zero decimal if creation failed
+    // Return value
+    int32 state_code = 14;
+    
+    // State message, return errors if createion failed
+    string state_message = 15;
+    
+    // Port details, the nic content created for server
+    // Return value
+    repeated neutron.Port ports = 16;
+    
+    // Server details
+    // Return value
+    repeated nova.Server servers = 17;
+    
+    // Floating IP details
+    // Return value
+    repeated neutron.FloatingIP floating_ips = 18;
+    
+    // Port-Server dictionary
+    // Return value
+    map<string, string> port_server_pairs = 19;
+    
+    // FloatingIP-Server dictionary
+    // Return value
+    map<string, string> fip_server_pairs = 20;
+    
+    // Server name, or name prefix for multi-creations
+    // Required
+    string name_prefix = 21;
+}
+
+message SecGroupInfo {
+    string id = 1;
+    string name = 2;    
+}
+
+message IfaceInfo {
+    string router_id = 1;
+    string router_name = 2;
+    string network_id = 3;
+    string network_name = 4;
+    string subnet_id = 5;
+    string subnet_name = 6;
+    repeated SecGroupInfo secgroups_info = 7;
+    string port_id = 8;
+    string port_name = 9;
+    string interface_info_id = 10;
+}
+
+message GatewayInfo {
+    string network_id = 1;
+    string network_name = 2;
+    string router_id = 3;
+    string router_name = 4;
+}
+
+message OpenstackNeutronLandscapeReqRespData {
+    repeated neutron.Network vnets = 1;
+    neutron.Router vrouter = 2;
+    neutron.SecGroup secgroup = 3;
+    repeated IfaceInfo ifaces_info = 4;
+    repeated GatewayInfo gateways_info = 5; 
+    int32 state_code = 6;
+    string state_message = 7;
+    repeated neutron.Port ports = 8;
+    repeated neutron.InterfaceInfo interfaces_info = 9;
+}
+
+message OpenstackNeutronNetRequestData {
+  string id = 1;
+  string name = 2;
+  neutron.Router router = 3;
+  neutron.Network network = 4;
+}
+
+message OpenstackNeutronNetResponseData {
+  string id = 1;
+  string name = 2;
+  neutron.Router router = 3;
+  neutron.Network network = 4;
+  neutron.InterfaceInfo interface_info = 5;
+  string gateway_network_id = 6;
+}
+
+message ConsoleResourceRequestData {
+    string id = 1;
+    string name = 2;
+}
+
+message ConsoleResourceResponseData {
+    string id = 1;
+    string name = 2;
+}
+
+message TraineeDroneRequestData {
+    string id = 1;
+    string name = 2;
+}
+
+message TraineeDroneResponseData {
+    string id = 1;
+    string name = 2;
+}
+
+message DefensiveDroneRequestData {
+    string id = 1;
+    string name = 2;
+}
+
+message DefensiveDroneResponseData {
+    string id = 1;
+    string name = 2;
+}
+
+message TokenReqRespData {
+    identity.TokenCredentialsV2 src = 1;
+    identity.Token tgt = 2;
+}

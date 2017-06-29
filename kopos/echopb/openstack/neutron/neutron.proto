@@ -3,34 +3,60 @@
 syntax = "proto3";
 package echopb.openstack.neutron;
 
-// option go_package = "neutron";
+option go_package = "openstack/neutron";
 
-import "google/protobuf/any.proto";
+// import "google/protobuf/any.proto";
+
+// FloatingIP represents a floating IP resource. A floating IP is an external
+// IP address that is mapped to an internal port and, optionally, a specific
+// IP address on a private network. In other words, it enables access to an
+// instance on a private network from an external network. For this reason,
+// floating IPs can only be defined on networks where the 'router:external'
+// attribute (provided by the external network extension) is set to True.
+message FloatingIP {
+	// Unique identifier for the floating IP instance.
+	string id = 1;
+
+	// UUID of the external network where the floating IP is to be created.
+	string floating_network_id = 2;
+
+	// Address of the floating IP on the external network.
+	string floating_ip_address = 3;
+
+	// UUID of the port on an internal network that is associated with the floating IP.
+	string port_id = 4;
+
+	// The specific IP address of the internal port which should be associated
+	// with the floating IP.
+	string fixed_ip_address = 5;
+
+	// Owner of the floating IP. Only admin users can specify a tenant identifier
+	// other than its own.
+	string tenant_id = 6;
+
+	// The condition of the API resource.
+	string status = 7;
+
+	//The ID of the router used for this Floating-IP
+	string router_id = 8;
+}
+
 
 message NetworkExternal {
     Network network = 1;
     bool external = 2;
 }
 
-message FloatingIP {
-    string id = 1;
-    string floating_network_id = 2;
-    string floating_ip = 3;
-    string port_id = 4;
-    string fixed_ip = 5;
-    string tenant_id = 6;
-    string status = 7;
-    string router_id = 8;
+message GatewayInfo {
+    string network_id = 1;
+}
+
+message Route {
+    string next_hop = 1;
+    string destination_cidr = 2;
 }
 
 message Router {
-    message GatewayInfo {
-        string network_id = 1;
-    }
-    message Route {
-        string next_hop = 1;
-        string destination_cidr = 2;
-    }
     string status =1;
     GatewayInfo gateway_info = 2;
     bool admin_state_up = 3;
@@ -41,17 +67,28 @@ message Router {
     repeated Route routes = 8;
 }
 
+// InterfaceInfo represents information about a particular router interface. As
+// mentioned above, in order for a router to forward to a subnet, it needs an
+// interface.
 message InterfaceInfo {
-    string subnet_id = 1;
-    string port_id = 2;
-    string id = 3;
-    string tenant_id = 4;
+	// The ID of the subnet which this interface is associated with.
+	string subnet_id = 1;
+
+	// The ID of the port that is a part of the subnet.
+	string port_id = 2;
+
+	// The UUID of the interface.
+	string id = 3;
+
+	// Owner of the interface.
+	string tenant_id = 4;
 }
 
 message PortBinding {
     Port port = 1;
     string host_id = 2;
-    map<string, google.protobuf.Any> vif_details = 3;
+    // map<string, google.protobuf.Any> vif_details = 3;
+    map<string, bytes> vif_details = 3;
     string vif_type = 4;
     string vnic_type = 5;
     map<string, string> profile = 6;
@@ -77,48 +114,118 @@ message NetworkExtAttrs {
     repeated Segment segments = 11;
 }
 
+// SecGroup represents a container for security group rules.
 message SecGroup {
-    string id = 1;
-    string name = 2;
-    string description = 3;
-    repeated SecGroupRule rules = 4;
-    string tenant_id = 5;
+	// The UUID for the security group.
+	string id =1;
+
+	// Human-readable name for the security group. Might not be unique. Cannot be
+	// named "default" as that is automatically created for a tenant.
+	string name = 2;
+
+	// The security group description.
+	string description = 3;
+
+	// A slice of security group rules that dictate the permitted behaviour for
+	// traffic entering and leaving the group.
+	repeated SecGroupRule security_group_rules = 4;
+
+	// Owner of the security group. Only admin users can specify a TenantID
+	// other than their own.
+	string tenant_id = 5;
 }
 
+// SecGroupRule represents a rule to dictate the behaviour of incoming or
+// outgoing traffic for a particular security group.
 message SecGroupRule {
-    string id = 1;
-    string direction = 2;
-    string ether_type = 3;
-    string sec_group_id = 4;
-    int32 port_range_min = 5;
-    int32 port_range_max = 6;
-    string protocol = 7;
-    string remote_group_id = 8;
-    string remote_ip_prefix = 9;
-    string tenant_id = 10;
+	// The UUID for this security group rule.
+	string id = 1;
+
+	// The direction in which the security group rule is applied. The only values
+	// allowed are "ingress" or "egress". For a compute instance, an ingress
+	// security group rule is applied to incoming (ingress) traffic for that
+	// instance. An egress rule is applied to traffic leaving the instance.
+	string direction = 2;
+
+	// Must be IPv4 or IPv6, and addresses represented in CIDR must match the
+	// ingress or egress rules.
+	// EtherType string json:"ethertype"
+	string ethertype = 3;
+
+	// The security group ID to associate with this security group rule.
+	string security_group_id = 4;
+
+	// The minimum port number in the range that is matched by the security group
+	// rule. If the protocol is TCP or UDP, this value must be less than or equal
+	// to the value of the PortRangeMax attribute. If the protocol is ICMP, this
+	// value must be an ICMP type.
+	int32 port_range_min = 5;
+
+	// The maximum port number in the range that is matched by the security group
+	// rule. The PortRangeMin attribute constrains the PortRangeMax attribute. If
+	// the protocol is ICMP, this value must be an ICMP type.
+	int32 port_range_max = 6;
+
+	// The protocol that is matched by the security group rule. Valid values are
+	// "tcp", "udp", "icmp" or an empty string.
+	string protocol = 7;
+
+	// The remote group ID to be associated with this security group rule. You
+	// can specify either RemoteGroupID or RemoteIPPrefix.
+	string remote_group_id = 8;
+
+	// The remote IP prefix to be associated with this security group rule. You
+	// can specify either RemoteGroupID or RemoteIPPrefix . This attribute
+	// matches the specified IP prefix as the source IP address of the IP packet.
+	string remote_ip_prefix = 9;
+
+	// The owner of this security group rule.
+	string tenant_id = 10;
 }
 
+// Network represents, well, a network.
 message Network {
-    string id = 1;
-    string name = 2;
-    bool admin_state_up = 3;
-    string status = 4;
+	// UUID for the network
+	// ID string json:"id"
+	string id = 1;
+
+	// Human-readable name for the network. Might not be unique.
+	// Name string json:"name"
+	string name = 2;
+
+	// The administrative state of network. If false (down), the network does not forward packets.
+	// AdminStateUp bool json:"admin_state_up"
+	bool admin_state_up = 3;
+
+	// Indicates whether network is currently operational. Possible values include
+	// 'ACTIVE', 'DOWN', 'BUILD', or 'ERROR'. Plug-ins might define additional values.
+	// Status string json:"status"
+	string status = 4;
+
+	// Subnets associated with this network.
+	// Subnets []string json:"subnets"
     repeated Subnet subnets = 5;
+
+	// Owner of network. Only admin users can specify a tenant_id other than its own.
+	// TenantID string json:"tenant_id"
     string tenant_id = 6;
+
+	// Specifies whether the network resource can be accessed by any tenant or not.
+	// Shared bool json:"shared"
     bool shared = 7;
 }
 
-message Port {
-    message IP {
-        string subnet_id = 1;
-        string ip_address = 2;
-    }
-    
-    message AddressPair {
-        string ip_address = 1;
-        string mac_address = 2;
-    }
-    
+message IP {
+    string subnet_id = 1;
+    string ip_address = 2;
+}
+
+message AddressPair {
+    string ip_address = 1;
+    string mac_address = 2;
+}
+
+message Port {  
     string id = 1;
     string network_id = 2;
     string name = 3;
@@ -133,26 +240,26 @@ message Port {
     repeated AddressPair allowed_address_pairs = 12;
 }
 
-message Subnet {
-    message HostRoute {
-        string destination_cidr = 1;
-        string next_hop = 2;
-    }
+message HostRoute {
+    string destination_cidr = 1;
+    string next_hop = 2;
+}
     
-    message AllocationPool {
-        string start = 1;
-        string end = 2;
-    }
+message AllocationPool {
+    string start = 1;
+    string end = 2;
+}
 
+message Subnet {
     string id = 1;
     string network_id = 2;
     string name = 3;
-    int32 ipversion = 4;
+    int32 ip_version = 4;
     string cidr = 5;
     string gateway_ip = 6;
     repeated string dns_name_servers = 7;
     repeated AllocationPool allocation_pools = 8;
     repeated HostRoute host_routes = 9; 
-    bool enabledhcp = 10;
+    bool enable_dhcp = 10;
     string tenant_id = 11;
 }

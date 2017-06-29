@@ -3,8 +3,110 @@
 ## Tables of content
 
 
+## OpenAPI
 
-## Configurability of Domain
+POST /v1/landscape
+```
+{
+  "externs": [
+    "string"
+  ],
+  "interface_info": [
+    {
+      "id": "string",
+      "port_id": "string",
+      "subnet_id": "string",
+      "tenant_id": "string"
+    }
+  ],
+  "ports": [
+    {
+      "admin_state_up": true,
+      "allowed_address_pairs": [
+        {
+          "ip_address": "string",
+          "mac_address": "string"
+        }
+      ],
+      "device_id": "string",
+      "device_owner": "string",
+      "fixed_ips": [
+        {
+          "ip_address": "string",
+          "subnet_id": "string"
+        }
+      ],
+      "id": "string",
+      "mac_address": "string",
+      "name": "string",
+      "network_id": "string",
+      "security_groups": [
+        "string"
+      ],
+      "status": "string",
+      "tenant_id": "string"
+    }
+  ],
+  "state_code": 0,
+  "state_message": "string",
+  "vnets": [
+    {
+      "admin_state_up": true,
+      "id": "string",
+      "name": "string",
+      "shared": true,
+      "status": "string",
+      "subnets": [
+        {
+          "allocation_pools": [
+            {
+              "end": "string",
+              "start": "string"
+            }
+          ],
+          "cidr": "string",
+          "dns_name_servers": [
+            "string"
+          ],
+          "enabledhcp": true,
+          "gateway_ip": "string",
+          "host_routes": [
+            {
+              "destination_cidr": "string",
+              "next_hop": "string"
+            }
+          ],
+          "id": "string",
+          "ipversion": 0,
+          "name": "string",
+          "network_id": "string",
+          "tenant_id": "string"
+        }
+      ],
+      "tenant_id": "string"
+    }
+  ],
+  "vrouter": {
+    "admin_state_up": true,
+    "distributed": true,
+    "gateway_info": {
+      "network_id": "string"
+    },
+    "id": "string",
+    "name": "string",
+    "routes": [
+      {
+        "destination_cidr": "string",
+        "next_hop": "string"
+      }
+    ],
+    "status": "string",
+    "tenant_id": "string"
+  }
+}
+```
+
+## Technology
 
 Core Technology: *Kubernetes* [ThirdPartyResource](http://kubernetes.io/docs/user-guide/thirdpartyresources/)
 
@@ -48,4 +150,6 @@ Powering up each new *Project(or Tenant)* and its joining *users* to provisionin
 
 ### Proof of Concepts
 
-**Battlefield** is identified as a shared networking created by admin
+**Battlefield** is defined as a shared networking created by admin
+
+**Combatroom** is defined as a Console VM which is created in tenant network for personality 

@@ -5,7 +5,8 @@ package echopb;
 
 import "google/api/annotations.proto";
 
-import "data.proto";
+import "openstack/data.proto";
+import "openstack/image.proto";
 
 message EchoMessage {
  string value = 1;
@@ -18,11 +19,264 @@ service EchoService {
       body: "*"
     };
   }
+ 
+  // To discover networks (App user, e.g. identity service register).
+  //
+  // Input/Output is a same protobuf/json object. But for HTTP request, you may not need anything. 
+  rpc DiscoverNetworks(openstack.NetworkDiscoveryReqRespData) returns (openstack.NetworkDiscoveryReqRespData) {
+    option (google.api.http) = {
+      get: "/v1/networks"
+    };
+  }
+ 
+  // To discover subnets (App user, e.g. identity service register).
+  //
+  // Input/Output is a same protobuf/json object. But for HTTP request, you may not need anything. 
+  rpc DiscoverSubnets(openstack.SubnetDiscoveryReqRespData) returns (openstack.SubnetDiscoveryReqRespData) {
+    option (google.api.http) = {
+      get: "/v1/Subnets"
+    };
+  }
 
-  // admin (e.g. DevOps) to register external networking (public net/subnet and router)
+  // To establish networking landscape (App admin).
+  //
+  // Input/Output is a same protobuf/json object but reqest only need less fields. For example:
+  //  {
+  //    "vnets": [
+  //      {
+  //        "name": "int-stage-0",
+  //        "subnets": [
+  //          {
+  //            "name": "int-192-168-128-0-slash-24",
+  //            "cidr": "192.168.128.0/24",
+  //            "enabledhcp": true
+  //          }
+  //        ]
+  //      },
+  //      {
+  //        "name": "int-stage-1",
+  //        "subnets": [
+  //          {
+  //            "name": "int-192-168-129-0-slash-24",
+  //            "cidr": "192.168.129.0/24",
+  //            "enabledhcp": true
+  //          }
+  //        ]
+  //      },
+  //      {
+  //        "name": "int-stage-2",
+  //        "subnets": [
+  //          {
+  //            "name": "int-192-168-130-0-slash-24",
+  //            "cidr": "192.168.130.0/24",
+  //            "enabledhcp": true
+  //          }
+  //        ]
+  //      },
+  //      {
+  //        "name": "int-stage-3",
+  //        "subnets": [
+  //          {
+  //            "name": "int-192-168-131-0-slash-24",
+  //            "cidr": "192.168.131.0/24",
+  //            "enabledhcp": true
+  //          }
+  //        ]
+  //      },
+  //      {
+  //        "name": "public",
+  //        "admin_state_up": true,
+  //        "subnets": [
+  //          {
+  //            "name": "10.100.151.0/24",
+  //            "cidr": "10.100.151.0/24",
+  //            "gateway_ip": "10.100.151.1",
+  //            "allocation_pools": {
+  //              "start": "10.100.151.50",
+  //              "end": "10.100.151.240"
+  //            },
+  //            "enabledhcp": false
+  //          }
+  //        ],
+  //        "shared": true
+  //      }
+  //    ],
+  //    "vrouter": {
+  //      "name": "hack",
+  //      "admint_state_up": true
+  //    },
+  //    "secgroup": {
+  //      "name": "hack",
+  //      "rules": [
+  //        {
+  //          "direction": "ingress",
+  //          "protocol": "tcp"
+  //        },
+  //        {
+  //          "direction": "ingress",
+  //          "protocol": "udp"
+  //        },
+  //        {
+  //          "direction": "ingress",
+  //          "protocol": "icmp"
+  //        }
+  //      ]
+  //    },
+  //    "ifaces_info": [
+  //      {
+  //        "router_name": "hack",
+  //        "network_name": "int-stage-0",
+  //        "subnet_name": "int-192-168-128-0-slash-24",
+  //        "secgroups_info": [
+  //          {
+  //            "name": "hack"
+  //          }
+  //        ]
+  //      },
+  //      {
+  //        "router_name": "hack",
+  //        "network_name": "int-stage-1",
+  //        "subnet_name": "int-192-168-129-0-slash-24",
+  //        "secgroups_info": [
+  //          {
+  //            "name": "hack"
+  //          }
+  //        ]
+  //      },
+  //      {
+  //        "router_name": "hack",
+  //        "network_name": "int-stage-2",
+  //        "subnet_name": "int-192-168-130-0-slash-24",
+  //        "secgroups_info": [
+  //          {
+  //            "name": "hack"
+  //          }
+  //        ]
+  //      },
+  //      {
+  //        "router_name": "hack",
+  //        "network_name": "int-stage-3",
+  //        "subnet_name": "int-192-168-131-0-slash-24",
+  //        "secgroups_info": [
+  //          {
+  //            "name": "hack"
+  //          }
+  //        ]
+  //      }
+  //    ],
+  //    "gateways_info": [
+  //      {
+  //        "network_name": "public",
+  //        "router_name": "hack"
+  //      }
+  //    ]
+  //  }
+  // Altervative '***_id' is available
+  rpc EstablishNetworkLandscape(openstack.OpenstackNeutronLandscapeReqRespData) returns (openstack.OpenstackNeutronLandscapeReqRespData) {
+    option (google.api.http) = {
+      post: "/v1/landscape"
+      body: "*"  
+    };  
+  }
+ 
+  // To discover images (App user, e.g. identity service register).
+  //
+  // Input/Output is a same protobuf/json object. But for HTTP request, you may not need anything. 
+  rpc DiscoverImages(openstack.ImageDiscoveryReqRespData) returns (openstack.ImageDiscoveryReqRespData) {
+    option (google.api.http) = {
+      get: "/v1/images"
+    };
+  }
+
+  // To discover a image detailed
+  //
+  // The request input is 'id' in URL path
+  rpc DiscoverImageDetailed(openstack.Image) returns (openstack.Image) {
+    option (google.api.http) = {
+      get: "/v1/images/0x3f/{id}"
+    };
+  }
+
+  // To search image name for details
+  //
+  // The request input is 'name' in URL path
+  rpc SearchImageDetails(openstack.Image) returns (openstack.Image) {
+    option (google.api.http) = {
+      get: "/v1/images/0x3fname/{name}"
+    };
+  }
+ 
+  // To discover Flavors (App user, e.g. identity service register).
+  //
+  // Input/Output is a same protobuf/json object. But for HTTP request, you may not need anything. 
+  rpc DiscoverFlavors(openstack.FlavorDiscoveryReqRespData) returns (openstack.FlavorDiscoveryReqRespData) {
+    option (google.api.http) = {
+      get: "/v1/flavors"
+    };
+  }
+
+  // To discover a flavor detailed
+  //
+  // The request input is 'id' in URL path
+  rpc DiscoverFlavorDetailed(openstack.Flavor) returns (openstack.Flavor) {
+    option (google.api.http) = {
+      get: "/v1/flavors/0x3f/{id}"
+    };
+  }
+
+  // To search flavor name for details
+  //
+  // The request input is 'name' in URL path
+  rpc SearchFlavorDetails(openstack.Flavor) returns (openstack.Flavor) {
+    option (google.api.http) = {
+      get: "/v1/flavors/0x3fname/{name}"
+    };
+  }
+
+  // To discover Machines (App user, e.g. identity service register).
+  //
+  // Input/Output is a same protobuf/json object. But for HTTP request, you may not need anything. 
+  rpc DiscoverMachines(openstack.MachineDiscoveryReqRespData) returns (openstack.MachineDiscoveryReqRespData) {
+    option (google.api.http) = {
+      get: "/v1/servers"
+    };
+  }
+ 
+  // To boot virtual machines into networking landscape (App user, e.g. identity service register)
+  //
+  // Input/Output is a same protobuf/json object. For example:
+  //  {
+  //    "flavor_name": "m1.small",
+  //    "image_name": "cirros",
+  //    "min_count": 2,
+  //    "max_count": 4,
+  //    "secgroups_info": [],
+  //    "user_data": [],
+  //    "network_name": "private",
+  //    "floating_network_name": "public",
+  //    "personality": [],
+  //    "name_prefix": "awesome VM"
+  //  }
+  // Altervative 'flavor_id' and 'image_id' is available
+  rpc BootVirtualMachines(openstack.OpenstackNovaBootReqRespData) returns (openstack.OpenstackNovaBootReqRespData) {
+    option (google.api.http) = {
+      post: "/v1/boot"
+      body: "*"  
+    };
+  }
+
+  // To reboot Machines (App user, e.g. identity service register).
+  //
+  // Input/Output is a same protobuf/json object. But for HTTP request, you may not need anything. 
+  rpc RebootMachines(openstack.MachineRebootReqRespData) returns (openstack.MachineRebootReqRespData) {
+    option (google.api.http) = {
+      post: "/v1/servers"
+      body: "*"
+    };
+  }
 
   // admin (e.g. head referee) to create battlefield
-  rpc AdminSharedNetworkCreation(OpenstackNeutronNetRequestData) returns (OpenstackNeutronNetResponseData) {
+  rpc AdminSharedNetworkCreation(openstack.OpenstackNeutronNetRequestData) returns (openstack.OpenstackNeutronNetResponseData) {
     option (google.api.http) = {
       post: "/v1/battlefields"
       body: "*"  
@@ -30,27 +284,18 @@ service EchoService {
   }
 
   // user (e.g. registered user) to establish combatroom
-  rpc ApplyConsoleIntoDnatWithNetworkAndMachine(ConsoleResourceRequestData) returns (ConsoleResourceResponseData) {
+  rpc ApplyConsoleIntoDnatWithNetworkAndMachine(openstack.ConsoleResourceRequestData) returns (openstack.ConsoleResourceResponseData) {
     option (google.api.http) = {
       post: "/v1/combatrooms"
       body: "*"
     };
   }
- 
-  // user (e.g. registered user) to order targetdrone for training
-  rpc OrderTargetDroneIntoTrainee(TraineeDroneRequestData) returns (TraineeDroneResponseData) {
-    option (google.api.http) = {
-      post: "/v1/bootcamp/traineedrones"
-      body: "*"  
-    };
-  }
- 
-  // user (e.g. registered user) to establish defensive drone into battlefield
-  rpc OrderTargetDroneIntoDefenseFortification(DefensiveDroneRequestData) returns (DefensiveDroneResponseData) {
-    option (google.api.http) = {
-      post: "/v1/defensivedrones"
-      body: "*"  
-    };
-  }
 
+  // user (e.g. registered user) to verify if token is available
+  rpc ValidateToken(openstack.TokenReqRespData) returns (openstack.TokenReqRespData){
+    option (google.api.http) = {
+       post: "/v1/token"
+       body: "*"
+    };
+  }
 }

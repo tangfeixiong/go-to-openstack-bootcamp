@@ -1,10 +1,14 @@
 package osctl
 
 import (
+	"database/sql"
+	"fmt"
+	"log"
 	// "os"
 	"strings"
 
 	"github.com/golang/glog"
+
 	"github.com/gophercloud/gophercloud"
 	"github.com/gophercloud/gophercloud/openstack"
 	_ "github.com/gophercloud/gophercloud/openstack/compute/v2/servers"
@@ -15,6 +19,10 @@ import (
 	"github.com/gophercloud/gophercloud/openstack/networking/v2/ports"
 	"github.com/gophercloud/gophercloud/openstack/networking/v2/subnets"
 	_ "github.com/gophercloud/gophercloud/openstack/utils"
+
+	"github.com/jinzhu/gorm"
+	_ "github.com/jinzhu/gorm/dialects/postgres"
+	"github.com/lib/pq"
 )
 
 type AdminInfra struct {
@@ -23,6 +31,109 @@ type AdminInfra struct {
 
 func Admin() *AdminInfra {
 	return new(AdminInfra)
+}
+
+type User struct {
+	Name string
+	Age  int
+}
+
+func pq_tut() {
+	/*
+		 A backslash will escape the next character in values:
+		"user=space\ man password='it\'s valid'
+	*/
+	db, err := sql.Open("postgres", "user=pqgotest dbname=pqgotest sslmode=verify-full")
+	// db, err := sql.Open("postgres", "postgres://pqgotest:password@localhost/pqgotest?sslmode=verify-full")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	age := 21
+	rows, err := db.Query("SELECT name FROM users WHERE age = $1", age)
+	println(rows)
+
+	rows, err = db.Query(`SELECT name FROM users WHERE favorite_fruit = $1
+	OR age BETWEEN $2 AND $2 + 3`, "orange", 64)
+	println(rows)
+
+	/*
+	   pq does not support the LastInsertId() method of the Result type in database/sql.
+	   To return the identifier of an INSERT (or UPDATE or DELETE),
+	   use the Postgres RETURNING clause with a standard Query or QueryRow call:
+	*/
+	var userid int
+	err = db.QueryRow(`INSERT INTO users(name, favorite_fruit, age)
+	VALUES('beatrice', 'starfruit', 93) RETURNING id`).Scan(&userid)
+
+	if err, ok := err.(*pq.Error); ok {
+		fmt.Println("pq error:", err.Code.Name())
+	}
+
+	// Bulk imports
+	txn, err := db.Begin()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	stmt, err := txn.Prepare(pq.CopyIn("users", "name", "age"))
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	users := []User{{"foor", 19}, {"bar", 20}}
+
+	for _, user := range users {
+		_, err = stmt.Exec(user.Name, int64(user.Age))
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
+
+	_, err = stmt.Exec()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	err = stmt.Close()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	err = txn.Commit()
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+type Account struct {
+	ID      int `gorm:"primary_key"`
+	Balance int
+}
+
+func gorm_tut() {
+	// ORM
+	const addr = "postgresql://maxroach@localhost:26257/bank?sslmode=disable"
+	db, err := gorm.Open("postgres", addr)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
+
+	// Automatically create the "accounts" table based on the Account model.
+	db.AutoMigrate(&Account{})
+
+	// Insert two rows into the "accounts" table.
+	db.Create(&Account{ID: 1, Balance: 1000})
+	db.Create(&Account{ID: 2, Balance: 250})
+
+	// Print out the balances.
+	var accounts []Account
+	db.Find(&accounts)
+	fmt.Println("Initial balances:")
+	for _, account := range accounts {
+		fmt.Printf("%d %d\n", account.ID, account.Balance)
+	}
 }
 
 func (admin *AdminInfra) CreateSharedNet(name, tenandid, subnetcidr, gatewayip, description string) {

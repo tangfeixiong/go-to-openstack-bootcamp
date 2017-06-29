@@ -1,0 +1,77 @@
+// tangfeixiong <tangfx128@gmail.com>
+
+syntax = "proto3";
+package echopb.openstack;
+
+import "google/protobuf/timestamp.proto";
+
+// Image model
+// Does not include the literal image data; just metadata.
+// returned by listing images, and by fetching a specific image.
+message Image {
+	// ID is the image UUID
+	string id = 1;
+
+	// Name is the human-readable display name for the image.
+	string name = 2;
+
+	// Status is the image status. It can be "queued" or "active"
+	// See imageservice/v2/images/type.go
+	string status = 3;
+
+	// Tags is a list of image tags. Tags are arbitrarily defined strings
+	// attached to an image.
+	repeated string tags = 4;
+
+	// ContainerFormat is the format of the container.
+	// Valid values are ami, ari, aki, bare, and ovf.
+	string container_format = 5;
+
+	// DiskFormat is the format of the disk.
+	// If set, valid values are ami, ari, aki, vhd, vmdk, raw, qcow2, vdi, and iso.
+	string disk_format = 6;
+
+	// MinDiskGigabytes is the amount of disk space in GB that is required to boot the image.
+	int32 min_disk = 7;
+
+	// MinRAMMegabytes [optional] is the amount of RAM in MB that is required to boot the image.
+	int32 min_ram = 8;
+
+	// Owner is the tenant the image belongs to.
+	string owner = 9;
+
+	// Protected is whether the image is deletable or not.
+	bool protected = 10;
+
+	// Visibility defines who can see/use the image.
+	string visibility = 11;
+
+	// Checksum is the checksum of the data that's associated with the image
+	string checksum = 12;
+
+	// SizeBytes is the size of the data that's associated with the image.
+	int64 size = 13;
+
+	// Metadata is a set of metadata associated with the image.
+	// Image metadata allow for meaningfully define the image properties
+	// and tags. See http://docs.openstack.org/developer/glance/metadefs-concepts.html.
+	map<string, string> metadata = 14;
+
+	// Properties is a set of key-value pairs, if any, that are associated with the image.
+	map<string, string> properties = 15;
+
+	// CreatedAt is the date when the image has been created.
+	// google.protobuf.Timestamp created_at = 16;
+    string create_at = 16;
+
+	// UpdatedAt is the date when the last change has been made to the image or it's properties.
+	// google.protobuf.Timestamp updated_at = 17;
+    string updated_at = 17;
+
+	// File is the trailing path after the glance endpoint that represent the location
+	// of the image or the path to retrieve it.
+	string file = 18;
+
+	// Schema is the path to the JSON-schema that represent the image or image entity.
+	string schema = 19;
+}

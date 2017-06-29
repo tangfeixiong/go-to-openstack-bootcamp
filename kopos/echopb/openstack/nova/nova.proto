@@ -1,0 +1,204 @@
+// tangfeixiong <tangfx128@gmail.com>
+
+syntax = "proto3";
+package echopb.openstack.nova;
+
+option go_package = "openstack/nova";
+
+// import "google/protobuf/any.proto";
+// import "google/protobuf/timestamp.proto";
+
+// Flavor records represent (virtual) hardware configurations for server resources in a region.
+message Flavor {
+	// The Id field contains the flavor's unique identifier.
+	// For example, this identifier will be useful when specifying which hardware configuration to use for a new server instance.
+	// ID string json:"id"
+	string id = 1;
+	// The Disk and RA< fields provide a measure of storage space offered by the flavor, in GB and MB, respectively.
+	// Disk int json:"disk"
+	// RAM  int json:"ram"
+	int32 disk = 2;
+	int32 ram = 3;
+	// The Name field provides a human-readable moniker for the flavor.
+	// Name       string  json:"name"
+	// RxTxFactor float64 json:"rxtx_factor"
+	string name = 4;
+	double rxtx_factor = 5;
+	// Swap indicates how much space is reserved for swap.
+	// If not provided, this field will be set to 0.
+	// Swap int json:"swap"
+	int32 swap = 6;
+	// VCPUs indicates how many (virtual) CPUs are available for this flavor.
+	// VCPUs int json:"vcpus"
+	int32 vcpus = 7;
+	// IsPublic indicates whether the flavor is public.
+	// IsPublic bool json:"is_public"
+	bool is_public = 8;
+}
+
+// Image is used for JSON (un)marshalling.
+// It provides a description of an OS image.
+message Image {
+	// ID contains the image's unique identifier.
+	string id = 1;
+
+	string created = 2;
+
+	// MinDisk and MinRAM specify the minimum resources a server must provide to be able to install the image.
+	int32 min_disk = 3;
+	int32 min_ram = 4;
+
+	// Name provides a human-readable moniker for the OS image.
+	string name = 5;
+
+	// The Progress and Status fields indicate image-creation status.
+	// Any usable image will have 100% progress.
+	int32 progress  = 6;
+	string status = 7;
+
+	string updated = 8;
+
+	map<string, string> metadata = 9;
+}
+
+// Server exposes only the standard OpenStack fields corresponding to a given server on the user's account.
+message Server {
+	// ID uniquely identifies this server amongst all other servers, including those not accessible to the current tenant.
+	string id = 1;
+	// TenantID identifies the tenant owning this server resource.
+	string tenant_id = 2;
+	// UserID uniquely identifies the user account owning the tenant.
+	string user_id = 3;
+	// Name contains the human-readable name for the server.
+	string name = 4;
+	// Updated and Created contain ISO-8601 timestamps of when the state of the server last changed, and when it was created.
+	// google.protobuf.Timestamp updated = 5;
+	string updated = 5;
+	// google.protobuf.Timestamp created = 6;
+	string created = 6;
+	string    host_id = 7;
+	// Status contains the current operational status of the server, such as IN_PROGRESS or ACTIVE.
+	string status = 8;
+	// Progress ranges from 0..100.
+	// A request made against the server completes only once Progress reaches 100.
+	int32 progress = 9;
+	// AccessIPv4 and AccessIPv6 contain the IP addresses of the server, suitable for remote access for administration.
+	string accessIPv4 = 10;
+	string accessIPv6 = 11;
+	// Image refers to a JSON object, which itself indicates the OS image used to deploy the server.
+	map<string, Image> images = 12;
+	// Flavor refers to a JSON object, which itself indicates the hardware configuration of the deployed server.
+	map<string, Flavor> flavors = 13;
+	// Addresses includes a list of all IP addresses assigned to the server, keyed by pool.
+	map<string, Addresses> addresses = 14;
+	// Metadata includes a list of all user-specified key-value pairs attached to the server.
+	map<string, string> metadata_info = 15;
+	// Links includes HTTP references to the itself, useful for passing along to other APIs that might want a server reference.
+	repeated string links = 16;
+	// KeyName indicates which public key was injected into the server on launch.
+	string key_name = 17;
+	// AdminPass will generally be empty ("").  However, it will contain the administrative password chosen when provisioning a new server without a set AdminPass setting in the first place.
+	// Note that this is the ONLY time this field will be valid.
+	string adminPass= 18;
+	// SecurityGroups includes the security groups that this instance has applied to it
+	repeated SecurityGroups security_groups= 20;
+}
+
+// Network is used within CreateOpts to control a new server's network attachments.
+message Network {
+	// UUID of a nova-network to attach to the newly provisioned server.
+	// Required unless Port is provided.
+	string uuid = 1;
+
+	// Port of a neutron network to attach to the newly provisioned server.
+	// Required unless UUID is provided.
+	string port = 2;
+
+	// FixedIP [optional] specifies a fixed IPv4 address to be used on this network.
+	string fixed_ip = 3;
+}
+
+
+// File is used within CreateOpts and RebuildOpts to inject a file into the server at launch.
+// File implements the json.Marshaler interface, so when a Create or Rebuild operation is requested,
+// json.Marshal will call File's MarshalJSON method.
+message File {
+	// Path of the file
+	string path = 1;
+	// Contents of the file. Maximum content size is 255 bytes.
+	bytes contents = 2;
+}
+
+message Addresses {
+    repeated Address addresses = 1;
+}
+
+// Address represents an IP address.
+message Address {
+	int32   version = 1;
+	string  addr = 2;
+}
+
+message SecurityGroups {
+    map<string, SecurityGroup> security_groups = 1;
+}
+
+// SecurityGroup represents a security group.
+message SecurityGroup {
+	// The unique ID of the group. If Neutron is installed, this ID will be
+	// represented as a string UUID; if Neutron is not installed, it will be a
+	// numeric ID. For the sake of consistency, we always cast it to a string.
+	string id = 1;
+
+	// The human-readable name of the group, which needs to be unique.
+	string name = 2;
+
+	// The human-readable description of the group.
+	string description = 3;
+
+	// The rules which determine how this security group operates.
+	repeated Rule rules = 4;
+
+	// The ID of the tenant to which this security group belongs.
+	string tenant_id = 5;
+}
+
+
+// Rule represents a security group rule, a policy which determines how a
+// security group operates and what inbound traffic it allows in.
+message Rule {
+	// The unique ID. If Neutron is installed, this ID will be
+	// represented as a string UUID; if Neutron is not installed, it will be a
+	// numeric ID. For the sake of consistency, we always cast it to a string.
+	string id = 1;
+
+	// The lower bound of the port range which this security group should open up
+	int32 from_port = 2;
+
+	// The upper bound of the port range which this security group should open up
+	int32 to_port = 3;
+
+	// The IP protocol (e.g. TCP) which the security group accepts
+	string ip_protocol = 4;
+
+	// The CIDR IP range whose traffic can be received
+	IPRange ip_range = 5;
+
+	// The security group ID to which this rule belongs
+	string parent_group_id = 6;
+
+	// Not documented.
+	Group group = 7;
+}
+
+// IPRange represents the IP range whose traffic will be accepted by the
+// security group.
+message IPRange {
+	string cidr = 1;
+}
+
+// Group represents a group.
+message Group {
+	string tenant_id = 1;
+	string name = 2;
+}
