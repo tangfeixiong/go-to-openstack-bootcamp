@@ -1,0 +1,62 @@
+version: '2'
+
+services:
+  guacd:
+    restart: always
+    image: docker.io/guacamole/guacd:0.9.12-incubating
+
+  mysql:
+    restart: always
+    image: mysql:5.7
+    volumes:
+    - /srv/docker/guacamole/mysql:/var/lib/mysql:Z
+    environment:
+    - MYSQL_ROOT_PASSWORD=secret
+
+  # postgres:
+  #   restart: always
+  #   image: sameersbn/postgresql:9.6
+  #   volumes:
+  #   - /srv/docker/guacamole/postgresql:/var/lib/postgresql:Z
+  #   environment:
+  #   - POSTGRES_PASSWORD=secret
+
+  guacamole:
+    restart: always
+    image: docker.io/guacamole/guacamole:0.9.12-incubating
+    depends_on:
+    - mysql
+    # - postgresql
+    ports:
+    - "58080:8080"
+    environment:
+    - GUACD_HOSTNAME=guacd
+    - GUACD_PORT=4822
+    
+    - MYSQL_HOSTNAME=mysql
+    - MYSQL_PORT=3306
+    
+    - MYSQL_DATABASE=guacamole_db
+    - MYSQL_USER=guacamole_user
+    - MYSQL_PASSWORD=secret
+    
+    - MYSQL_ABSOLUTE_MAX_CONNECTIONS=0
+    - MYSQL_DEFAULT_MAX_CONNECTIONS=0
+    - MYSQL_DEFAULT_MAX_GROUP_CONNECTIONS=0
+    - MYSQL_DEFAULT_MAX_CONNECTIONS_PER_USER=0
+    - MYSQL_DEFAULT_MAX_GROUP_CONNECTIONS_PER_USER=1 
+
+    # - POSTGRES_HOSTNAME=postgres
+    # - POSTGRES_PORT=5432
+    
+    # - POSTGRES_DATABASE=guacamole_db
+    # - POSTGRES_USER=guacamole_user
+    # - POSTGRES_PASSWORD=secret
+    
+    # - POSTGRES_ABSOLUTE_MAX_CONNECTIONS=0
+    # - POSTGRES_DEFAULT_MAX_CONNECTIONS=0
+    # - POSTGRES_DEFAULT_MAX_GROUP_CONNECTIONS=0
+    # - POSTGRES_DEFAULT_MAX_CONNECTIONS_PER_USER=0
+    # - POSTGRES_DEFAULT_MAX_GROUP_CONNECTIONS_PER_USER=1
+
+    # - GUACAMOLE_HOME=/root/.guacamole

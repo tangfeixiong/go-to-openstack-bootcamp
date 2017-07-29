@@ -1,5 +1,6 @@
 /*
- This package is forked from https://github.com/openshift/origin/blob/master/pkg/cmd/flagtypes/glog.go
+  The source is forked from
+    https://github.com/openshift/origin/blob/master/pkg/cmd/flagtypes/glog.go
 */
 package cmd
 

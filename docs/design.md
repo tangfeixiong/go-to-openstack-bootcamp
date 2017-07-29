@@ -1,7 +1,11 @@
 # Architecture of OpenStack Bootcamp
 
-## Tables of content
+## Table of contents
 
+* OpenAPI
+* Technology
+* Openstack Provider ReST
+* Openstack security management
 
 ## OpenAPI
 
@@ -138,6 +142,8 @@ Required Technology: [Openstack SDK for Go](https://github.com/gophercloud/gophe
 * Networking/neutron
 * Compute/nova
 
+## OpenStack Provider ReST
+
 ### Features
 
 **Create and Inspect private network for each project**
@@ -153,3 +159,9 @@ Powering up each new *Project(or Tenant)* and its joining *users* to provisionin
 **Battlefield** is defined as a shared networking created by admin
 
 **Combatroom** is defined as a Console VM which is created in tenant network for personality 
+
+## OpenStack Security management
+
+Architecture
+
+![openstack-secure-mgmt.png](./openstack-secure-mgmt.png)

@@ -200,6 +200,201 @@ func (player *InfraResClient) DiscoverSubnets(discovery *pbos.SubnetDiscoveryReq
 	return resp, nil
 }
 
+/*
+[vagrant@localhost ~]$ neutron router-list
++--------------------------------------+-----------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-------------+-------+
+| id                                   | name                        | external_gateway_info                                                                                                                                                                     | distributed | ha    |
++--------------------------------------+-----------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-------------+-------+
+| 9601f30a-fd2f-4d1c-a620-e4e0dba834ee | router-admin1               | {"network_id": "a7276117-d06e-4d9a-b3dd-4f31e0d4d861", "enable_snat": true, "external_fixed_ips": [{"subnet_id": "c31a05b1-d146-4a6e-b456-bc5113f4567e", "ip_address": "10.100.151.33"}]} | False       | False |
+| e0355b34-c31e-4dad-b0ad-d8dc84d5167b | router-upstream-192-168-1-0 | {"network_id": "4009f5c5-e7de-4143-9f2e-362e2ed0bd92", "enable_snat": true, "external_fixed_ips": [{"subnet_id": "eab1570e-b347-4ce9-8ffb-0180bec0c0f9", "ip_address": "192.168.1.40"}]}  | False       | False |
++--------------------------------------+-----------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-------------+-------+
+[vagrant@localhost ~]$ neutron port-show 5901c3bc-8022-40a8-b6cb-9cf46de77866
++-----------------------+--------------------------------------------------------------------------------------+
+| Field                 | Value                                                                                |
++-----------------------+--------------------------------------------------------------------------------------+
+| admin_state_up        | True                                                                                 |
+| allowed_address_pairs |                                                                                      |
+| binding:host_id       | network                                                                              |
+| binding:profile       | {}                                                                                   |
+| binding:vif_details   | {"port_filter": true, "ovs_hybrid_plug": true}                                       |
+| binding:vif_type      | ovs                                                                                  |
+| binding:vnic_type     | normal                                                                               |
+| device_id             | 9601f30a-fd2f-4d1c-a620-e4e0dba834ee                                                 |
+| device_owner          | network:router_interface                                                             |
+| extra_dhcp_opts       |                                                                                      |
+| fixed_ips             | {"subnet_id": "cdef6f83-4e44-4ed9-b84b-dc049e453431", "ip_address": "192.168.128.1"} |
+| id                    | 5901c3bc-8022-40a8-b6cb-9cf46de77866                                                 |
+| mac_address           | fa:16:3e:0d:cb:57                                                                    |
+| name                  |                                                                                      |
+| network_id            | 05fc56e3-0aac-4812-8c9e-56a54c20fdc6                                                 |
+| security_groups       |                                                                                      |
+| status                | ACTIVE                                                                               |
+| tenant_id             | 1ba84201548b469aae6ec1303abbb482                                                     |
++-----------------------+--------------------------------------------------------------------------------------+
+[vagrant@localhost ~]$ neutron net-list
++--------------------------------------+--------------------+-------------------------------------------------------+
+| id                                   | name               | subnets                                               |
++--------------------------------------+--------------------+-------------------------------------------------------+
+| 4009f5c5-e7de-4143-9f2e-362e2ed0bd92 | public-192-168-1-0 | eab1570e-b347-4ce9-8ffb-0180bec0c0f9 192.168.1.0/24   |
+| a7276117-d06e-4d9a-b3dd-4f31e0d4d861 | public             | c31a05b1-d146-4a6e-b456-bc5113f4567e 10.100.151.0/24  |
+| 05fc56e3-0aac-4812-8c9e-56a54c20fdc6 | private-admin1     | cdef6f83-4e44-4ed9-b84b-dc049e453431 192.168.128.0/24 |
+| 488ab6d0-984c-433f-86f5-e15d7c410064 | private            | b2d36e5d-dad0-437f-9a4b-b2574b536b11 10.1.1.0/24      |
++--------------------------------------+--------------------+-------------------------------------------------------+
+[vagrant@localhost ~]$ neutron subnet-list
++--------------------------------------+-----------------------------+------------------+--------------------------------------------------------+
+| id                                   | name                        | cidr             | allocation_pools                                       |
++--------------------------------------+-----------------------------+------------------+--------------------------------------------------------+
+| eab1570e-b347-4ce9-8ffb-0180bec0c0f9 | subnet-192-168-1-0-slash-24 | 192.168.1.0/24   | {"start": "192.168.1.32", "end": "192.168.1.49"}       |
+| c31a05b1-d146-4a6e-b456-bc5113f4567e | subnet-at-public            | 10.100.151.0/24  | {"start": "10.100.151.32", "end": "10.100.151.49"}     |
+| cdef6f83-4e44-4ed9-b84b-dc049e453431 | subnet-at-private-admin1    | 192.168.128.0/24 | {"start": "192.168.128.100", "end": "192.168.128.199"} |
+| b2d36e5d-dad0-437f-9a4b-b2574b536b11 | subnet-10-1-1-0-slash-24    | 10.1.1.0/24      | {"start": "10.1.1.100", "end": "10.1.1.199"}           |
++--------------------------------------+-----------------------------+------------------+--------------------------------------------------------+
+*/
+func (player *InfraResClient) DiscoverNetworkingTopology(req *pbos.NetworkTopologyReqRespData) (*pbos.NetworkTopologyReqRespData, error) {
+	glog.Infof("Go to discover networking topology, input=%+v", req)
+	resp := new(pbos.NetworkTopologyReqRespData)
+	resp.Information = make([]*pbos.OpenstackNeutronLandscapeReqRespData, 0)
+	if nil == req {
+		req = resp
+	} else {
+		resp.FloatingNetworkId = req.FloatingNetworkId
+	}
+
+	vrouters, err := player.tryto().gainRouters()
+	if nil != err {
+		return resp, err
+	}
+	for i := 0; i < len(vrouters); i++ {
+		if 0 == len(vrouters[i].GatewayInfo.NetworkID) || (0 != len(req.FloatingNetworkId) && vrouters[i].GatewayInfo.NetworkID != req.FloatingNetworkId) {
+			continue
+		}
+		resp.Information = append(resp.Information, &pbos.OpenstackNeutronLandscapeReqRespData{
+			Vnets: make([]*pbneutron.Network, 0),
+			Vrouter: &pbneutron.Router{
+				Status:       vrouters[i].Status,
+				GatewayInfo:  new(pbneutron.GatewayInfo),
+				AdminStateUp: vrouters[i].AdminStateUp,
+				Distributed:  vrouters[i].Distributed,
+				Name:         vrouters[i].Name,
+				Id:           vrouters[i].ID,
+				TenantId:     vrouters[i].TenantID,
+				Routes:       make([]*pbneutron.Route, 0),
+			},
+			IfacesInfo:     make([]*pbos.IfaceInfo, 0),
+			GatewaysInfo:   make([]*pbos.GatewayInfo, 0),
+			Ports:          make([]*pbneutron.Port, 0),
+			InterfacesInfo: make([]*pbneutron.InterfaceInfo, 0),
+		})
+		offset := len(resp.Information) - 1
+		resp.Information[offset].Vrouter.GatewayInfo.NetworkId = vrouters[i].GatewayInfo.NetworkID
+		vnet, err := player.tryto().queryNetwork(vrouters[i].GatewayInfo.NetworkID)
+		if nil != err {
+			resp.Information[offset].StateCode = int32(2000 + i + 1)
+			resp.Information[offset].StateMessage = "Could not decide gateway info"
+			return resp, fmt.Errorf("Could not decide gateway info")
+		}
+		resp.Information[offset].GatewaysInfo = append(resp.Information[offset].GatewaysInfo, &pbos.GatewayInfo{
+			NetworkId:   vnet.ID,
+			NetworkName: vnet.Name,
+			RouterId:    vrouters[i].ID,
+			RouterName:  vrouters[i].Name,
+		})
+		for x := 0; x < len(vrouters[i].Routes); x++ {
+			resp.Information[offset].Vrouter.Routes = append(resp.Information[offset].Vrouter.Routes, &pbneutron.Route{
+				NextHop:         vrouters[i].Routes[x].NextHop,
+				DestinationCidr: vrouters[i].Routes[x].DestinationCIDR,
+			})
+		}
+
+		resultports, err := player.tryto().searchPorts("network:router_interface", vrouters[i].ID, "")
+		if nil != err {
+			resp.Information[offset].StateCode = int32(5000 + i + 1)
+			resp.Information[offset].StateMessage = "Could not decide ports info"
+			return resp, fmt.Errorf("Could not decide ports info")
+		}
+	LOOP_PORTS:
+		for x := 0; x < len(resultports); x++ {
+			vport := &pbneutron.Port{
+				Id:                  resultports[x].ID,
+				NetworkId:           resultports[x].NetworkID,
+				Name:                resultports[x].Name,
+				AdminStateUp:        resultports[x].AdminStateUp,
+				Status:              resultports[x].Status,
+				MacAddress:          resultports[x].MACAddress,
+				FixedIps:            make([]*pbneutron.IP, 0),
+				TenantId:            resultports[x].TenantID,
+				DeviceOwner:         resultports[x].DeviceOwner,
+				SecurityGroups:      resultports[x].SecurityGroups,
+				DeviceId:            resultports[x].DeviceID,
+				AllowedAddressPairs: make([]*pbneutron.AddressPair, 0),
+			}
+			for y := 0; y < len(resultports[x].FixedIPs); y++ {
+				vport.FixedIps = append(vport.FixedIps, &pbneutron.IP{
+					SubnetId:  resultports[x].FixedIPs[y].SubnetID,
+					IpAddress: resultports[x].FixedIPs[y].IPAddress,
+				})
+			}
+			for y := 0; y < len(resultports[x].AllowedAddressPairs); y++ {
+				vport.AllowedAddressPairs = append(vport.AllowedAddressPairs, &pbneutron.AddressPair{
+					IpAddress:  resultports[x].AllowedAddressPairs[y].IPAddress,
+					MacAddress: resultports[x].AllowedAddressPairs[y].MACAddress,
+				})
+			}
+			resp.Information[offset].Ports = append(resp.Information[offset].Ports, vport)
+
+			for y := 0; y < len(resp.Information[offset].Vnets); y++ {
+				if resp.Information[offset].Vnets[y].Id == resultports[x].NetworkID {
+				LOOP_FIXEDIPS:
+					for j := 0; j < len(resultports[x].FixedIPs); j++ {
+						for z := 0; z < len(resp.Information[offset].Vnets[x].Subnets); z++ {
+							if resp.Information[offset].Vnets[y].Subnets[z].Id == resultports[x].FixedIPs[j].SubnetID {
+								continue LOOP_FIXEDIPS
+							}
+						}
+						resp.Information[offset].Vnets[y].Subnets = append(resp.Information[offset].Vnets[y].Subnets, &pbneutron.Subnet{
+							Id:        resultports[x].FixedIPs[j].SubnetID,
+							NetworkId: resultports[x].NetworkID,
+						})
+					}
+					continue LOOP_PORTS
+				}
+			}
+			resp.Information[offset].Vnets = append(resp.Information[offset].Vnets, &pbneutron.Network{
+				Id:      resultports[x].NetworkID,
+				Subnets: make([]*pbneutron.Subnet, 0),
+			})
+			len_vnets := len(resp.Information[offset].Vnets)
+			for j := 0; j < len(resultports[x].FixedIPs); j++ {
+				resp.Information[offset].Vnets[len_vnets-1].Subnets = append(resp.Information[offset].Vnets[len_vnets-1].Subnets, &pbneutron.Subnet{
+					Id:        resultports[x].FixedIPs[j].SubnetID,
+					NetworkId: resultports[x].NetworkID,
+				})
+			}
+		}
+
+		for x := 0; x < len(resp.Information[offset].Vnets); x++ {
+			vnet, err := player.tryto().queryNetwork(resp.Information[offset].Vnets[x].Id)
+			if err != nil {
+				resp.Information[offset].StateCode = int32(1000 + i + 1)
+				resp.Information[offset].StateMessage = "Could not decide network info"
+				return resp, err
+			}
+			resp.Information[offset].Vnets[x].Name = vnet.Name
+			for y := 0; y < len(resp.Information[offset].Vnets[x].Subnets); y++ {
+				vsubnet, err := player.tryto().querySubnet(resp.Information[offset].Vnets[x].Subnets[y].Id)
+				if err != nil {
+					resp.Information[offset].StateCode = int32(1000 + i + 1)
+					resp.Information[offset].StateMessage = "Could not decide subnet info"
+					return resp, err
+				}
+				resp.Information[offset].Vnets[x].Subnets[y].Name = vsubnet.Name
+			}
+		}
+	}
+
+	return resp, nil
+}
+
 func (player *InfraResClient) CreateNetworkingLandscape(req *pbos.OpenstackNeutronLandscapeReqRespData) (*pbos.OpenstackNeutronLandscapeReqRespData, error) {
 	glog.Infof("Go to establish network environments, input=%+v", req)
 	resp := new(pbos.OpenstackNeutronLandscapeReqRespData)
@@ -1077,6 +1272,23 @@ func (player *InfraResClient) DiscoverFlavorDetails(discovery *pbos.Flavor) (*pb
 	return resp, nil
 }
 
+func (player *InfraResClient) SpawnMachines(req *pbos.MachineSpawnsReqRespData) (*pbos.MachineSpawnsReqRespData, error) {
+	resp := new(pbos.MachineSpawnsReqRespData)
+	if nil == req || 0 == len(req.Vms) {
+		return resp, fmt.Errorf("Request data required")
+	}
+	glog.Infof("Go to spawn virtual machines, input=%+v", req.Vms)
+	resp.Vms = make([]*pbos.OpenstackNovaBootReqRespData, 0)
+	for i := 0; i < len(req.Vms); i++ {
+		result, err := player.BootVirtualMachines(req.Vms[i])
+		if err != nil {
+			return resp, err
+		}
+		resp.Vms = append(resp.Vms, result)
+	}
+	return resp, nil
+}
+
 func (player *InfraResClient) DiscoverMachines(discovery *pbos.MachineDiscoveryReqRespData) (*pbos.MachineDiscoveryReqRespData, error) {
 	glog.V(2).Infoln("Go to list vms")
 
@@ -1109,6 +1321,9 @@ func (player *InfraResClient) DiscoverMachines(discovery *pbos.MachineDiscoveryR
 			AdminPass:      result[i].AdminPass,
 			SecurityGroups: make([]*pbnova.SecurityGroups, 0),
 		})
+		for k, v := range result[i].Addresses {
+			resp.Vms[i].Addresses[k] = convertServerAddresses(v)
+		}
 	}
 
 	return resp, nil
@@ -1142,6 +1357,42 @@ func (player *InfraResClient) DestroyMachines(discovery *pbos.MachineDestroyReqR
 	return resp, nil
 }
 
+/*
+[vagrant@localhost sample-microservices-springboot]$ nova show cirros
++--------------------------------------+----------------------------------------------------------+
+| Property                             | Value                                                    |
++--------------------------------------+----------------------------------------------------------+
+| OS-DCF:diskConfig                    | MANUAL                                                   |
+| OS-EXT-AZ:availability_zone          | nova                                                     |
+| OS-EXT-SRV-ATTR:host                 | compute01                                                |
+| OS-EXT-SRV-ATTR:hypervisor_hostname  | compute01                                                |
+| OS-EXT-SRV-ATTR:instance_name        | instance-00001ae7                                        |
+| OS-EXT-STS:power_state               | 1                                                        |
+| OS-EXT-STS:task_state                | -                                                        |
+| OS-EXT-STS:vm_state                  | active                                                   |
+| OS-SRV-USG:launched_at               | 2017-06-28T14:51:36.000000                               |
+| OS-SRV-USG:terminated_at             | -                                                        |
+| accessIPv4                           |                                                          |
+| accessIPv6                           |                                                          |
+| config_drive                         |                                                          |
+| created                              | 2017-06-28T14:52:34Z                                     |
+| flavor                               | m1.tiny (1)                                              |
+| hostId                               | e83aac7a15c101f5e3067197f03c138e8266d00b13a10b31e3ed8ecb |
+| id                                   | 2b6f6e0c-589a-44dc-9b4c-dec4415b86cd                     |
+| image                                | cirros (57027f5c-3c5c-4472-92e2-9d508e64e392)            |
+| key_name                             | -                                                        |
+| metadata                             | {}                                                       |
+| name                                 | cirros                                                   |
+| os-extended-volumes:volumes_attached | []                                                       |
+| private network                      | 192.168.0.147                                            |
+| progress                             | 0                                                        |
+| security_groups                      | default                                                  |
+| status                               | ACTIVE                                                   |
+| tenant_id                            | a2a01453f7ed456a8d0d270ed5207697                         |
+| updated                              | 2017-06-28T14:52:39Z                                     |
+| user_id                              | 83a12c3a27de46f99ba0ec7b2fa218a3                         |
++--------------------------------------+----------------------------------------------------------+
+*/
 func (player *InfraResClient) RebootMachines(discovery *pbos.MachineRebootReqRespData) (*pbos.MachineRebootReqRespData, error) {
 	glog.V(2).Infoln("Go to delete vms")
 
@@ -1275,7 +1526,7 @@ func (player *InfraResClient) BootVirtualMachines(req *pbos.OpenstackNovaBootReq
 	if 0 == len(req.NetworkId) && 0 != len(req.NetworkName) {
 		id, err := player.tryto().identifyNetwork(req.NetworkName)
 		if nil != err {
-			resp.StateCode = 300
+			resp.StateCode = 301
 			resp.StateMessage = err.Error()
 			return resp, fmt.Errorf("Could not decide machine network")
 		}
@@ -1284,7 +1535,7 @@ func (player *InfraResClient) BootVirtualMachines(req *pbos.OpenstackNovaBootReq
 		resp.NetworkName = req.NetworkName
 	}
 	if 0 == len(req.NetworkId) && 0 == len(req.NetworkName) {
-		resp.StateCode = 301
+		resp.StateCode = 300
 		resp.StateMessage = "Could not decide machine network"
 		return resp, fmt.Errorf("Could not decide machine network")
 	}
@@ -1301,18 +1552,14 @@ func (player *InfraResClient) BootVirtualMachines(req *pbos.OpenstackNovaBootReq
 	if 0 == len(req.FloatingNetworkId) && 0 != len(req.FloatingNetworkName) {
 		id, err := player.tryto().identifyNetwork(req.FloatingNetworkName)
 		if nil != err {
-			resp.StateCode = 300
-			resp.StateMessage = err.Error()
-			return resp, fmt.Errorf("Could not decide floating network")
+			req.NetworkName = ""
 		}
 		req.FloatingNetworkId = *id
 		resp.FloatingNetworkId = *id
 		resp.FloatingNetworkName = req.NetworkName
 	}
 	if 0 == len(req.FloatingNetworkId) && 0 == len(req.FloatingNetworkName) {
-		resp.StateCode = 301
-		resp.StateMessage = "Could not decide floating network"
-		return resp, fmt.Errorf("Could not decide floating network")
+		glog.V(2).Infoln("Floating network not used")
 	}
 
 	resp.Ports = make([]*pbneutron.Port, 0)
@@ -1411,6 +1658,9 @@ func (player *InfraResClient) BootVirtualMachines(req *pbos.OpenstackNovaBootReq
 			AdminPass:      vm.AdminPass,
 			SecurityGroups: make([]*pbnova.SecurityGroups, 0),
 		})
+		for k, v := range vm.Addresses {
+			resp.Servers[len(resp.Servers)-1].Addresses[k] = convertServerAddresses(v)
+		}
 		resp.PortServerPairs[req.Ports[i].Id] = vm.ID
 	}
 	req.Servers = resp.Servers
@@ -1420,27 +1670,56 @@ func (player *InfraResClient) BootVirtualMachines(req *pbos.OpenstackNovaBootReq
 	}
 
 	resp.FloatingIps = make([]*pbneutron.FloatingIP, 0)
-	for i := 0; i < int(req.MaxCount); i++ {
-		floatingnetworkid := req.FloatingNetworkId
-		portid := req.Ports[i].Id
-		resultfip, err := player.tryto().createFloatingIp(floatingnetworkid, "", portid, "", "")
-		if nil != err {
-			if int(req.MinCount) < i {
-				break
+	if 0 != len(req.FloatingNetworkId) {
+	LOOP_FIP:
+		for i := 0; i < int(req.MaxCount); i++ {
+			floatingnetworkid := req.FloatingNetworkId
+			portid := req.Ports[i].Id
+			resultfloatingips, err := player.tryto().searchFloatingIps(floatingnetworkid)
+			if nil == err && 0 != len(resultfloatingips) {
+				for _, item := range resultfloatingips {
+					if 0 == len(item.PortID) {
+						resultfip, err := player.tryto().updateFloatingIp(item.ID, portid)
+						if nil != err {
+							if int(req.MinCount) < i {
+								break LOOP_FIP
+							}
+							resp.StateCode = 600
+							resp.StateMessage = err.Error()
+							return resp, fmt.Errorf("Could not create enough floating ip, currnt=%d", i)
+							return resp, err
+						}
+						resp.MinCount = int32(i) + 1
+						resp.FloatingIps = append(resp.FloatingIps, &pbneutron.FloatingIP{
+							FloatingNetworkId: resultfip.FloatingNetworkID,
+							FloatingIpAddress: resultfip.FloatingIP,
+							PortId:            resultfip.PortID,
+							FixedIpAddress:    resultfip.FixedIP,
+							TenantId:          resultfip.TenantID,
+						})
+						continue
+					}
+				}
 			}
-			resp.StateCode = 600
-			resp.StateMessage = err.Error()
-			return resp, fmt.Errorf("Could not create enough floating ip, currnt=%d", i)
-			return resp, err
+			resultfip, err := player.tryto().createFloatingIp(floatingnetworkid, "", portid, "", "")
+			if nil != err {
+				if int(req.MinCount) < i {
+					break
+				}
+				resp.StateCode = 600
+				resp.StateMessage = err.Error()
+				return resp, fmt.Errorf("Could not create enough floating ip, currnt=%d", i)
+				return resp, err
+			}
+			resp.MinCount = int32(i) + 1
+			resp.FloatingIps = append(resp.FloatingIps, &pbneutron.FloatingIP{
+				FloatingNetworkId: resultfip.FloatingNetworkID,
+				FloatingIpAddress: resultfip.FloatingIP,
+				PortId:            resultfip.PortID,
+				FixedIpAddress:    resultfip.FixedIP,
+				TenantId:          resultfip.TenantID,
+			})
 		}
-		resp.MinCount = int32(i) + 1
-		resp.FloatingIps = append(resp.FloatingIps, &pbneutron.FloatingIP{
-			FloatingNetworkId: resultfip.FloatingNetworkID,
-			FloatingIpAddress: resultfip.FloatingIP,
-			PortId:            resultfip.PortID,
-			FixedIpAddress:    resultfip.FixedIP,
-			TenantId:          resultfip.TenantID,
-		})
 	}
 
 	// watch spawn required

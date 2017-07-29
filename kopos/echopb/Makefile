@@ -8,7 +8,7 @@ all: openstack
 		-I${GOPATHP}/src \
 		-I${GOPATHD}/src/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis \
 		--gofast_out=Mopenstack/data.proto=github.com/tangfeixiong/go-to-openstack-bootcamp/kopos/echopb/openstack,Mopenstack/image.proto=github.com/tangfeixiong/go-to-openstack-bootcamp/kopos/echopb/openstack,Mgoogle/api/annotations.proto=github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis/google/api,plugins=grpc:. \
-		service.proto
+		service.proto workerservice.proto
 	protoc -I/usr/local/include -I. \
 		-I${GOPATHP}/src \
 		-I${GOPATHD}/src/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis \

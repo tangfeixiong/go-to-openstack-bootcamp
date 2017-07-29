@@ -190,7 +190,8 @@ github.com/tangfeixiong/go-to-openstack-bootcamp/kopos/pkg/ui/data/swagger
 github.com/tangfeixiong/go-to-openstack-bootcamp/kopos/pkg/osctl
 github.com/tangfeixiong/go-to-openstack-bootcamp/kopos/cmd
 github.com/tangfeixiong/go-to-openstack-bootcamp/kopos
-vagrant@vagrant-ubuntu-trusty-64:/Users/fanhongling/Downloads/workspace/src/github.com/tangfeixiong/go-to-openstack-bootcamp$ kopos/bin/kopos --helpTo get started run the serve subcommand which will start a server
+vagrant@vagrant-ubuntu-trusty-64:/Users/fanhongling/Downloads/workspace/src/github.com/tangfeixiong/go-to-openstack-bootcamp$ kopos/bin/kopos --help
+To get started run the serve subcommand which will start a server
 on localhost:10000:
 
     grpc-gateway-example serve
@@ -285,4 +286,20 @@ The push refers to a repository [docker.io/tangfeixiong/go-to-openstack-bootcamp
 6a5537dbb4eb: Pushed 
 4ac76077f2c7: Pushed 
 canary: digest: sha256:de41ced4baccdfa61a903d253f7cb0e312dba8f8a1ef9d6bb80a51aa30fa168b size: 3769
+```
+
+Run
+```
+[vagrant@localhost kopos]$ docker run -d -e OS_PASSWORD='<your secret>' docker.io/tangfeixiong/go-to-openstack-bootcamp:canary
+f14cd3157d2104255393cd53cdcd8b239445cb518c6bb97f9a54c23476569f1f 
+[vagrant@localhost kopos]$ docker logs f14cd3157d2104255393cd53cdcd8b239445cb518c6bb97f9a54c23476569f1f
+grpc on port: 10000
+http on host: :10001
+grpc on host: localhost:10002
+```
+
+Or
+```
+[vagrant@localhost kopos]$ docker run -d -e OS_PASSWORD='<your secret>' -p 10001:10001 -p 10000:10000 --name kopos docker.io/tangfeixiong/go-to-openstack-bootcamp:canary
+f14cd3157d2104255393cd53cdcd8b239445cb518c6bb97f9a54c23476569f1f 
 ```

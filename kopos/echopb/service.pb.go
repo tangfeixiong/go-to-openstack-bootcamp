@@ -7,9 +7,11 @@
 
 	It is generated from these files:
 		service.proto
+		workerservice.proto
 
 	It has these top-level messages:
 		EchoMessage
+		SSHReqRespData
 */
 package echopb
 
@@ -54,8 +56,41 @@ func (m *EchoMessage) GetValue() string {
 	return ""
 }
 
+type SSHReqRespData struct {
+	Cmd    string   `protobuf:"bytes,1,opt,name=cmd,proto3" json:"cmd,omitempty"`
+	Env    []string `protobuf:"bytes,2,rep,name=env" json:"env,omitempty"`
+	Result []string `protobuf:"bytes,3,rep,name=result" json:"result,omitempty"`
+}
+
+func (m *SSHReqRespData) Reset()                    { *m = SSHReqRespData{} }
+func (m *SSHReqRespData) String() string            { return proto.CompactTextString(m) }
+func (*SSHReqRespData) ProtoMessage()               {}
+func (*SSHReqRespData) Descriptor() ([]byte, []int) { return fileDescriptorService, []int{1} }
+
+func (m *SSHReqRespData) GetCmd() string {
+	if m != nil {
+		return m.Cmd
+	}
+	return ""
+}
+
+func (m *SSHReqRespData) GetEnv() []string {
+	if m != nil {
+		return m.Env
+	}
+	return nil
+}
+
+func (m *SSHReqRespData) GetResult() []string {
+	if m != nil {
+		return m.Result
+	}
+	return nil
+}
+
 func init() {
 	proto.RegisterType((*EchoMessage)(nil), "echopb.EchoMessage")
+	proto.RegisterType((*SSHReqRespData)(nil), "echopb.SSHReqRespData")
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -78,6 +113,10 @@ type EchoServiceClient interface {
 	//
 	// Input/Output is a same protobuf/json object. But for HTTP request, you may not need anything.
 	DiscoverSubnets(ctx context.Context, in *echopb_openstack1.SubnetDiscoveryReqRespData, opts ...grpc.CallOption) (*echopb_openstack1.SubnetDiscoveryReqRespData, error)
+	// To discover networks (App user, e.g. identity service register).
+	//
+	// Input/Output is a same protobuf/json object. But for HTTP request, you may not need anything.
+	DiscoverNetworkingTopology(ctx context.Context, in *echopb_openstack1.NetworkTopologyReqRespData, opts ...grpc.CallOption) (*echopb_openstack1.NetworkTopologyReqRespData, error)
 	// To establish networking landscape (App admin).
 	//
 	// Input/Output is a same protobuf/json object but reqest only need less fields. For example:
@@ -241,6 +280,32 @@ type EchoServiceClient interface {
 	//
 	// Input/Output is a same protobuf/json object. But for HTTP request, you may not need anything.
 	DiscoverMachines(ctx context.Context, in *echopb_openstack1.MachineDiscoveryReqRespData, opts ...grpc.CallOption) (*echopb_openstack1.MachineDiscoveryReqRespData, error)
+	// To reboot Machines (App user, e.g. identity service register).
+	//
+	// Input/Output is a same protobuf/json object. But for HTTP request, you may not need anything.
+	RebootMachines(ctx context.Context, in *echopb_openstack1.MachineRebootReqRespData, opts ...grpc.CallOption) (*echopb_openstack1.MachineRebootReqRespData, error)
+	// To discover Machines (App user, e.g. identity service register).
+	//
+	// Input/Output is a same protobuf/json object. But for HTTP request, you may not need anything.
+	DestroyMachines(ctx context.Context, in *echopb_openstack1.MachineDestroyReqRespData, opts ...grpc.CallOption) (*echopb_openstack1.MachineDestroyReqRespData, error)
+	// To spawn machines into networking landscape (App user, e.g. identity service register)
+	//
+	// Input/Output is a same protobuf/json object. For example:
+	// [ {
+	//    "flavor_name": "m1.small",
+	//    "image_name": "cirros",
+	//    "min_count": 2,
+	//    "max_count": 4,
+	//    "secgroups_info": [],
+	//    "user_data": [],
+	//    "network_name": "private",
+	//    "floating_network_name": "public",
+	//    "personality": [],
+	//    "name_prefix": "awesome VM"
+	// } ]
+	// Altervative 'flavor_id' and 'image_id' is available
+	// 'floating_network_name' is optional
+	SpawnMachines(ctx context.Context, in *echopb_openstack1.MachineSpawnsReqRespData, opts ...grpc.CallOption) (*echopb_openstack1.MachineSpawnsReqRespData, error)
 	// To boot virtual machines into networking landscape (App user, e.g. identity service register)
 	//
 	// Input/Output is a same protobuf/json object. For example:
@@ -258,16 +323,17 @@ type EchoServiceClient interface {
 	//  }
 	// Altervative 'flavor_id' and 'image_id' is available
 	BootVirtualMachines(ctx context.Context, in *echopb_openstack1.OpenstackNovaBootReqRespData, opts ...grpc.CallOption) (*echopb_openstack1.OpenstackNovaBootReqRespData, error)
-	// To reboot Machines (App user, e.g. identity service register).
+	// To discover Libvirt Domain info (App user, e.g. identity service register).
 	//
 	// Input/Output is a same protobuf/json object. But for HTTP request, you may not need anything.
-	RebootMachines(ctx context.Context, in *echopb_openstack1.MachineRebootReqRespData, opts ...grpc.CallOption) (*echopb_openstack1.MachineRebootReqRespData, error)
+	GetLibvirtDomainVNCDisplay(ctx context.Context, in *echopb_openstack1.LibvirtDomainReqRespData, opts ...grpc.CallOption) (*echopb_openstack1.LibvirtDomainReqRespData, error)
+	// user (e.g. registered user) to verify if token is available
+	ValidateToken(ctx context.Context, in *echopb_openstack1.TokenReqRespData, opts ...grpc.CallOption) (*echopb_openstack1.TokenReqRespData, error)
 	// admin (e.g. head referee) to create battlefield
 	AdminSharedNetworkCreation(ctx context.Context, in *echopb_openstack1.OpenstackNeutronNetRequestData, opts ...grpc.CallOption) (*echopb_openstack1.OpenstackNeutronNetResponseData, error)
 	// user (e.g. registered user) to establish combatroom
 	ApplyConsoleIntoDnatWithNetworkAndMachine(ctx context.Context, in *echopb_openstack1.ConsoleResourceRequestData, opts ...grpc.CallOption) (*echopb_openstack1.ConsoleResourceResponseData, error)
-	// user (e.g. registered user) to verify if token is available
-	ValidateToken(ctx context.Context, in *echopb_openstack1.TokenReqRespData, opts ...grpc.CallOption) (*echopb_openstack1.TokenReqRespData, error)
+	MockSSH(ctx context.Context, in *SSHReqRespData, opts ...grpc.CallOption) (*SSHReqRespData, error)
 }
 
 type echoServiceClient struct {
@@ -299,6 +365,15 @@ func (c *echoServiceClient) DiscoverNetworks(ctx context.Context, in *echopb_ope
 func (c *echoServiceClient) DiscoverSubnets(ctx context.Context, in *echopb_openstack1.SubnetDiscoveryReqRespData, opts ...grpc.CallOption) (*echopb_openstack1.SubnetDiscoveryReqRespData, error) {
 	out := new(echopb_openstack1.SubnetDiscoveryReqRespData)
 	err := grpc.Invoke(ctx, "/echopb.EchoService/DiscoverSubnets", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *echoServiceClient) DiscoverNetworkingTopology(ctx context.Context, in *echopb_openstack1.NetworkTopologyReqRespData, opts ...grpc.CallOption) (*echopb_openstack1.NetworkTopologyReqRespData, error) {
+	out := new(echopb_openstack1.NetworkTopologyReqRespData)
+	err := grpc.Invoke(ctx, "/echopb.EchoService/DiscoverNetworkingTopology", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -377,6 +452,33 @@ func (c *echoServiceClient) DiscoverMachines(ctx context.Context, in *echopb_ope
 	return out, nil
 }
 
+func (c *echoServiceClient) RebootMachines(ctx context.Context, in *echopb_openstack1.MachineRebootReqRespData, opts ...grpc.CallOption) (*echopb_openstack1.MachineRebootReqRespData, error) {
+	out := new(echopb_openstack1.MachineRebootReqRespData)
+	err := grpc.Invoke(ctx, "/echopb.EchoService/RebootMachines", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *echoServiceClient) DestroyMachines(ctx context.Context, in *echopb_openstack1.MachineDestroyReqRespData, opts ...grpc.CallOption) (*echopb_openstack1.MachineDestroyReqRespData, error) {
+	out := new(echopb_openstack1.MachineDestroyReqRespData)
+	err := grpc.Invoke(ctx, "/echopb.EchoService/DestroyMachines", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *echoServiceClient) SpawnMachines(ctx context.Context, in *echopb_openstack1.MachineSpawnsReqRespData, opts ...grpc.CallOption) (*echopb_openstack1.MachineSpawnsReqRespData, error) {
+	out := new(echopb_openstack1.MachineSpawnsReqRespData)
+	err := grpc.Invoke(ctx, "/echopb.EchoService/SpawnMachines", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *echoServiceClient) BootVirtualMachines(ctx context.Context, in *echopb_openstack1.OpenstackNovaBootReqRespData, opts ...grpc.CallOption) (*echopb_openstack1.OpenstackNovaBootReqRespData, error) {
 	out := new(echopb_openstack1.OpenstackNovaBootReqRespData)
 	err := grpc.Invoke(ctx, "/echopb.EchoService/BootVirtualMachines", in, out, c.cc, opts...)
@@ -386,9 +488,18 @@ func (c *echoServiceClient) BootVirtualMachines(ctx context.Context, in *echopb_
 	return out, nil
 }
 
-func (c *echoServiceClient) RebootMachines(ctx context.Context, in *echopb_openstack1.MachineRebootReqRespData, opts ...grpc.CallOption) (*echopb_openstack1.MachineRebootReqRespData, error) {
-	out := new(echopb_openstack1.MachineRebootReqRespData)
-	err := grpc.Invoke(ctx, "/echopb.EchoService/RebootMachines", in, out, c.cc, opts...)
+func (c *echoServiceClient) GetLibvirtDomainVNCDisplay(ctx context.Context, in *echopb_openstack1.LibvirtDomainReqRespData, opts ...grpc.CallOption) (*echopb_openstack1.LibvirtDomainReqRespData, error) {
+	out := new(echopb_openstack1.LibvirtDomainReqRespData)
+	err := grpc.Invoke(ctx, "/echopb.EchoService/GetLibvirtDomainVNCDisplay", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *echoServiceClient) ValidateToken(ctx context.Context, in *echopb_openstack1.TokenReqRespData, opts ...grpc.CallOption) (*echopb_openstack1.TokenReqRespData, error) {
+	out := new(echopb_openstack1.TokenReqRespData)
+	err := grpc.Invoke(ctx, "/echopb.EchoService/ValidateToken", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -413,9 +524,9 @@ func (c *echoServiceClient) ApplyConsoleIntoDnatWithNetworkAndMachine(ctx contex
 	return out, nil
 }
 
-func (c *echoServiceClient) ValidateToken(ctx context.Context, in *echopb_openstack1.TokenReqRespData, opts ...grpc.CallOption) (*echopb_openstack1.TokenReqRespData, error) {
-	out := new(echopb_openstack1.TokenReqRespData)
-	err := grpc.Invoke(ctx, "/echopb.EchoService/ValidateToken", in, out, c.cc, opts...)
+func (c *echoServiceClient) MockSSH(ctx context.Context, in *SSHReqRespData, opts ...grpc.CallOption) (*SSHReqRespData, error) {
+	out := new(SSHReqRespData)
+	err := grpc.Invoke(ctx, "/echopb.EchoService/MockSSH", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -434,6 +545,10 @@ type EchoServiceServer interface {
 	//
 	// Input/Output is a same protobuf/json object. But for HTTP request, you may not need anything.
 	DiscoverSubnets(context.Context, *echopb_openstack1.SubnetDiscoveryReqRespData) (*echopb_openstack1.SubnetDiscoveryReqRespData, error)
+	// To discover networks (App user, e.g. identity service register).
+	//
+	// Input/Output is a same protobuf/json object. But for HTTP request, you may not need anything.
+	DiscoverNetworkingTopology(context.Context, *echopb_openstack1.NetworkTopologyReqRespData) (*echopb_openstack1.NetworkTopologyReqRespData, error)
 	// To establish networking landscape (App admin).
 	//
 	// Input/Output is a same protobuf/json object but reqest only need less fields. For example:
@@ -597,6 +712,32 @@ type EchoServiceServer interface {
 	//
 	// Input/Output is a same protobuf/json object. But for HTTP request, you may not need anything.
 	DiscoverMachines(context.Context, *echopb_openstack1.MachineDiscoveryReqRespData) (*echopb_openstack1.MachineDiscoveryReqRespData, error)
+	// To reboot Machines (App user, e.g. identity service register).
+	//
+	// Input/Output is a same protobuf/json object. But for HTTP request, you may not need anything.
+	RebootMachines(context.Context, *echopb_openstack1.MachineRebootReqRespData) (*echopb_openstack1.MachineRebootReqRespData, error)
+	// To discover Machines (App user, e.g. identity service register).
+	//
+	// Input/Output is a same protobuf/json object. But for HTTP request, you may not need anything.
+	DestroyMachines(context.Context, *echopb_openstack1.MachineDestroyReqRespData) (*echopb_openstack1.MachineDestroyReqRespData, error)
+	// To spawn machines into networking landscape (App user, e.g. identity service register)
+	//
+	// Input/Output is a same protobuf/json object. For example:
+	// [ {
+	//    "flavor_name": "m1.small",
+	//    "image_name": "cirros",
+	//    "min_count": 2,
+	//    "max_count": 4,
+	//    "secgroups_info": [],
+	//    "user_data": [],
+	//    "network_name": "private",
+	//    "floating_network_name": "public",
+	//    "personality": [],
+	//    "name_prefix": "awesome VM"
+	// } ]
+	// Altervative 'flavor_id' and 'image_id' is available
+	// 'floating_network_name' is optional
+	SpawnMachines(context.Context, *echopb_openstack1.MachineSpawnsReqRespData) (*echopb_openstack1.MachineSpawnsReqRespData, error)
 	// To boot virtual machines into networking landscape (App user, e.g. identity service register)
 	//
 	// Input/Output is a same protobuf/json object. For example:
@@ -614,16 +755,17 @@ type EchoServiceServer interface {
 	//  }
 	// Altervative 'flavor_id' and 'image_id' is available
 	BootVirtualMachines(context.Context, *echopb_openstack1.OpenstackNovaBootReqRespData) (*echopb_openstack1.OpenstackNovaBootReqRespData, error)
-	// To reboot Machines (App user, e.g. identity service register).
+	// To discover Libvirt Domain info (App user, e.g. identity service register).
 	//
 	// Input/Output is a same protobuf/json object. But for HTTP request, you may not need anything.
-	RebootMachines(context.Context, *echopb_openstack1.MachineRebootReqRespData) (*echopb_openstack1.MachineRebootReqRespData, error)
+	GetLibvirtDomainVNCDisplay(context.Context, *echopb_openstack1.LibvirtDomainReqRespData) (*echopb_openstack1.LibvirtDomainReqRespData, error)
+	// user (e.g. registered user) to verify if token is available
+	ValidateToken(context.Context, *echopb_openstack1.TokenReqRespData) (*echopb_openstack1.TokenReqRespData, error)
 	// admin (e.g. head referee) to create battlefield
 	AdminSharedNetworkCreation(context.Context, *echopb_openstack1.OpenstackNeutronNetRequestData) (*echopb_openstack1.OpenstackNeutronNetResponseData, error)
 	// user (e.g. registered user) to establish combatroom
 	ApplyConsoleIntoDnatWithNetworkAndMachine(context.Context, *echopb_openstack1.ConsoleResourceRequestData) (*echopb_openstack1.ConsoleResourceResponseData, error)
-	// user (e.g. registered user) to verify if token is available
-	ValidateToken(context.Context, *echopb_openstack1.TokenReqRespData) (*echopb_openstack1.TokenReqRespData, error)
+	MockSSH(context.Context, *SSHReqRespData) (*SSHReqRespData, error)
 }
 
 func RegisterEchoServiceServer(s *grpc.Server, srv EchoServiceServer) {
@@ -680,6 +822,24 @@ func _EchoService_DiscoverSubnets_Handler(srv interface{}, ctx context.Context, 
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(EchoServiceServer).DiscoverSubnets(ctx, req.(*echopb_openstack1.SubnetDiscoveryReqRespData))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _EchoService_DiscoverNetworkingTopology_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(echopb_openstack1.NetworkTopologyReqRespData)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(EchoServiceServer).DiscoverNetworkingTopology(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/echopb.EchoService/DiscoverNetworkingTopology",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(EchoServiceServer).DiscoverNetworkingTopology(ctx, req.(*echopb_openstack1.NetworkTopologyReqRespData))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -828,6 +988,60 @@ func _EchoService_DiscoverMachines_Handler(srv interface{}, ctx context.Context,
 	return interceptor(ctx, in, info, handler)
 }
 
+func _EchoService_RebootMachines_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(echopb_openstack1.MachineRebootReqRespData)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(EchoServiceServer).RebootMachines(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/echopb.EchoService/RebootMachines",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(EchoServiceServer).RebootMachines(ctx, req.(*echopb_openstack1.MachineRebootReqRespData))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _EchoService_DestroyMachines_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(echopb_openstack1.MachineDestroyReqRespData)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(EchoServiceServer).DestroyMachines(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/echopb.EchoService/DestroyMachines",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(EchoServiceServer).DestroyMachines(ctx, req.(*echopb_openstack1.MachineDestroyReqRespData))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _EchoService_SpawnMachines_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(echopb_openstack1.MachineSpawnsReqRespData)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(EchoServiceServer).SpawnMachines(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/echopb.EchoService/SpawnMachines",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(EchoServiceServer).SpawnMachines(ctx, req.(*echopb_openstack1.MachineSpawnsReqRespData))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _EchoService_BootVirtualMachines_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(echopb_openstack1.OpenstackNovaBootReqRespData)
 	if err := dec(in); err != nil {
@@ -846,20 +1060,38 @@ func _EchoService_BootVirtualMachines_Handler(srv interface{}, ctx context.Conte
 	return interceptor(ctx, in, info, handler)
 }
 
-func _EchoService_RebootMachines_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(echopb_openstack1.MachineRebootReqRespData)
+func _EchoService_GetLibvirtDomainVNCDisplay_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(echopb_openstack1.LibvirtDomainReqRespData)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(EchoServiceServer).RebootMachines(ctx, in)
+		return srv.(EchoServiceServer).GetLibvirtDomainVNCDisplay(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/echopb.EchoService/RebootMachines",
+		FullMethod: "/echopb.EchoService/GetLibvirtDomainVNCDisplay",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(EchoServiceServer).RebootMachines(ctx, req.(*echopb_openstack1.MachineRebootReqRespData))
+		return srv.(EchoServiceServer).GetLibvirtDomainVNCDisplay(ctx, req.(*echopb_openstack1.LibvirtDomainReqRespData))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _EchoService_ValidateToken_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(echopb_openstack1.TokenReqRespData)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(EchoServiceServer).ValidateToken(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/echopb.EchoService/ValidateToken",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(EchoServiceServer).ValidateToken(ctx, req.(*echopb_openstack1.TokenReqRespData))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -900,20 +1132,20 @@ func _EchoService_ApplyConsoleIntoDnatWithNetworkAndMachine_Handler(srv interfac
 	return interceptor(ctx, in, info, handler)
 }
 
-func _EchoService_ValidateToken_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(echopb_openstack1.TokenReqRespData)
+func _EchoService_MockSSH_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SSHReqRespData)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(EchoServiceServer).ValidateToken(ctx, in)
+		return srv.(EchoServiceServer).MockSSH(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/echopb.EchoService/ValidateToken",
+		FullMethod: "/echopb.EchoService/MockSSH",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(EchoServiceServer).ValidateToken(ctx, req.(*echopb_openstack1.TokenReqRespData))
+		return srv.(EchoServiceServer).MockSSH(ctx, req.(*SSHReqRespData))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -933,6 +1165,10 @@ var _EchoService_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DiscoverSubnets",
 			Handler:    _EchoService_DiscoverSubnets_Handler,
+		},
+		{
+			MethodName: "DiscoverNetworkingTopology",
+			Handler:    _EchoService_DiscoverNetworkingTopology_Handler,
 		},
 		{
 			MethodName: "EstablishNetworkLandscape",
@@ -967,12 +1203,28 @@ var _EchoService_serviceDesc = grpc.ServiceDesc{
 			Handler:    _EchoService_DiscoverMachines_Handler,
 		},
 		{
+			MethodName: "RebootMachines",
+			Handler:    _EchoService_RebootMachines_Handler,
+		},
+		{
+			MethodName: "DestroyMachines",
+			Handler:    _EchoService_DestroyMachines_Handler,
+		},
+		{
+			MethodName: "SpawnMachines",
+			Handler:    _EchoService_SpawnMachines_Handler,
+		},
+		{
 			MethodName: "BootVirtualMachines",
 			Handler:    _EchoService_BootVirtualMachines_Handler,
 		},
 		{
-			MethodName: "RebootMachines",
-			Handler:    _EchoService_RebootMachines_Handler,
+			MethodName: "GetLibvirtDomainVNCDisplay",
+			Handler:    _EchoService_GetLibvirtDomainVNCDisplay_Handler,
+		},
+		{
+			MethodName: "ValidateToken",
+			Handler:    _EchoService_ValidateToken_Handler,
 		},
 		{
 			MethodName: "AdminSharedNetworkCreation",
@@ -983,8 +1235,8 @@ var _EchoService_serviceDesc = grpc.ServiceDesc{
 			Handler:    _EchoService_ApplyConsoleIntoDnatWithNetworkAndMachine_Handler,
 		},
 		{
-			MethodName: "ValidateToken",
-			Handler:    _EchoService_ValidateToken_Handler,
+			MethodName: "MockSSH",
+			Handler:    _EchoService_MockSSH_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
@@ -1011,6 +1263,60 @@ func (m *EchoMessage) MarshalTo(dAtA []byte) (int, error) {
 		i++
 		i = encodeVarintService(dAtA, i, uint64(len(m.Value)))
 		i += copy(dAtA[i:], m.Value)
+	}
+	return i, nil
+}
+
+func (m *SSHReqRespData) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *SSHReqRespData) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if len(m.Cmd) > 0 {
+		dAtA[i] = 0xa
+		i++
+		i = encodeVarintService(dAtA, i, uint64(len(m.Cmd)))
+		i += copy(dAtA[i:], m.Cmd)
+	}
+	if len(m.Env) > 0 {
+		for _, s := range m.Env {
+			dAtA[i] = 0x12
+			i++
+			l = len(s)
+			for l >= 1<<7 {
+				dAtA[i] = uint8(uint64(l)&0x7f | 0x80)
+				l >>= 7
+				i++
+			}
+			dAtA[i] = uint8(l)
+			i++
+			i += copy(dAtA[i:], s)
+		}
+	}
+	if len(m.Result) > 0 {
+		for _, s := range m.Result {
+			dAtA[i] = 0x1a
+			i++
+			l = len(s)
+			for l >= 1<<7 {
+				dAtA[i] = uint8(uint64(l)&0x7f | 0x80)
+				l >>= 7
+				i++
+			}
+			dAtA[i] = uint8(l)
+			i++
+			i += copy(dAtA[i:], s)
+		}
 	}
 	return i, nil
 }
@@ -1048,6 +1354,28 @@ func (m *EchoMessage) Size() (n int) {
 	l = len(m.Value)
 	if l > 0 {
 		n += 1 + l + sovService(uint64(l))
+	}
+	return n
+}
+
+func (m *SSHReqRespData) Size() (n int) {
+	var l int
+	_ = l
+	l = len(m.Cmd)
+	if l > 0 {
+		n += 1 + l + sovService(uint64(l))
+	}
+	if len(m.Env) > 0 {
+		for _, s := range m.Env {
+			l = len(s)
+			n += 1 + l + sovService(uint64(l))
+		}
+	}
+	if len(m.Result) > 0 {
+		for _, s := range m.Result {
+			l = len(s)
+			n += 1 + l + sovService(uint64(l))
+		}
 	}
 	return n
 }
@@ -1122,6 +1450,143 @@ func (m *EchoMessage) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			m.Value = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipService(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthService
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *SSHReqRespData) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowService
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: SSHReqRespData: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: SSHReqRespData: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Cmd", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthService
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Cmd = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Env", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthService
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Env = append(m.Env, string(dAtA[iNdEx:postIndex]))
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Result", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthService
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Result = append(m.Result, string(dAtA[iNdEx:postIndex]))
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
@@ -1252,53 +1717,68 @@ var (
 func init() { proto.RegisterFile("service.proto", fileDescriptorService) }
 
 var fileDescriptorService = []byte{
-	// 758 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x9c, 0x96, 0x41, 0x4f, 0x13, 0x4d,
-	0x18, 0xc7, 0xdf, 0x7d, 0xf3, 0xbe, 0xe4, 0x65, 0xa0, 0xd0, 0x4c, 0x5b, 0xe0, 0x5d, 0xa0, 0x31,
-	0xc3, 0x45, 0x51, 0xba, 0x20, 0x89, 0x07, 0x6e, 0x40, 0x31, 0x21, 0x11, 0x4c, 0x5a, 0x83, 0xe7,
-	0xe9, 0xee, 0x43, 0x3b, 0x76, 0x3b, 0xb3, 0xee, 0x4c, 0xab, 0x84, 0x60, 0x0c, 0x89, 0x1e, 0x3c,
-	0x99, 0x78, 0xf1, 0xe4, 0x49, 0xbf, 0x8b, 0x47, 0x13, 0xbf, 0x80, 0x41, 0x3f, 0x88, 0x99, 0xd9,
-	0xdd, 0xb2, 0xa5, 0x2d, 0xb6, 0x5c, 0x9a, 0xce, 0x3c, 0xff, 0x79, 0xfe, 0xbf, 0x79, 0x76, 0xe6,
-	0xd9, 0x45, 0x19, 0x09, 0x61, 0x87, 0xb9, 0x50, 0x0a, 0x42, 0xa1, 0x04, 0x9e, 0x00, 0xb7, 0x21,
-	0x82, 0x9a, 0xbd, 0x54, 0x17, 0xa2, 0xee, 0x83, 0x43, 0x03, 0xe6, 0x50, 0xce, 0x85, 0xa2, 0x8a,
-	0x09, 0x2e, 0x23, 0x95, 0x9d, 0x17, 0x01, 0x70, 0xa9, 0xa8, 0xdb, 0x74, 0x3c, 0xaa, 0x68, 0x3c,
-	0x5b, 0xb8, 0x9c, 0x65, 0x2d, 0x5a, 0x8f, 0x53, 0x92, 0x15, 0x34, 0xb5, 0xe7, 0x36, 0xc4, 0x01,
-	0x48, 0x49, 0xeb, 0x80, 0xf3, 0xe8, 0xdf, 0x0e, 0xf5, 0xdb, 0xb0, 0x60, 0xdd, 0xb2, 0x6e, 0x4f,
-	0x56, 0xa2, 0xc1, 0xfd, 0xf7, 0xd9, 0x48, 0x55, 0x8d, 0x68, 0xf0, 0x1e, 0xfa, 0x47, 0x0f, 0x71,
-	0xae, 0x14, 0x01, 0x95, 0x52, 0x29, 0xec, 0x41, 0x93, 0x24, 0x77, 0xfe, 0xfd, 0xd7, 0x87, 0xbf,
-	0x33, 0xe4, 0x3f, 0xa7, 0xb3, 0xe1, 0xe8, 0xf8, 0x96, 0xb5, 0x8a, 0xdf, 0x5a, 0x28, 0x5b, 0x66,
-	0xd2, 0x15, 0x1d, 0x08, 0x0f, 0x41, 0xbd, 0x10, 0x61, 0x53, 0xe2, 0xb5, 0x64, 0x79, 0x97, 0xb7,
-	0x14, 0xc7, 0x12, 0xe9, 0x49, 0x05, 0x9e, 0x57, 0x40, 0x06, 0x65, 0xaa, 0xa8, 0x3d, 0x9e, 0x9c,
-	0xe4, 0x0d, 0xc7, 0x0c, 0x9e, 0xd6, 0x1c, 0x3c, 0xf1, 0x3c, 0xb7, 0xd0, 0x6c, 0x22, 0xaf, 0xb6,
-	0x6b, 0x1c, 0x94, 0xc4, 0xf7, 0xfa, 0x13, 0x47, 0xa1, 0x81, 0x18, 0x63, 0xa9, 0x93, 0x6a, 0xe0,
-	0x29, 0x4d, 0x91, 0x18, 0x7e, 0xb1, 0xd0, 0xff, 0x7b, 0x52, 0xd1, 0x9a, 0xcf, 0x64, 0x23, 0xde,
-	0xc3, 0x23, 0xca, 0x3d, 0xe9, 0xd2, 0x00, 0xf0, 0x83, 0x7e, 0x83, 0xc7, 0xc9, 0xbf, 0x43, 0x68,
-	0xab, 0x50, 0xf0, 0xae, 0x38, 0x0d, 0x76, 0xc3, 0x75, 0x64, 0xc1, 0x20, 0x62, 0x92, 0xd1, 0x88,
-	0x7e, 0xa2, 0xd0, 0x4f, 0xed, 0x15, 0x9a, 0x49, 0x36, 0xb5, 0xaf, 0x0f, 0x92, 0xc4, 0x77, 0xfb,
-	0x3d, 0x4c, 0x64, 0x60, 0xa5, 0xc6, 0x11, 0x13, 0x6c, 0x28, 0xa6, 0x31, 0xd2, 0x14, 0x2c, 0x72,
-	0xab, 0xa3, 0x42, 0x8f, 0x7f, 0x19, 0x14, 0x65, 0x3e, 0x78, 0x78, 0x7e, 0x48, 0x66, 0x7b, 0x58,
-	0x80, 0x2c, 0x99, 0xf4, 0x73, 0x38, 0x7f, 0x99, 0xde, 0x59, 0x7f, 0xb9, 0x79, 0xec, 0x9c, 0x32,
-	0xef, 0x0c, 0x3f, 0x43, 0xb8, 0x0a, 0x34, 0x74, 0x1b, 0x29, 0x1b, 0x79, 0x03, 0x17, 0x62, 0x5c,
-	0x96, 0xb0, 0x7d, 0xc5, 0x85, 0xd3, 0x16, 0x38, 0xa7, 0xfa, 0xf7, 0xac, 0xe7, 0x04, 0x3e, 0xf4,
-	0x69, 0x47, 0x84, 0x03, 0x4f, 0x60, 0x14, 0x1a, 0xf5, 0x04, 0x0e, 0x57, 0xf7, 0x9e, 0xc0, 0xe3,
-	0xd8, 0xb0, 0x89, 0xe6, 0x7a, 0x19, 0xba, 0xa5, 0x5d, 0x18, 0x96, 0xdc, 0x1e, 0x1a, 0x21, 0xcb,
-	0xc6, 0x62, 0x1e, 0x17, 0x52, 0x16, 0xa9, 0xea, 0x72, 0x94, 0x8b, 0xaa, 0x9b, 0xb6, 0x92, 0x37,
-	0x72, 0x5a, 0x31, 0x4e, 0xcb, 0x78, 0xf1, 0xaa, 0x53, 0xba, 0xc2, 0x6f, 0x52, 0xcd, 0xe6, 0x80,
-	0xba, 0x0d, 0xc6, 0x61, 0x60, 0xb3, 0x89, 0x63, 0xa3, 0x36, 0x9b, 0x6b, 0xe4, 0xbd, 0x45, 0xd6,
-	0x9d, 0x1c, 0x42, 0x89, 0xdf, 0x59, 0x28, 0xb7, 0x23, 0x84, 0x3a, 0x62, 0xa1, 0x6a, 0x53, 0xbf,
-	0x8b, 0x52, 0xba, 0xee, 0xa2, 0x8a, 0x0e, 0xd5, 0x6b, 0xd2, 0x2c, 0x63, 0xea, 0x7b, 0x3b, 0x70,
-	0x4d, 0x08, 0xa5, 0xef, 0xf2, 0x6b, 0x0b, 0xcd, 0x54, 0x40, 0x8f, 0xba, 0x1c, 0xab, 0x43, 0xf7,
-	0x18, 0x09, 0xd3, 0x0c, 0x63, 0x68, 0xc9, 0x9c, 0xf1, 0xcf, 0x92, 0x74, 0x31, 0x34, 0xc2, 0x27,
-	0x0b, 0xd9, 0xdb, 0x5e, 0x8b, 0xf1, 0x6a, 0x83, 0x86, 0xe0, 0xc5, 0x8d, 0x6f, 0x37, 0x04, 0xf3,
-	0x4e, 0xc3, 0xeb, 0x7f, 0xee, 0x5f, 0x87, 0xa0, 0x8d, 0xda, 0x20, 0x95, 0x81, 0xda, 0x18, 0x71,
-	0x85, 0x0c, 0x04, 0x97, 0x60, 0xd8, 0x16, 0x0d, 0x5b, 0x81, 0x64, 0x4d, 0x6d, 0xa8, 0x52, 0x3e,
-	0x1c, 0x33, 0xf0, 0x3d, 0x03, 0xf8, 0xd9, 0x42, 0x77, 0xb6, 0x83, 0xc0, 0x3f, 0xd9, 0x15, 0x5c,
-	0x0a, 0x1f, 0xf6, 0xb9, 0x12, 0x65, 0x4e, 0xd5, 0x53, 0xa6, 0x92, 0x36, 0xbd, 0xcd, 0xbd, 0x78,
-	0xdf, 0x83, 0x2e, 0x6d, 0xbc, 0xae, 0x02, 0x52, 0xb4, 0x43, 0x17, 0xd2, 0xac, 0x6b, 0x23, 0xa8,
-	0x53, 0x9c, 0xb6, 0xe1, 0xcc, 0x93, 0x59, 0xcd, 0xe9, 0x8a, 0x56, 0x8d, 0xaa, 0x50, 0x88, 0x96,
-	0xc1, 0x6c, 0xa1, 0xcc, 0x11, 0xf5, 0x99, 0x47, 0x15, 0x3c, 0x11, 0x4d, 0xe0, 0x98, 0xf4, 0xe7,
-	0x36, 0x81, 0xf4, 0x03, 0x1c, 0x41, 0x93, 0xbc, 0x32, 0xc9, 0xa4, 0x36, 0x55, 0x3a, 0xba, 0x65,
-	0xad, 0xee, 0x64, 0xbf, 0x5e, 0x14, 0xad, 0x6f, 0x17, 0x45, 0xeb, 0xc7, 0x45, 0xd1, 0xfa, 0xf8,
-	0xb3, 0xf8, 0x57, 0x6d, 0xc2, 0x7c, 0x50, 0x6c, 0xfe, 0x0e, 0x00, 0x00, 0xff, 0xff, 0x4e, 0x03,
-	0x7c, 0x05, 0xb4, 0x08, 0x00, 0x00,
+	// 1006 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x9c, 0x96, 0x4f, 0x6f, 0x1b, 0x45,
+	0x18, 0xc6, 0xd9, 0x06, 0x52, 0x3a, 0xa9, 0x13, 0x33, 0xb1, 0x1d, 0xb3, 0x4d, 0xa3, 0x6a, 0x22,
+	0x24, 0x48, 0x88, 0xb7, 0x69, 0x25, 0x0e, 0xbd, 0x25, 0x71, 0xa0, 0x95, 0x92, 0x20, 0xd9, 0x55,
+	0x90, 0x7a, 0x41, 0xe3, 0xdd, 0x37, 0xf6, 0xe0, 0xf5, 0xcc, 0xb2, 0x33, 0xde, 0x62, 0x45, 0x01,
+	0xa9, 0x08, 0x0e, 0xdc, 0x10, 0x17, 0x4e, 0x48, 0x48, 0xf0, 0x21, 0xf8, 0x06, 0x1c, 0x91, 0xf8,
+	0x02, 0x28, 0xf0, 0x41, 0xd0, 0xcc, 0xee, 0xba, 0xeb, 0x3f, 0x9b, 0xd8, 0xb9, 0x58, 0xde, 0x79,
+	0x9f, 0x79, 0x9f, 0xdf, 0xbc, 0xb3, 0xef, 0xcc, 0xa2, 0x82, 0x84, 0x30, 0x62, 0x2e, 0xd4, 0x82,
+	0x50, 0x28, 0x81, 0x17, 0xc1, 0xed, 0x88, 0xa0, 0x65, 0xaf, 0xb7, 0x85, 0x68, 0xfb, 0xe0, 0xd0,
+	0x80, 0x39, 0x94, 0x73, 0xa1, 0xa8, 0x62, 0x82, 0xcb, 0x58, 0x65, 0x97, 0x44, 0x00, 0x5c, 0x2a,
+	0xea, 0x76, 0x1d, 0x8f, 0x2a, 0x9a, 0x8c, 0x96, 0x5f, 0x8f, 0xb2, 0x1e, 0x6d, 0x27, 0x29, 0xc9,
+	0x26, 0x5a, 0x3a, 0x74, 0x3b, 0xe2, 0x18, 0xa4, 0xa4, 0x6d, 0xc0, 0x25, 0xf4, 0x56, 0x44, 0xfd,
+	0x3e, 0x54, 0xad, 0x07, 0xd6, 0xfb, 0x77, 0x1a, 0xf1, 0x03, 0x39, 0x42, 0xcb, 0xcd, 0xe6, 0xd3,
+	0x06, 0x7c, 0xd9, 0x00, 0x19, 0xd4, 0xa9, 0xa2, 0xb8, 0x88, 0x16, 0xdc, 0x9e, 0x97, 0xa8, 0xf4,
+	0x5f, 0x3d, 0x02, 0x3c, 0xaa, 0xde, 0x7a, 0xb0, 0xa0, 0x47, 0x80, 0x47, 0xb8, 0x82, 0x16, 0x43,
+	0x90, 0x7d, 0x5f, 0x55, 0x17, 0xcc, 0x60, 0xf2, 0xf4, 0xe8, 0x8f, 0x72, 0xec, 0xd9, 0x8c, 0xd7,
+	0x86, 0x0f, 0xd1, 0x9b, 0xfa, 0x11, 0xaf, 0xd6, 0xe2, 0xe5, 0xd5, 0x32, 0x40, 0xf6, 0xb4, 0x41,
+	0xb2, 0xfa, 0xea, 0xef, 0xff, 0x7e, 0xba, 0x55, 0x20, 0x6f, 0x3b, 0xd1, 0xae, 0xa3, 0xe3, 0x4f,
+	0xac, 0x2d, 0xfc, 0xbd, 0x85, 0x8a, 0x75, 0x26, 0x5d, 0x11, 0x41, 0x78, 0x02, 0xea, 0xa5, 0x08,
+	0xbb, 0x12, 0xef, 0xa4, 0xd3, 0x87, 0xab, 0xaf, 0x25, 0xb1, 0x54, 0x3a, 0xc8, 0x2c, 0xcb, 0x9e,
+	0x4f, 0x4e, 0x4a, 0x86, 0x63, 0x19, 0xdf, 0xd5, 0x1c, 0x3c, 0xf5, 0x7c, 0x65, 0xa1, 0x95, 0x54,
+	0xde, 0xec, 0xb7, 0x38, 0x28, 0x89, 0x3f, 0x9c, 0x4c, 0x1c, 0x87, 0xa6, 0x62, 0xcc, 0xa5, 0x4e,
+	0xab, 0x81, 0x97, 0x34, 0x85, 0x4c, 0x0c, 0x7f, 0xb4, 0x90, 0x3d, 0x56, 0x0d, 0xc6, 0xdb, 0xcf,
+	0x45, 0x20, 0x7c, 0xd1, 0x1e, 0x4c, 0xe3, 0x49, 0x54, 0xa9, 0xe4, 0x1a, 0x9e, 0x7c, 0x35, 0x59,
+	0x33, 0x3c, 0xef, 0x10, 0x53, 0x15, 0x95, 0x08, 0xf4, 0x0e, 0xfd, 0x6e, 0xa1, 0x77, 0x0f, 0xa5,
+	0xa2, 0x2d, 0x9f, 0xc9, 0x4e, 0x92, 0xe0, 0x88, 0x72, 0x4f, 0xba, 0x34, 0x00, 0xfc, 0xd1, 0xa4,
+	0xc9, 0xa7, 0xe9, 0xbf, 0x13, 0xe8, 0xab, 0x50, 0xf0, 0xa1, 0x38, 0x0b, 0x77, 0xc3, 0x79, 0xa4,
+	0x6a, 0x30, 0x31, 0x29, 0x68, 0x4c, 0x3f, 0x55, 0x68, 0xce, 0xaf, 0xd1, 0x72, 0x5a, 0xba, 0x67,
+	0xba, 0x55, 0x24, 0xde, 0x9e, 0xf4, 0x30, 0x91, 0xa9, 0xbb, 0x37, 0x8f, 0x98, 0x60, 0x43, 0x71,
+	0x17, 0x23, 0x4d, 0xc1, 0x62, 0xb7, 0x36, 0x2a, 0x8f, 0xf8, 0xd7, 0x41, 0x51, 0xe6, 0x83, 0x87,
+	0xd7, 0x72, 0x32, 0xdb, 0x79, 0x01, 0xb2, 0x6e, 0xd2, 0x57, 0x70, 0xe9, 0x75, 0x7a, 0xe7, 0xe1,
+	0x57, 0x8f, 0xcf, 0x9c, 0x73, 0xe6, 0x5d, 0xe0, 0x2f, 0x10, 0x6e, 0x02, 0x0d, 0xdd, 0x4e, 0xc6,
+	0x46, 0xde, 0xc0, 0x85, 0x18, 0x97, 0x75, 0x6c, 0x8f, 0xb9, 0x70, 0xda, 0x03, 0xe7, 0x5c, 0xff,
+	0x5e, 0x8c, 0x74, 0xc5, 0xc7, 0x3e, 0x8d, 0x44, 0x38, 0xb5, 0x2b, 0xe2, 0xd0, 0xac, 0x5d, 0x91,
+	0xaf, 0x1e, 0xed, 0x8a, 0xb3, 0xc4, 0xb0, 0x8b, 0x2a, 0xa3, 0x0c, 0xc3, 0xd2, 0x56, 0xf3, 0x92,
+	0xdb, 0xb9, 0x11, 0x72, 0xdf, 0x58, 0xac, 0xe1, 0x72, 0xc6, 0x22, 0x53, 0x5d, 0x8e, 0x56, 0xe3,
+	0xea, 0x66, 0xad, 0xe4, 0x8d, 0x9c, 0x36, 0x8d, 0xd3, 0x7d, 0x7c, 0x6f, 0xdc, 0x29, 0x5b, 0xe1,
+	0xef, 0x32, 0x07, 0xe0, 0x31, 0x75, 0x3b, 0x8c, 0xc3, 0xd4, 0x03, 0x30, 0x89, 0xcd, 0x7a, 0x00,
+	0x5e, 0x21, 0x1f, 0x3b, 0x7a, 0x20, 0x8c, 0x20, 0x94, 0xf8, 0x1b, 0xb4, 0xdc, 0x80, 0x96, 0x10,
+	0x6a, 0x08, 0xb1, 0x95, 0x9b, 0x35, 0x16, 0x66, 0x09, 0xe6, 0xd0, 0x92, 0xb2, 0xb1, 0x5f, 0x21,
+	0xa6, 0x79, 0x42, 0x13, 0xd6, 0xfd, 0xfb, 0xad, 0x7e, 0xd5, 0x40, 0xaa, 0x50, 0x0c, 0x86, 0x08,
+	0xdb, 0xf9, 0x0b, 0x8b, 0x95, 0xd7, 0x74, 0x70, 0xae, 0x98, 0x54, 0x0c, 0x44, 0x91, 0x2c, 0xc5,
+	0x10, 0xee, 0xc0, 0xf5, 0xcd, 0x29, 0x72, 0x81, 0x0a, 0xcd, 0x80, 0xbe, 0xe4, 0x33, 0x54, 0xc1,
+	0xe8, 0xe4, 0x6c, 0x55, 0x98, 0xd0, 0xa6, 0xb7, 0x10, 0xb9, 0x63, 0x36, 0x41, 0x87, 0xb5, 0xfd,
+	0x0f, 0x16, 0x5a, 0xdd, 0x17, 0x42, 0x9d, 0xb2, 0x50, 0xf5, 0xa9, 0x3f, 0xa4, 0xa8, 0x5d, 0x75,
+	0x5c, 0x8a, 0x88, 0xee, 0x8f, 0xed, 0xc7, 0x9c, 0xfa, 0xd1, 0xbb, 0x39, 0xdd, 0x91, 0x5f, 0x2d,
+	0x64, 0x7f, 0x02, 0xea, 0x88, 0xb5, 0x22, 0x16, 0xaa, 0xba, 0xe8, 0x51, 0xc6, 0x4f, 0x4f, 0x0e,
+	0xea, 0x4c, 0x06, 0x3e, 0x1d, 0x4c, 0xab, 0xcc, 0x88, 0xf4, 0x9a, 0xca, 0xe4, 0x69, 0xc9, 0xb6,
+	0x61, 0x79, 0x0f, 0x6f, 0x9a, 0x23, 0x3e, 0x56, 0xed, 0x78, 0x46, 0x26, 0xe3, 0x3e, 0x8d, 0xdf,
+	0xd9, 0xcf, 0x75, 0xbb, 0xf6, 0x50, 0xe1, 0x94, 0xfa, 0xcc, 0xa3, 0x0a, 0x9e, 0x8b, 0x2e, 0x70,
+	0x4c, 0x26, 0x9d, 0x4c, 0x20, 0x4b, 0x33, 0x83, 0x66, 0x74, 0x7f, 0x94, 0x8e, 0xea, 0x92, 0xfc,
+	0x62, 0x21, 0x7b, 0xcf, 0xeb, 0x31, 0xde, 0xec, 0xd0, 0x10, 0xbc, 0xe4, 0x3a, 0x3c, 0x08, 0xc1,
+	0x7c, 0xcb, 0xe1, 0x87, 0xd7, 0xdf, 0x6a, 0x27, 0xa0, 0x0b, 0xdf, 0x07, 0xa9, 0x0c, 0xca, 0xee,
+	0x8c, 0x33, 0x64, 0x20, 0xb8, 0x04, 0x43, 0x76, 0xcf, 0x90, 0x95, 0x49, 0xd1, 0x89, 0x1e, 0x39,
+	0x2d, 0xaa, 0x94, 0x0f, 0x67, 0x0c, 0x7c, 0x4f, 0x6a, 0xc0, 0xdf, 0x2c, 0xf4, 0xc1, 0x5e, 0x10,
+	0xf8, 0x83, 0x03, 0xc1, 0xa5, 0xf0, 0xe1, 0x19, 0x57, 0xa2, 0xce, 0xa9, 0xfa, 0x8c, 0xa9, 0xf4,
+	0xf2, 0xde, 0xe3, 0x5e, 0xf2, 0x5e, 0x4d, 0x3b, 0xca, 0x93, 0x79, 0x0d, 0x90, 0xa2, 0x1f, 0xba,
+	0x90, 0x65, 0xdd, 0x99, 0x41, 0x9d, 0xe1, 0xb4, 0x0d, 0x67, 0x89, 0xac, 0x68, 0x4e, 0x57, 0xf4,
+	0x5a, 0x54, 0x85, 0x42, 0xf4, 0x0c, 0xa6, 0x8f, 0x6e, 0x1f, 0x0b, 0xb7, 0xdb, 0x6c, 0x3e, 0xc5,
+	0x95, 0x34, 0xeb, 0xe8, 0xc7, 0xaa, 0x9d, 0x33, 0x4e, 0x76, 0x4d, 0xda, 0x6d, 0x72, 0xdb, 0x34,
+	0x8e, 0xec, 0x3c, 0xb1, 0xb6, 0x5e, 0xac, 0xe0, 0x42, 0xf2, 0xe4, 0x9c, 0xbb, 0x3d, 0xef, 0xe2,
+	0x45, 0x72, 0x35, 0x4b, 0xd9, 0x09, 0xfa, 0xad, 0xfd, 0xe2, 0x9f, 0x97, 0x1b, 0xd6, 0x5f, 0x97,
+	0x1b, 0xd6, 0x3f, 0x97, 0x1b, 0xd6, 0xcf, 0xff, 0x6e, 0xbc, 0xd1, 0x5a, 0x34, 0xdf, 0xd1, 0x8f,
+	0xff, 0x0f, 0x00, 0x00, 0xff, 0xff, 0xce, 0xa4, 0xf1, 0xa5, 0xab, 0x0b, 0x00, 0x00,
 }

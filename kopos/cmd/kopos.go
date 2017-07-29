@@ -202,13 +202,15 @@ var tokenCommand = &cobra.Command{
 }
 
 func bootCommand() *cobra.Command {
+	var insecure, ishttp bool
+	var multimode bool
 	bootcmd := &cobra.Command{
 		Use:   "boot",
 		Short: "Example boot gRPC service CLI client",
 		Run: func(cmd *cobra.Command, args []string) {
-			var insecure, ishttp bool
-			pflag.BoolVar(&insecure, "insecure", true, "using insecure rpc/http.")
-			pflag.BoolVar(&ishttp, "http", true, "using http.")
+			pflag.BoolVarP(&insecure, "insecure", "n", true, "using insecure rpc/http.")
+			pflag.BoolVarP(&ishttp, "http", "t", true, "using http.")
+			pflag.BoolVar(&multimode, "multimode", false, "multiple flavor and image")
 			pflag.Parse()
 
 			if insecure {
@@ -218,8 +220,8 @@ func bootCommand() *cobra.Command {
 {
   "flavor_name": "m1.tiny",
   "image_name": "cirros",
-  "min_count": 2,
-  "max_count": 4,
+  "min_count": 1,
+  "max_count": 2,
   "secgroups_info": [
     {
       "id": "15895b59-9aa7-4e6e-9d23-75a9324030f5",
@@ -227,13 +229,54 @@ func bootCommand() *cobra.Command {
     }
   ],
   "user_data": [],
-  "network_name": "private-admin1",
-  "floating_network_name": "public",
+  "network_name": "private",
+  "floating_network_name": "public-192-168-1-0",
   "personality": [],
   "name_prefix": "............"
 }
 `, "............", rand.String(12), 1))
+					if multimode {
+						jsonStr = []byte(strings.Replace(`
+{ "vms": [{
+  "flavor_name": "m1.tiny",
+  "image_name": "cirros",
+  "min_count": 1,
+  "max_count": 2,
+  "secgroups_info": [
+    {
+      "id": "15895b59-9aa7-4e6e-9d23-75a9324030f5",
+      "name": "default"
+    }
+  ],
+  "user_data": [],
+  "network_name": "private",
+  "floating_network_name": "public-192-168-1-0",
+  "personality": [],
+  "name_prefix": "............"
+},
+{
+  "flavor_name": "m1.tiny",
+  "image_name": "cirros",
+  "min_count": 1,
+  "max_count": 2,
+  "secgroups_info": [
+    {
+      "id": "15895b59-9aa7-4e6e-9d23-75a9324030f5",
+      "name": "default"
+    }
+  ],
+  "user_data": [],
+  "network_name": "private",
+  "floating_network_name": "public-192-168-1-0",
+  "personality": [],
+  "name_prefix": "............"
+}]}`, "............", rand.String(12), 1))
+						url = "http://localhost:10001/v1/spawn"
+					}
 					req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonStr))
+					if err != nil {
+						panic(err)
+					}
 					req.Header.Set("X-Custom-Header", "test again")
 					req.Header.Set("Content-Type", "application/json")
 
@@ -293,6 +336,10 @@ func bootCommand() *cobra.Command {
 
 		},
 	}
+
+	bootcmd.Flags().BoolVarP(&ishttp, "http", "t", true, "using insecure http.")
+	bootcmd.Flags().BoolVar(&multimode, "multimode", false, "multiple flavor and image")
+
 	bootcmd.Flags().StringP("name", "", "", "vm name and/or prefix")
 	bootcmd.Flags().StringP("flavor_name", "", "m1.small", "vm spec")
 	bootcmd.Flags().StringP("image_name", "", "cirros", "vm image")

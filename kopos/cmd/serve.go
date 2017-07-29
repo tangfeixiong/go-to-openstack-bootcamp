@@ -6,19 +6,21 @@ import (
 	"crypto/tls"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"log"
 	"mime"
 	"net"
 	"net/http"
 	"os"
 	"path"
+	"path/filepath"
 	"strings"
 	"sync"
 
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/philips/go-bindata-assetfs"
 	"github.com/spf13/cobra"
-	_ "github.com/spf13/pflag"
+	// "github.com/spf13/pflag"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
@@ -27,6 +29,7 @@ import (
 	pbos "github.com/tangfeixiong/go-to-openstack-bootcamp/kopos/echopb/openstack"
 	"github.com/tangfeixiong/go-to-openstack-bootcamp/kopos/pkg/osctl"
 	"github.com/tangfeixiong/go-to-openstack-bootcamp/kopos/pkg/ui/data/swagger"
+	"github.com/tangfeixiong/go-to-openstack-bootcamp/kopos/pkg/util"
 )
 
 // serveCmd represents the serve command
@@ -59,16 +62,45 @@ var serveCmd = &cobra.Command{
 	},
 }
 
-var wg sync.WaitGroup
+var (
+	wg         sync.WaitGroup
+	workconfig util.WorkerConfig
+)
 
 func init() {
-	RootCmd.AddCommand(serveCmd)
 	// bridge glog with pflag
 	GLog(RootCmd.PersistentFlags())
+	RootCmd.AddCommand(serveCmd)
+	// "/Users/fanhongling/Downloads/tmp"
+	path := filepath.Join("/Users", "fanhongling", "Downloads", "tmp")
+	serveCmd.Flags().BoolVar(&workconfig.GRPCUsed, "grpcworker", false, "using gRPC worker service")
+	serveCmd.Flags().BoolVar(&workconfig.SSHAgent, "sshagent", false, "using ssh agent")
+	serveCmd.Flags().StringVarP(&workconfig.SSHUser.Name, "sshusername", "u", "root", "ssh user")
+	serveCmd.Flags().StringVarP(&workconfig.SSHUser.Password, "sshpassword", "p", "", "ssh password")
+	serveCmd.Flags().StringVarP(&workconfig.SSHUser.RSAKeyPath, "sshrsapubpath", "k", path, "ssh private key, like $HOME/.ssh/id_rsa")
+	if _, err := os.Stat(path); os.IsNotExist(err) {
+		if err := os.MkdirAll(path, 0600); nil != err {
+			fmt.Printf("Not writen init: %v\n", err)
+		}
+	}
+	pub := []byte(util.Key_vagrant)
+	path = filepath.Join(path, "vagrant")
+	if err := ioutil.WriteFile(path, pub, 0600); nil != err {
+		fmt.Printf("Not writen init: %v\n", err)
+	}
+	// f, err := os.Create(path)
+	// if nil != err {
+	//	 fmt.Printf("Not writen init: %v\n", err)
+	// }
+	// defer f.Close()
+	// if _, err := f.Write(pub); nil != err {
+	//	 fmt.Printf("Not writen init: %v\n", err)
+	// }
 }
 
 type myService struct {
-	config *osctl.CounterConfig
+	config       *osctl.CounterConfig
+	workerconfig *util.WorkerConfig
 }
 
 func (m *myService) DiscoverNetworks(ctx context.Context, in *pbos.NetworkDiscoveryReqRespData) (*pbos.NetworkDiscoveryReqRespData, error) {
@@ -77,6 +109,10 @@ func (m *myService) DiscoverNetworks(ctx context.Context, in *pbos.NetworkDiscov
 
 func (m *myService) DiscoverSubnets(ctx context.Context, in *pbos.SubnetDiscoveryReqRespData) (*pbos.SubnetDiscoveryReqRespData, error) {
 	return osctl.InfraRes().Credential(m.config).DiscoverSubnets(in)
+}
+
+func (m *myService) DiscoverNetworkingTopology(ctx context.Context, req *pbos.NetworkTopologyReqRespData) (*pbos.NetworkTopologyReqRespData, error) {
+	return osctl.InfraRes().Credential(m.config).DiscoverNetworkingTopology(req)
 }
 
 func (m *myService) EstablishNetworkLandscape(ctx context.Context, req *pbos.OpenstackNeutronLandscapeReqRespData) (*pbos.OpenstackNeutronLandscapeReqRespData, error) {
@@ -107,6 +143,10 @@ func (m *myService) SearchFlavorDetails(ctx context.Context, in *pbos.Flavor) (*
 	return osctl.InfraRes().Credential(m.config).DiscoverFlavorDetails(in)
 }
 
+func (m *myService) SpawnMachines(ctx context.Context, in *pbos.MachineSpawnsReqRespData) (*pbos.MachineSpawnsReqRespData, error) {
+	return osctl.InfraRes().Credential(m.config).SpawnMachines(in)
+}
+
 func (m *myService) DiscoverMachines(ctx context.Context, in *pbos.MachineDiscoveryReqRespData) (*pbos.MachineDiscoveryReqRespData, error) {
 	return osctl.InfraRes().Credential(m.config).DiscoverMachines(in)
 }
@@ -117,6 +157,10 @@ func (m *myService) DestroyMachines(ctx context.Context, in *pbos.MachineDestroy
 
 func (m *myService) RebootMachines(ctx context.Context, in *pbos.MachineRebootReqRespData) (*pbos.MachineRebootReqRespData, error) {
 	return osctl.InfraRes().Credential(m.config).RebootMachines(in)
+}
+
+func (m *myService) GetLibvirtDomainVNCDisplay(ctx context.Context, in *pbos.LibvirtDomainReqRespData) (*pbos.LibvirtDomainReqRespData, error) {
+	return osctl.Admin().Credential(m.config).Config(m.workerconfig).GetLibvirtDomainVNCDisplay(in)
 }
 
 func (m *myService) BootVirtualMachines(ctx context.Context, in *pbos.OpenstackNovaBootReqRespData) (*pbos.OpenstackNovaBootReqRespData, error) {
@@ -130,6 +174,10 @@ func (m *myService) Echo(c context.Context, s *pb.EchoMessage) (*pb.EchoMessage,
 
 func (m *myService) ValidateToken(ctx context.Context, req *pbos.TokenReqRespData) (*pbos.TokenReqRespData, error) {
 	return osctl.InfraRes().Credential(m.config).ValidateToken(req)
+}
+
+func (m *myService) MockSSH(ctx context.Context, req *pb.SSHReqRespData) (*pb.SSHReqRespData, error) {
+	return osctl.Admin().Credential(m.config).Config(m.workerconfig).MockSSH(req)
 }
 
 func (m *myService) AdminSharedNetworkCreation(ctx context.Context, req *pbos.OpenstackNeutronNetRequestData) (*pbos.OpenstackNeutronNetResponseData, error) {
@@ -153,8 +201,26 @@ func (m *myService) OrderTargetDroneIntoDefenseFortification(ctx context.Context
 }
 
 func newServer() *myService {
+	hvusername := os.Getenv("HV_USERNAME")
+	hvpassword := os.Getenv("HV_PASSWORD")
+	hvkeypath := os.Getenv("HV_KEYPATH")
+	// "/Users/fanhongling/Downloads/tmp/vagrant"
+	path := filepath.Join("/Users", "fanhongling", "Downloads", "tmp", "vagrant")
+	if 0 != len(hvusername) && hvusername != "fake user" && hvusername != workconfig.SSHUser.Name {
+		workconfig.SSHUser.Name = hvusername
+	}
+	if 0 != len(hvpassword) && hvpassword != "fake secret" && 0 == len(workconfig.SSHUser.Password) {
+		workconfig.SSHUser.Password = hvpassword
+	}
+	if 0 != len(hvkeypath) && hvkeypath != path && 0 == len(workconfig.SSHUser.RSAKeyPath) {
+		workconfig.SSHUser.Password = hvkeypath
+	}
+
 	// return new(myService)
-	return &myService{osctl.NewCounterConfig()}
+	return &myService{
+		config:       osctl.NewCounterConfig(),
+		workerconfig: &workconfig,
+	}
 }
 
 // grpcHandlerFunc returns an http.Handler that delegates to grpcServer on incoming gRPC

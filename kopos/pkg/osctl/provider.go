@@ -445,6 +445,26 @@ func (provider *InfraProvider) createSubnet(networkid, cidr, name, tenantid stri
 	return subnet, nil
 }
 
+func (provider *InfraProvider) querySubnet(id string) (*subnets.Subnet, error) {
+	client, err := openstack.NewNetworkV2(provider.providerclient, gophercloud.EndpointOpts{
+		Region: os.Getenv("OS_REGION_NAME"),
+	})
+	if nil != err {
+		glog.Errorf("Could not reap networking service: %v", err)
+		return nil, err
+	}
+	glog.V(5).Infof("Reap networking serivce endpoint: %v%v", client.Endpoint, client.ResourceBase)
+
+	resp, err := subnets.Get(client, id).Extract()
+	if nil != err {
+		glog.Errorf("Could not reap networking interface of showing subnet: %v", err)
+		return nil, err
+	}
+	glog.V(5).Infof("Succeeded to reap networking interface of showing subnet: %v", resp)
+
+	return resp, nil
+}
+
 func (provider *InfraProvider) identifySubnet(name string) (*string, error) {
 	client, err := openstack.NewNetworkV2(provider.providerclient, gophercloud.EndpointOpts{
 		Region: os.Getenv("OS_REGION_NAME"),
@@ -463,6 +483,60 @@ func (provider *InfraProvider) identifySubnet(name string) (*string, error) {
 	glog.V(5).Infof("Succeeded to reap subnet-list interface: %v", resp)
 
 	return &resp, nil
+}
+
+func (provider *InfraProvider) gainRouters() ([]routers.Router, error) {
+	client, err := openstack.NewNetworkV2(provider.providerclient, gophercloud.EndpointOpts{
+		Region: os.Getenv("OS_REGION_NAME"),
+	})
+	if nil != err {
+		glog.Errorf("Could not reap network service: %v", err)
+		return nil, err
+	}
+	glog.V(5).Infof("Succeeded to reap network serivce: %v%v", client.Endpoint, client.ResourceBase)
+
+	id_fake := "fake subnet id"
+	name_fake := "fake subnet name"
+	adminStateUp := false
+	distributed_fake := false
+	status_fake := "ACTIVE"
+	tenantId := "fake project id"
+	limit_fake := 0
+	marker_fake := "00000000-0000-0000-0000-000000000000"
+	sortKey := "ID"
+	sortDir := "ASC"
+
+	opts := routers.ListOpts{
+		ID:           id_fake,
+		Name:         name_fake,
+		AdminStateUp: &adminStateUp,
+		Distributed:  &distributed_fake,
+		Status:       status_fake,
+		TenantID:     tenantId,
+		Limit:        limit_fake,
+		Marker:       marker_fake,
+		SortKey:      sortKey,
+		SortDir:      sortDir,
+	}
+	opts = routers.ListOpts{
+		Status: "ACTIVE",
+	}
+
+	resp, err := routers.List(client, opts).AllPages()
+	if nil != err {
+		glog.Errorf("Could not reap router-list capability: %v", err)
+		return nil, err
+	}
+	glog.V(5).Infof("Succeeded to reap router-list capability: %v", resp)
+
+	result, err := routers.ExtractRouters(resp)
+	if nil != err {
+		glog.Errorf("Could not unmarshall routers result: %v", err)
+		return nil, err
+	}
+	glog.V(5).Infof("Succeeded to unmarshall routers result: %v", result)
+
+	return result, nil
 }
 
 func (provider *InfraProvider) searchRouters(name string) ([]routers.Router, error) {
@@ -659,6 +733,62 @@ func (provider *InfraProvider) gainFloatingIps() ([]floatingips.FloatingIP, erro
 	return resp, nil
 }
 
+func (provider *InfraProvider) searchFloatingIps(floatingnetworkid string) ([]floatingips.FloatingIP, error) {
+	client, err := openstack.NewNetworkV2(provider.providerclient, gophercloud.EndpointOpts{
+		Region: os.Getenv("OS_REGION_NAME"),
+	})
+	if nil != err {
+		glog.Errorf("Could not reap neutron service: %v", err)
+		return nil, err
+	}
+	glog.V(5).Infof("Reap neutron serivce endpoint: %v%v", client.Endpoint, client.ResourceBase)
+
+	id_fake := "The id"
+	floatingNetworkId := "network id"
+	floatingIp := "ip"
+	portId := "port id"
+	fixedIp := "ip"
+	tenantId := "fake"
+	limit_fake := 0
+	marker_fake := "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF"
+	sortKey := "ID"
+	sortDir := "ASC"
+	routerId := "fake"
+
+	opts := floatingips.ListOpts{
+		ID:                id_fake,
+		FloatingNetworkID: floatingNetworkId,
+		FloatingIP:        floatingIp,
+		PortID:            portId,
+		FixedIP:           fixedIp,
+		TenantID:          tenantId,
+		Limit:             limit_fake,
+		Marker:            marker_fake,
+		SortKey:           sortKey,
+		SortDir:           sortDir,
+		RouterID:          routerId,
+	}
+	opts = floatingips.ListOpts{
+		FloatingNetworkID: floatingnetworkid,
+	}
+
+	result, err := floatingips.List(client, opts).AllPages()
+	if nil != err {
+		glog.Errorf("Could not reap networking floatingips capability: %v", err)
+		return nil, err
+	}
+	glog.V(5).Infof("Succeeded to reap networking floating capability: %v", result)
+
+	resp, err := floatingips.ExtractFloatingIPs(result)
+	if nil != err {
+		glog.Errorf("Could not reap networking floatingips marshall: %v", err)
+		return nil, err
+	}
+	glog.V(5).Infof("Succeeded to reap networking floating marshall: %v", resp)
+
+	return resp, nil
+}
+
 func (provider *InfraProvider) createFloatingIp(floatingnetworkid, floatingip, portid, fixedip, tenantid string) (*floatingips.FloatingIP, error) {
 	client, err := openstack.NewNetworkV2(provider.providerclient, gophercloud.EndpointOpts{
 		Region: os.Getenv("OS_REGION_NAME"),
@@ -706,6 +836,35 @@ func (provider *InfraProvider) createFloatingIp(floatingnetworkid, floatingip, p
 	return result, nil
 }
 
+func (provider *InfraProvider) updateFloatingIp(floatingipid, portid string) (*floatingips.FloatingIP, error) {
+	client, err := openstack.NewNetworkV2(provider.providerclient, gophercloud.EndpointOpts{
+		Region: os.Getenv("OS_REGION_NAME"),
+	})
+	if nil != err {
+		glog.Errorf("Could not reap neutron service: %v", err)
+		return nil, err
+	}
+	glog.V(5).Infof("Reap neutron serivce endpoint: %v%v", client.Endpoint, client.ResourceBase)
+
+	portId := "required"
+
+	opts := floatingips.UpdateOpts{
+		PortID: &portId,
+	}
+	opts = floatingips.UpdateOpts{
+		PortID: &portid,
+	}
+
+	result, err := floatingips.Update(client, floatingipid, opts).Extract()
+	if nil != err {
+		glog.Errorf("Could not reap networking floatingip updation capability: %v", err)
+		return nil, err
+	}
+	glog.V(5).Infof("Succeeded to reap networking floatingip updateion capability: %v", result)
+
+	return result, nil
+}
+
 func (provider *InfraProvider) queryFloatingIp(id string) (*floatingips.FloatingIP, error) {
 	client, err := openstack.NewNetworkV2(provider.providerclient, gophercloud.EndpointOpts{
 		Region: os.Getenv("OS_REGION_NAME"),
@@ -722,6 +881,131 @@ func (provider *InfraProvider) queryFloatingIp(id string) (*floatingips.Floating
 		return nil, err
 	}
 	glog.V(5).Infof("Succeeded to reap networking floating capability: %v", result)
+
+	return result, nil
+}
+
+func (provider *InfraProvider) gainPorts() ([]ports.Port, error) {
+	client, err := openstack.NewNetworkV2(provider.providerclient, gophercloud.EndpointOpts{
+		Region: os.Getenv("OS_REGION_NAME"),
+	})
+	if nil != err {
+		glog.Errorf("Could not reap neutron service: %v", err)
+		return nil, err
+	}
+	glog.V(5).Infof("Reap neutron serivce endpoint: %v%v", client.Endpoint, client.ResourceBase)
+
+	status_fake := "ACTIVE"
+	name_fake := "port name if existed"
+	adminStateUp := true // *bool
+	networkId := "network_id"
+	tenantId := "tenant_id"
+	deviceOwner := "device_owner"
+	macAddress := "mac_address"
+	id_fake := "id"
+	deviceId := "device_id"
+	limit_fake := 0
+	marker_fake := "00000000-0000-0000-0000-000000000000"
+	sortKey := "ID"
+	sortDir := "ASC"
+
+	opts := ports.ListOpts{
+		Status:       status_fake,
+		Name:         name_fake,
+		AdminStateUp: &adminStateUp,
+		NetworkID:    networkId,
+		TenantID:     tenantId,
+		DeviceOwner:  deviceOwner,
+		MACAddress:   macAddress,
+		ID:           id_fake,
+		DeviceID:     deviceId,
+		Limit:        limit_fake,
+		Marker:       marker_fake,
+		SortKey:      sortKey,
+		SortDir:      sortDir,
+	}
+	opts = ports.ListOpts{
+		Status: "ACTIVE",
+	}
+
+	resp, err := ports.List(client, opts).AllPages()
+	if nil != err {
+		glog.Errorf("Could not reap neutron ports: %v", err)
+		return nil, err
+	}
+
+	result, err := ports.ExtractPorts(resp)
+	if nil != err {
+		glog.Errorf("Could not reap neutron ports list: %v", err)
+		return nil, err
+	}
+	glog.V(5).Infof("Succeeded to reap neutron ports list: %v", result)
+
+	return result, nil
+}
+
+func (provider *InfraProvider) searchPorts(deviceowner, deviceid, networkid string) ([]ports.Port, error) {
+	client, err := openstack.NewNetworkV2(provider.providerclient, gophercloud.EndpointOpts{
+		Region: os.Getenv("OS_REGION_NAME"),
+	})
+	if nil != err {
+		glog.Errorf("Could not reap neutron service: %v", err)
+		return nil, err
+	}
+	glog.V(5).Infof("Reap neutron serivce endpoint: %v%v", client.Endpoint, client.ResourceBase)
+
+	status_fake := "ACTIVE"
+	name_fake := "port name if existed"
+	adminStateUp := true // *bool
+	networkId := "network_id"
+	tenantId := "tenant_id"
+	deviceOwner := "device_owner"
+	macAddress := "mac_address"
+	id_fake := "id"
+	deviceId := "device_id"
+	limit_fake := 0
+	marker_fake := "00000000-0000-0000-0000-000000000000"
+	sortKey := "ID"
+	sortDir := "ASC"
+
+	opts := ports.ListOpts{
+		Status:       status_fake,
+		Name:         name_fake,
+		AdminStateUp: &adminStateUp,
+		NetworkID:    networkId,
+		TenantID:     tenantId,
+		DeviceOwner:  deviceOwner,
+		MACAddress:   macAddress,
+		ID:           id_fake,
+		DeviceID:     deviceId,
+		Limit:        limit_fake,
+		Marker:       marker_fake,
+		SortKey:      sortKey,
+		SortDir:      sortDir,
+	}
+	opts = ports.ListOpts{}
+	if len(deviceId) > 0 {
+		opts.DeviceID = deviceid
+	}
+	if len(deviceOwner) > 0 {
+		opts.DeviceOwner = deviceowner
+	}
+	if len(networkid) > 0 {
+		opts.NetworkID = networkid
+	}
+
+	resp, err := ports.List(client, opts).AllPages()
+	if nil != err {
+		glog.Errorf("Could not reap neutron ports: %v", err)
+		return nil, err
+	}
+
+	result, err := ports.ExtractPorts(resp)
+	if nil != err {
+		glog.Errorf("Could not reap neutron ports list: %v", err)
+		return nil, err
+	}
+	glog.V(5).Infof("Succeeded to reap neutron ports list: %v", result)
 
 	return result, nil
 }

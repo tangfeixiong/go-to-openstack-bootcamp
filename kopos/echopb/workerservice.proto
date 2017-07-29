@@ -1,0 +1,19 @@
+// Author: tangfeixiong "tangfx128@gmail.com"
+
+syntax = "proto3";
+package echopb;
+
+import "google/api/annotations.proto";
+
+import "service.proto";
+import "openstack/data.proto";
+
+service WorkerService {
+  rpc StartPacketCapturing(openstack.OSILayersReqRespData) returns (openstack.OSILayersReqRespData) {}
+
+  rpc StopPacketCapturing(openstack.OSILayersReqRespData) returns (openstack.OSILayersReqRespData) {}
+
+  rpc GetLibvirtDomainInfo(openstack.LibvirtDomainInfo) returns (openstack.LibvirtDomainInfo) {}
+
+  rpc Echo(EchoMessage) returns (EchoMessage) {}
+}

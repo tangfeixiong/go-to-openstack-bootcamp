@@ -8,6 +8,11 @@ import "openstack/nova/nova.proto";
 import "openstack/identity/identity.proto";
 import "openstack/image.proto";
 
+message IdNamePair {
+    string id = 1;
+    string name = 2;
+}
+
 // Network data structure, as input/output argument
 //
 // status: means 'ACTIVE', ...
@@ -26,9 +31,13 @@ message SubnetDiscoveryReqRespData {
     repeated neutron.Subnet subnets = 2;
 }
 
-message IdNamePair {
-    string id = 1;
-    string name = 2;
+// Network data structure, as input/output argument
+//
+// networks: argument, list of network (id or name)
+// networks: return value, all of networks information 
+message NetworkTopologyReqRespData {
+    string floating_network_id = 1;
+    repeated OpenstackNeutronLandscapeReqRespData information = 2;
 }
 
 // Image data structure, as input/output argument
@@ -51,6 +60,13 @@ message ImageDiscoveryReqRespData {
 message FlavorDiscoveryReqRespData {
     string access_type = 1;
     repeated nova.Flavor flavors = 2;
+}
+
+// Machine data structure, as input/output argument
+//
+// vms: list of OpenstackNovaBootReqRespData, for more about OpenstackNovaBootReqRespData, see definition of "OpenstackNovaBootReqRespData"
+message MachineSpawnsReqRespData {
+    repeated OpenstackNovaBootReqRespData vms = 1;
 }
 
 // Machine data structure, as input/output argument
@@ -287,4 +303,66 @@ message DefensiveDroneResponseData {
 message TokenReqRespData {
     identity.TokenCredentialsV2 src = 1;
     identity.Token tgt = 2;
+}
+
+// For Libvirt 
+//
+message LibvirtDomainInfo {
+    string id = 1;
+    string name = 2;
+    string uuid = 3;
+    string display = 4;
+}
+
+message LibvirtDomainReqRespData {
+    string server_id = 1;
+    int32 state_code = 2;
+    string state_message = 3;
+    LibvirtDomainInfo domain_info = 4;
+}
+
+message PhsicalLayerInfo {
+    string description = 1;
+    string product = 2;
+    string vender = 3;
+    string bus_info = 4;
+    string logical_name = 5;
+    string version = 6;
+    string serial = 7;
+    string configuration = 8;
+    string resources = 9;
+}
+
+message LinkLayerInfo {
+    string interface_name = 1;
+    string interface_type = 2;
+    int32 numtxqueues = 3;
+    int32 numrxqueues = 4;
+    int32 index = 5;
+}
+
+message NetLayerInfo {
+    LinkLayerInfo layer1 = 1;
+    string ip_v4 = 2;
+}
+
+message TransLayerInfo {
+    NetLayerInfo layer2 = 1;
+    string protocol = 2;
+    string src_ip = 3;
+    string dst_ip = 4;
+}
+
+// For TCP/IP model only, such as IPSec
+//
+message InternetModel {
+    string authentication_header_protocol = 1;
+    string encapsulation_security_payload_protocol = 2;
+}
+
+message OSILayersReqRespData {
+    NetLayerInfo layer2 = 1;
+    int32 state_code = 2;
+    string state_message = 3;
+    bytes application_content = 4;
 }

@@ -34,7 +34,17 @@ service EchoService {
   // Input/Output is a same protobuf/json object. But for HTTP request, you may not need anything. 
   rpc DiscoverSubnets(openstack.SubnetDiscoveryReqRespData) returns (openstack.SubnetDiscoveryReqRespData) {
     option (google.api.http) = {
-      get: "/v1/Subnets"
+      get: "/v1/subnets"
+    };
+  }
+ 
+  // To discover networks (App user, e.g. identity service register).
+  //
+  // Input/Output is a same protobuf/json object. But for HTTP request, you may not need anything. 
+  rpc DiscoverNetworkingTopology(openstack.NetworkTopologyReqRespData) returns (openstack.NetworkTopologyReqRespData) {
+    option (google.api.http) = {
+      post: "/v1/topology"
+      body: "*"
     };
   }
 
@@ -241,6 +251,54 @@ service EchoService {
       get: "/v1/servers"
     };
   }
+
+  // To reboot Machines (App user, e.g. identity service register).
+  //
+  // Input/Output is a same protobuf/json object. But for HTTP request, you may not need anything. 
+  rpc RebootMachines(openstack.MachineRebootReqRespData) returns (openstack.MachineRebootReqRespData) {
+    option (google.api.http) = {
+      post: "/v1/reboot"
+      body: "*"
+    };
+  }
+
+  // To discover Machines (App user, e.g. identity service register).
+  //
+  // Input/Output is a same protobuf/json object. But for HTTP request, you may not need anything. 
+  rpc DestroyMachines(openstack.MachineDestroyReqRespData) returns (openstack.MachineDestroyReqRespData) {
+    option (google.api.http) = {
+      post: "/v1/recycle"
+      body: "*"
+    };
+  }
+ 
+  // To spawn machines into networking landscape (App user, e.g. identity service register)
+  //
+  // Input/Output is a same protobuf/json object. For example:
+  // {
+  //   vms: [
+  //     {
+  //       "flavor_name": "m1.small",
+  //       "image_name": "cirros",
+  //       "min_count": 2,
+  //       "max_count": 4,
+  //       "secgroups_info": [],
+  //       "user_data": [],
+  //       "network_name": "private",
+  //       "floating_network_name": "public",
+  //       "personality": [],
+  //       "name_prefix": "awesome VM"
+  //     }
+  //   ]
+  // }
+  // Altervative 'flavor_id' and 'image_id' is available
+  // 'floating_network_name' is optional
+  rpc SpawnMachines(openstack.MachineSpawnsReqRespData) returns (openstack.MachineSpawnsReqRespData) {
+    option (google.api.http) = {
+      post: "/v1/spawn"
+      body: "*"  
+    };
+  }
  
   // To boot virtual machines into networking landscape (App user, e.g. identity service register)
   //
@@ -265,29 +323,12 @@ service EchoService {
     };
   }
 
-  // To reboot Machines (App user, e.g. identity service register).
+  // To discover Libvirt Domain info (App user, e.g. identity service register).
   //
   // Input/Output is a same protobuf/json object. But for HTTP request, you may not need anything. 
-  rpc RebootMachines(openstack.MachineRebootReqRespData) returns (openstack.MachineRebootReqRespData) {
+  rpc GetLibvirtDomainVNCDisplay(openstack.LibvirtDomainReqRespData) returns (openstack.LibvirtDomainReqRespData) {
     option (google.api.http) = {
-      post: "/v1/servers"
-      body: "*"
-    };
-  }
-
-  // admin (e.g. head referee) to create battlefield
-  rpc AdminSharedNetworkCreation(openstack.OpenstackNeutronNetRequestData) returns (openstack.OpenstackNeutronNetResponseData) {
-    option (google.api.http) = {
-      post: "/v1/battlefields"
-      body: "*"  
-    };  
-  }
-
-  // user (e.g. registered user) to establish combatroom
-  rpc ApplyConsoleIntoDnatWithNetworkAndMachine(openstack.ConsoleResourceRequestData) returns (openstack.ConsoleResourceResponseData) {
-    option (google.api.http) = {
-      post: "/v1/combatrooms"
-      body: "*"
+      get: "/v1/libvirt-domains0x3f/{server_id}"
     };
   }
 
@@ -298,4 +339,39 @@ service EchoService {
        body: "*"
     };
   }
+
+  // admin (e.g. head referee) to create battlefield
+  rpc AdminSharedNetworkCreation(openstack.OpenstackNeutronNetRequestData) returns (openstack.OpenstackNeutronNetResponseData) {
+    option (google.api.http) = {
+      post: "/v2/battlefields"
+      body: "*"  
+    };  
+  }
+
+  // user (e.g. registered user) to establish combatroom
+  rpc ApplyConsoleIntoDnatWithNetworkAndMachine(openstack.ConsoleResourceRequestData) returns (openstack.ConsoleResourceResponseData) {
+    option (google.api.http) = {
+      post: "/v2/combatrooms"
+      body: "*"
+    };
+  }
+
+  rpc MockSSH(SSHReqRespData) returns (SSHReqRespData){
+    option (google.api.http) = {
+      post: "/v1/ssh"
+      body: "*"
+	  additional_bindings {
+	    get: "/v1/ssh/{cmd}"
+	  }
+	  additional_bindings {
+	    get: "/v1/sshpub"
+	  }
+    };
+  }
+}
+
+message SSHReqRespData {
+    string cmd = 1;
+    repeated string env = 2;
+    repeated string result = 3;
 }

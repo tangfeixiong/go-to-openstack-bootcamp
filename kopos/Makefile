@@ -40,3 +40,23 @@ restart: kill $(TARGET)
 dist: clean $(TARGET)
 	@NODE_ENV=production $(NODE_BIN)/webpack --progress --colors
 	@zip -r -v $(APP_NAME)-$(APP_VERSION).zip $(TARGET) webpack-assets.json public templates
+
+.PHONY: kopos-bin
+kopos-bin:
+	@CGO_ENABLED=0 go build -v -o bin/kopos --installsuffix cgo .
+
+.PHONY: kopos-docker
+IMG_NAME ?= docker.io/tangfeixiong/go-to-openstack-bootcamp
+IMG_TAG ?= latest
+kopos-docker: kopos-bin
+	@sed 's%bin/kopos%kopos%' Dockerfile >./bin/Dockerfile
+	@docker build -t $(IMG_NAME):$(IMG_TAG) ./bin
+	@docker push $(IMG_NAME):$(IMG_TAG)
+
+.PHONY: kopos-run
+OS_PASSWORD ?= secret
+MOCK_HOST ?= 127.0.0.1
+SSH_USER ?= vagrant
+kopos-runtest: 
+	$(shell inst=$$(docker ps -qf name=kopos); [[ -z $$inst ]] && docker stop $$inst && docker rm $$inst )
+	@docker run -d --name kopos -p 10001:10001 -e OS_PASSWORD=$(OS_PASSWORD) -e MOCK_HOST=$(MOCK_HOST) --restart always docker.io/tangfeixiong/go-to-openstack-bootcamp:0.1 -k /Users/fanhongling/Downloads/tmp/vagrant -u vagrant --loglevel 2

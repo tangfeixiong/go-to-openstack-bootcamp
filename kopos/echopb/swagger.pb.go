@@ -18,51 +18,6 @@ swagger = `{
     "application/json"
   ],
   "paths": {
-    "/v1/Subnets": {
-      "get": {
-        "summary": "To discover subnets (App user, e.g. identity service register).",
-        "description": "Input/Output is a same protobuf/json object. But for HTTP request, you may not need anything.",
-        "operationId": "DiscoverSubnets",
-        "responses": {
-          "200": {
-            "description": "",
-            "schema": {
-              "$ref": "#/definitions/openstackSubnetDiscoveryReqRespData"
-            }
-          }
-        },
-        "tags": [
-          "EchoService"
-        ]
-      }
-    },
-    "/v1/battlefields": {
-      "post": {
-        "summary": "admin (e.g. head referee) to create battlefield",
-        "operationId": "AdminSharedNetworkCreation",
-        "responses": {
-          "200": {
-            "description": "",
-            "schema": {
-              "$ref": "#/definitions/openstackOpenstackNeutronNetResponseData"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/openstackOpenstackNeutronNetRequestData"
-            }
-          }
-        ],
-        "tags": [
-          "EchoService"
-        ]
-      }
-    },
     "/v1/boot": {
       "post": {
         "summary": "To boot virtual machines into networking landscape (App user, e.g. identity service register)",
@@ -83,33 +38,6 @@ swagger = `{
             "required": true,
             "schema": {
               "$ref": "#/definitions/openstackOpenstackNovaBootReqRespData"
-            }
-          }
-        ],
-        "tags": [
-          "EchoService"
-        ]
-      }
-    },
-    "/v1/combatrooms": {
-      "post": {
-        "summary": "user (e.g. registered user) to establish combatroom",
-        "operationId": "ApplyConsoleIntoDnatWithNetworkAndMachine",
-        "responses": {
-          "200": {
-            "description": "",
-            "schema": {
-              "$ref": "#/definitions/openstackConsoleResourceResponseData"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/openstackConsoleResourceRequestData"
             }
           }
         ],
@@ -316,6 +244,33 @@ swagger = `{
         ]
       }
     },
+    "/v1/libvirt-domains0x3f/{server_id}": {
+      "get": {
+        "summary": "To discover Libvirt Domain info (App user, e.g. identity service register).",
+        "description": "Input/Output is a same protobuf/json object. But for HTTP request, you may not need anything.",
+        "operationId": "GetLibvirtDomainVNCDisplay",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/openstackLibvirtDomainReqRespData"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "server_id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "string"
+          }
+        ],
+        "tags": [
+          "EchoService"
+        ]
+      }
+    },
     "/v1/networks": {
       "get": {
         "summary": "To discover networks (App user, e.g. identity service register).",
@@ -334,23 +289,7 @@ swagger = `{
         ]
       }
     },
-    "/v1/servers": {
-      "get": {
-        "summary": "To discover Machines (App user, e.g. identity service register).",
-        "description": "Input/Output is a same protobuf/json object. But for HTTP request, you may not need anything.",
-        "operationId": "DiscoverMachines",
-        "responses": {
-          "200": {
-            "description": "",
-            "schema": {
-              "$ref": "#/definitions/openstackMachineDiscoveryReqRespData"
-            }
-          }
-        },
-        "tags": [
-          "EchoService"
-        ]
-      },
+    "/v1/reboot": {
       "post": {
         "summary": "To reboot Machines (App user, e.g. identity service register).",
         "description": "Input/Output is a same protobuf/json object. But for HTTP request, you may not need anything.",
@@ -373,6 +312,165 @@ swagger = `{
             }
           }
         ],
+        "tags": [
+          "EchoService"
+        ]
+      }
+    },
+    "/v1/recycle": {
+      "post": {
+        "summary": "To discover Machines (App user, e.g. identity service register).",
+        "description": "Input/Output is a same protobuf/json object. But for HTTP request, you may not need anything.",
+        "operationId": "DestroyMachines",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/openstackMachineDestroyReqRespData"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/openstackMachineDestroyReqRespData"
+            }
+          }
+        ],
+        "tags": [
+          "EchoService"
+        ]
+      }
+    },
+    "/v1/servers": {
+      "get": {
+        "summary": "To discover Machines (App user, e.g. identity service register).",
+        "description": "Input/Output is a same protobuf/json object. But for HTTP request, you may not need anything.",
+        "operationId": "DiscoverMachines",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/openstackMachineDiscoveryReqRespData"
+            }
+          }
+        },
+        "tags": [
+          "EchoService"
+        ]
+      }
+    },
+    "/v1/spawn": {
+      "post": {
+        "summary": "To spawn machines into networking landscape (App user, e.g. identity service register)",
+        "description": "Input/Output is a same protobuf/json object. For example:\n[ {\n   \"flavor_name\": \"m1.small\",\n   \"image_name\": \"cirros\",\n   \"min_count\": 2,\n   \"max_count\": 4,\n   \"secgroups_info\": [],\n   \"user_data\": [],\n   \"network_name\": \"private\",\n   \"floating_network_name\": \"public\",\n   \"personality\": [],\n   \"name_prefix\": \"awesome VM\"\n} ]\nAltervative 'flavor_id' and 'image_id' is available\n'floating_network_name' is optional",
+        "operationId": "SpawnMachines",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/openstackMachineSpawnsReqRespData"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/openstackMachineSpawnsReqRespData"
+            }
+          }
+        ],
+        "tags": [
+          "EchoService"
+        ]
+      }
+    },
+    "/v1/ssh": {
+      "post": {
+        "operationId": "MockSSH",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/echopbSSHReqRespData"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/echopbSSHReqRespData"
+            }
+          }
+        ],
+        "tags": [
+          "EchoService"
+        ]
+      }
+    },
+    "/v1/ssh/{cmd}": {
+      "get": {
+        "operationId": "MockSSH",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/echopbSSHReqRespData"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "cmd",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "string"
+          }
+        ],
+        "tags": [
+          "EchoService"
+        ]
+      }
+    },
+    "/v1/sshpub": {
+      "get": {
+        "operationId": "MockSSH",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/echopbSSHReqRespData"
+            }
+          }
+        },
+        "tags": [
+          "EchoService"
+        ]
+      }
+    },
+    "/v1/subnets": {
+      "get": {
+        "summary": "To discover subnets (App user, e.g. identity service register).",
+        "description": "Input/Output is a same protobuf/json object. But for HTTP request, you may not need anything.",
+        "operationId": "DiscoverSubnets",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/openstackSubnetDiscoveryReqRespData"
+            }
+          }
+        },
         "tags": [
           "EchoService"
         ]
@@ -404,6 +502,88 @@ swagger = `{
           "EchoService"
         ]
       }
+    },
+    "/v1/topology": {
+      "post": {
+        "summary": "To discover networks (App user, e.g. identity service register).",
+        "description": "Input/Output is a same protobuf/json object. But for HTTP request, you may not need anything.",
+        "operationId": "DiscoverNetworkingTopology",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/openstackNetworkTopologyReqRespData"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/openstackNetworkTopologyReqRespData"
+            }
+          }
+        ],
+        "tags": [
+          "EchoService"
+        ]
+      }
+    },
+    "/v2/battlefields": {
+      "post": {
+        "summary": "admin (e.g. head referee) to create battlefield",
+        "operationId": "AdminSharedNetworkCreation",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/openstackOpenstackNeutronNetResponseData"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/openstackOpenstackNeutronNetRequestData"
+            }
+          }
+        ],
+        "tags": [
+          "EchoService"
+        ]
+      }
+    },
+    "/v2/combatrooms": {
+      "post": {
+        "summary": "user (e.g. registered user) to establish combatroom",
+        "operationId": "ApplyConsoleIntoDnatWithNetworkAndMachine",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/openstackConsoleResourceResponseData"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/openstackConsoleResourceRequestData"
+            }
+          }
+        ],
+        "tags": [
+          "EchoService"
+        ]
+      }
     }
   },
   "definitions": {
@@ -413,6 +593,29 @@ swagger = `{
         "value": {
           "type": "string",
           "format": "string"
+        }
+      }
+    },
+    "echopbSSHReqRespData": {
+      "type": "object",
+      "properties": {
+        "cmd": {
+          "type": "string",
+          "format": "string"
+        },
+        "env": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "string"
+          }
+        },
+        "result": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "string"
+          }
         }
       }
     },
@@ -1033,6 +1236,21 @@ swagger = `{
           "type": "string",
           "format": "string"
         },
+        "assigned_type": {
+          "type": "string",
+          "format": "string"
+        },
+        "ext": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string",
+            "format": "byte"
+          }
+        },
+        "mac_addr": {
+          "type": "string",
+          "format": "string"
+        },
         "version": {
           "type": "integer",
           "format": "int32"
@@ -1415,6 +1633,69 @@ swagger = `{
       "description": "status: means 'queued', 'saving', 'active', ...\nvisibility: means 'public', 'shared', 'community', ...\nmember_status: means 'accepted', 'all', ...\nimages: return value, all of images Information",
       "title": "Image data structure, as input/output argument"
     },
+    "openstackLibvirtDomainInfo": {
+      "type": "object",
+      "properties": {
+        "display": {
+          "type": "string",
+          "format": "string"
+        },
+        "id": {
+          "type": "string",
+          "format": "string"
+        },
+        "name": {
+          "type": "string",
+          "format": "string"
+        },
+        "uuid": {
+          "type": "string",
+          "format": "string"
+        }
+      },
+      "title": "For Libvirt"
+    },
+    "openstackLibvirtDomainReqRespData": {
+      "type": "object",
+      "properties": {
+        "domain_info": {
+          "$ref": "#/definitions/openstackLibvirtDomainInfo"
+        },
+        "server_id": {
+          "type": "string",
+          "format": "string"
+        },
+        "state_code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "state_message": {
+          "type": "string",
+          "format": "string"
+        }
+      }
+    },
+    "openstackMachineDestroyReqRespData": {
+      "type": "object",
+      "properties": {
+        "state_code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "state_message": {
+          "type": "string",
+          "format": "string"
+        },
+        "vms": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/openstackIdNamePair"
+          }
+        }
+      },
+      "description": "id: required if name is empty\nname: required if id is empty\nstate_: return value",
+      "title": "Machine data structure, as input/output argument"
+    },
     "openstackMachineDiscoveryReqRespData": {
       "type": "object",
       "properties": {
@@ -1453,6 +1734,19 @@ swagger = `{
       "description": "id: required if name is empty\nname: required if id is empty\nstate_: return value",
       "title": "Machine data structure, as input/output argument"
     },
+    "openstackMachineSpawnsReqRespData": {
+      "type": "object",
+      "properties": {
+        "vms": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/openstackOpenstackNovaBootReqRespData"
+          }
+        }
+      },
+      "description": "OpenstackNovaBootReqRespData: see definition of \"OpenstackNovaBootReqRespData\"",
+      "title": "Machine data structure, as input/output argument"
+    },
     "openstackNetworkDiscoveryReqRespData": {
       "type": "object",
       "properties": {
@@ -1468,6 +1762,23 @@ swagger = `{
         }
       },
       "description": "status: means 'ACTIVE', ...\nnetworks: return value, all of networks information",
+      "title": "Network data structure, as input/output argument"
+    },
+    "openstackNetworkTopologyReqRespData": {
+      "type": "object",
+      "properties": {
+        "floating_network_id": {
+          "type": "string",
+          "format": "string"
+        },
+        "information": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/openstackOpenstackNeutronLandscapeReqRespData"
+          }
+        }
+      },
+      "description": "networks: argument, list of network (id or name)\nnetworks: return value, all of networks information",
       "title": "Network data structure, as input/output argument"
     },
     "openstackOpenstackNeutronLandscapeReqRespData": {

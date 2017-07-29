@@ -137,6 +137,9 @@ message Addresses {
 message Address {
 	int32   version = 1;
 	string  addr = 2;
+    string  mac_addr = 3;
+    string  assigned_type = 4;
+    map<string, bytes> ext = 5;
 }
 
 message SecurityGroups {
