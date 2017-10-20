@@ -1,7 +1,3 @@
-/*
-   Inspired from
-     https://wiki.linuxfoundation.org/networking/iproute2
-*/
 package netutils
 
 import (
@@ -13,49 +9,14 @@ import (
 	"strings"
 
 	"github.com/tangfeixiong/go-to-openstack-bootcamp/kopos/kopit/pkg/util"
+	"github.com/tangfeixiong/go-to-openstack-bootcamp/kopos/kopit/pkg/util/nsenter"
 )
 
-type LinkData struct {
-	Id             string
-	Name           string
-	DataLinkStatus []string
-	DataLinkConf   []string // map[string]string
-	// MTU                 int
-	// Queueing_Discipline string
-	DataLinkFrame    string
-	DataLinkEtherMAC string
-	DataLinkEtherBRD string
-	DataLinkNetnsID  string
-}
-
-type IPAddress struct {
-	LinkData
-	IPv4       string
-	V4Mask     string
-	V4Info     []string
-	V4Lifetime []string
-	IPv6       string
-	V6Mask     string
-	V6Info     []string
-	V6Lifetime []string
-}
-
-const (
-	datalink_Line1_regexp = `([0-9]+): ([\w-@]+): <([\w-,]+)> ([\w ]+)`                                         // 2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UP group default qlen 1000
-	datalink_line2_regexp = `\s+link/(\w+) (([0-9a-f]{2}:?){6}) brd (([0-9a-f]{2}:?){6})( link-netnsid (\w+))?` //     link/ether 08:00:27:46:54:e7 brd ff:ff:ff:ff:ff:ff
-	//     link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
-	//     link/ether ce:68:9a:f1:bf:7c brd ff:ff:ff:ff:ff:ff link-netnsid 1
-	net_ipv4_regexp = `\s+inet ((\d{1,3}\.?){4})/(\d\d) ((\w ?)+)` //     inet 172.17.0.1/22 scope global docker0
-	net_ipv6_regexp = `\s+inet6 ([0-9a-f:]+)/(\d\d) ([\w ]+)`      //     inet6 fe80::42:1ff:fe74:cc7e/64 scope link
-	net_lft_regexp  = `\s+([\w ]+)`                                //        valid_lft forever preferred_lft forever
-
-)
-
-func Execute_ip_addr_show() ([]*IPAddress, error) {
+func ListAddresses_nsenter(target string) ([]*IPAddress, error) {
 	util.Logger.Println("Go to show all IP address")
 
-	cli := util.Client
-	out, err := cli.AddrShow("")
+	cli := nsenter.Client
+	out, err := cli.Run(target, false, false, false, true, false, "ip", "address", "show")
 	if nil != err {
 		util.Logger.Println(err)
 		return nil, fmt.Errorf("Failed to list ip stacks: %s", err.Error())

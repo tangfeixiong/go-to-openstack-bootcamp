@@ -22,7 +22,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 
-	dumpcommand "github.com/tangfeixiong/go-to-openstack-bootcamp/kopos/kopit/pkg/gopaketctl"
+	dumpcommand "github.com/tangfeixiong/go-to-openstack-bootcamp/kopos/kopit/pkg/gopacketctl"
 	logutil "github.com/tangfeixiong/go-to-openstack-bootcamp/kopos/kopit/pkg/util"
 )
 
@@ -122,7 +122,7 @@ func buildrun(opt *Option, out io.Writer) func(*cobra.Command, []string) {
 						logger.Fatal("BPF filter error:", err)
 					}
 				}
-				err = dumpcommand.Run(handle)
+				err = dumpcommand.Run_dumpcommand(handle)
 				if err != nil {
 					logger.Fatal(err)
 				}

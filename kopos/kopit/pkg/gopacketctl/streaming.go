@@ -3,138 +3,15 @@ package gopacketctl
 import (
 	"bufio"
 	"bytes"
-	"flag"
+	// "flag"
 	"fmt"
 	"io"
 	"log"
-	"os"
+	// "os"
 	"strconv"
 	"strings"
 	"time"
-
-	"github.com/google/gopacket"
-	"github.com/google/gopacket/ip4defrag"
-	"github.com/google/gopacket/layers" // pulls in all layers decoders
-
-	"github.com/tangfeixiong/go-to-openstack-bootcamp/kopos/kopit/pkg/util"
 )
-
-var (
-	print       = flag.Bool("print", true, "Print out packets, if false only prints out statistics")
-	maxcount    = flag.Int("c", -1, "Only grab this many packets, then exit")
-	decoder     = flag.String("decoder", "Ethernet", "Name of the decoder to use")
-	dump        = flag.Bool("X", true, "If true, dump very verbose info on each packet")
-	statsevery  = flag.Int("stats", 1000, "Output statistics every N packets")
-	printErrors = flag.Bool("errors", false, "Print out packet dumps of decode errors, useful for checking decoders against live traffic")
-	lazy        = flag.Bool("lazy", false, "If true, do lazy decoding")
-	defrag      = flag.Bool("defrag", false, "If true, do IPv4 defrag")
-	logger      = util.Logger
-)
-
-func Run(src gopacket.PacketDataSource) error {
-	if !flag.Parsed() {
-		log.Fatalln("Run called without flags.Parse() being called")
-	}
-	var dec gopacket.Decoder
-	var ok bool
-	if dec, ok = gopacket.DecodersByLayerName[*decoder]; !ok {
-		// log.Fatalln("No decoder named", *decoder)
-		logger.Println("No decoder named", *decoder)
-		return fmt.Errorf("No decoder named %v", *decoder)
-	}
-	source := gopacket.NewPacketSource(src, dec)
-	source.Lazy = *lazy
-	source.NoCopy = true
-	source.DecodeStreamsAsDatagrams = true
-	fmt.Fprintln(os.Stderr, "Starting to read packets")
-	count := 0
-	bytes := int64(0)
-	start := time.Now()
-	errors := 0
-	truncated := 0
-	layertypes := map[gopacket.LayerType]int{}
-	defragger := ip4defrag.NewIPv4Defragmenter()
-
-	for packet := range source.Packets() {
-		count++
-		bytes += int64(len(packet.Data()))
-
-		// defrag the IPv4 packet if required
-		if *defrag {
-			ip4Layer := packet.Layer(layers.LayerTypeIPv4)
-			if ip4Layer == nil {
-				continue
-			}
-			ip4 := ip4Layer.(*layers.IPv4)
-			l := ip4.Length
-
-			newip4, err := defragger.DefragIPv4(ip4)
-			if err != nil {
-				// log.Fatalln("Error while de-fragmenting", err)
-				logger.Println("Error while de-fragmenting", err)
-				return fmt.Errorf("Error while de-fragmenting, %v", err)
-			} else if newip4 == nil {
-				continue // packet fragment, we don't have whole packet yet.
-			}
-			if newip4.Length != l {
-				fmt.Printf("Decoding re-assembled packet: %s\n", newip4.NextLayerType())
-				pb, ok := packet.(gopacket.PacketBuilder)
-				if !ok {
-					// panic("Not a PacketBuilder")
-					logger.Println("Not a PacketBuilder")
-					return fmt.Errorf("Not a PacketBuilder")
-				}
-				nextDecoder := newip4.NextLayerType()
-				nextDecoder.Decode(newip4.Payload, pb)
-			}
-		}
-
-		if *dump {
-			// fmt.Println(packet.Dump())
-			d := packet.Dump()
-			if err := verbose(d); err != nil {
-				logger.Printf("Failed to parse: %v", err)
-			}
-		} else if *print {
-			fmt.Println(packet)
-			if err := stats(packet.String()); err != nil {
-				logger.Printf("Failed to parse: %v", err)
-			}
-		} else {
-			logger.Printf("print=%b, maxcount=%d, decoder=%s, dump=%b, statsevery=%d, printErrors=%b, lazy=%b, defrag=%b", *print, *maxcount, *decoder, *dump, *statsevery, *printErrors, *lazy, *defrag)
-		}
-		if !*lazy || *print || *dump { // if we've already decoded all layers...
-			for _, layer := range packet.Layers() {
-				layertypes[layer.LayerType()]++
-			}
-			if packet.Metadata().Truncated {
-				truncated++
-			}
-			if errLayer := packet.ErrorLayer(); errLayer != nil {
-				errors++
-				if *printErrors {
-					fmt.Println("Error:", errLayer.Error())
-					fmt.Println("--- Packet ---")
-					fmt.Println(packet.Dump())
-				}
-			}
-		}
-		done := *maxcount > 0 && count >= *maxcount
-		if count%*statsevery == 0 || done {
-			fmt.Fprintf(os.Stderr, "Processed %v packets (%v bytes) in %v, %v errors and %v truncated packets\n", count, bytes, time.Since(start), errors, truncated)
-			if len(layertypes) > 0 {
-				fmt.Fprintf(os.Stderr, "Layer types seen: %+v\n", layertypes)
-			}
-		}
-		if done {
-			break
-		}
-
-		time.Sleep(time.Second)
-	}
-
-	return nil
-}
 
 /*
 PACKET: 78 bytes, wire length 78 cap length 78 @ 2017-07-02 14:02:17.556352 -0700 PDT
@@ -249,7 +126,7 @@ func stats(s string) error {
 				l1_ethertype = line[i:j]
 				fmt.Println("src_mac:"+l1_srcmac, "dst_mac:"+l1_dstmac, "ethernet_type:"+l1_ethertype)
 			} else {
-				logger.Print("...:", line[j:])
+				log.Println("...:", line[j:])
 			}
 		case strings.HasPrefix(line, "- Layer 2"):
 			i := strings.Index(line, " = ") + 3
@@ -274,7 +151,7 @@ func stats(s string) error {
 				l2_ipv4dstip = line[i:j]
 				fmt.Println("flags:"+l2_ipv4flags, "flag_offset:"+l2_ipv4flagoffset, "protocol:"+l2_ipv4protocol, "src_ip:"+l2_ipv4srcip, "dst_ip:"+l2_ipv4dstip)
 			} else {
-				logger.Print("...:", line[j:])
+				log.Println("...:", line[j:])
 			}
 		case strings.HasPrefix(line, "- Layer 3"):
 			if "IPv4" == l2_protocol || "TCP" == l2_ipv4protocol || "UDP" == l2_ipv4protocol {
@@ -305,12 +182,12 @@ func stats(s string) error {
 					l3_ICMPv4_typecode = line[i:j]
 					fmt.Println("type_code:" + l3_ICMPv4_typecode)
 				} else {
-					logger.Print("...:", line[j:])
+					log.Println("...:", line[j:])
 				}
 			} else if "ARP" == l2_protocol {
-				logger.Print("...:", line)
+				log.Println("...:", line)
 			} else {
-				logger.Print("...:", line)
+				log.Println("...:", line)
 			}
 		case strings.HasPrefix(line, "- Layer 4"):
 			i := strings.Index(line, " = ") + 3
@@ -324,10 +201,10 @@ func stats(s string) error {
 				l4_payload_value = line[j+1 : len(line)-1]
 				fmt.Println("payload:", l4_payload_value)
 			} else {
-				logger.Print("...:", line)
+				log.Println("...:", line)
 			}
 		default:
-			logger.Print("...:", line)
+			log.Println("...:", line)
 		}
 	}
 	fmt.Println()
@@ -501,7 +378,7 @@ func verbose(v string) error {
 		case len(line) == 0:
 			t = time.Now().String()
 			l0_PDU = ""
-			logger.Println(t)
+			log.Println(t)
 			break
 		case strings.HasPrefix(line, "-- FULL PACKET DATA"):
 			i := strings.Index(line[0:], "(") + 1
@@ -522,9 +399,9 @@ func verbose(v string) error {
 					}
 				}
 			}
-			logger.Printf("\n%s", l0_PDU)
+			log.Printf("\n%s", l0_PDU)
 		case strings.HasPrefix(line, "--- Layer 1 ---"): // Ethernet	{Contents=[..14..] Payload=[..115..] SrcMAC=ac:bc:32:7c:3c:37 DstMAC=00:19:5b:27:b6:9e EthernetType=IPv4 Length=0}
-			logger.Print(line)
+			log.Print(line)
 			var err error
 			c := 1
 			for row := 0; row < c/16+2; row++ {
@@ -533,7 +410,7 @@ func verbose(v string) error {
 					return fmt.Errorf("Failed to read data link layer: %s", err.Error())
 				}
 				if 0 != row {
-					logger.Print(line)
+					log.Print(line)
 					continue
 				}
 				j := strings.Index(line, string('\t'))
@@ -555,13 +432,13 @@ func verbose(v string) error {
 					i = j + strings.Index(line[j:], "EthernetType=") + 13
 					j = i + strings.Index(line[i:], " ")
 					l1_EtherType = line[i:j]
-					logger.Printf("{ethernet:{src_mac:%s,dst_mac:%s,ether_type:%s}}\n", l1_SrcMAC, l1_DstMAC, l1_EtherType)
+					log.Printf("{ethernet:{src_mac:%s,dst_mac:%s,ether_type:%s}}\n", l1_SrcMAC, l1_DstMAC, l1_EtherType)
 				default:
-					logger.Print(line)
+					log.Print(line)
 				}
 			}
 		case strings.HasPrefix(line, "--- Layer 2 ---"): // IPv4	{Contents=[..20..] Payload=[..64..] Version=4 IHL=5 TOS=0 Length=84 Id=34747 Flags= FragOffset=0 TTL=64 Protocol=ICMPv4 Checksum=37528 SrcIP=172.17.4.1 DstIP=172.17.4.50 Options=[] Padding=[]}
-			logger.Print(line)
+			log.Print(line)
 			var err error
 			c := 1
 			for row := 0; row < c/16+2; row++ {
@@ -570,7 +447,7 @@ func verbose(v string) error {
 					return fmt.Errorf("Failed to read network layer: %s", err.Error())
 				}
 				if 0 != row {
-					logger.Print(line)
+					log.Print(line)
 					continue
 				}
 				j := strings.Index(line, string('\t'))
@@ -597,13 +474,13 @@ func verbose(v string) error {
 					i = j + 1 + 6
 					j = i + strings.Index(line[i:], " ")
 					l2_IPv4DstIP = line[i:j]
-					logger.Printf("{ipv4:{flags:%s,flag_offset:%s,protocol:%s,src_ip:%s,dst_ip:%s}}\n", l2_IPv4Flags, l2_IPv4FlagOffset, l2_IPv4Protocol, l2_IPv4SrcIP, l2_IPv4DstIP)
+					log.Printf("{ipv4:{flags:%s,flag_offset:%s,protocol:%s,src_ip:%s,dst_ip:%s}}\n", l2_IPv4Flags, l2_IPv4FlagOffset, l2_IPv4Protocol, l2_IPv4SrcIP, l2_IPv4DstIP)
 				default:
-					logger.Print(line)
+					log.Print(line)
 				}
 			}
 		case strings.HasPrefix(line, "--- Layer 3 ---"): // TCP	{Contents=[..44..] Payload=[] SrcPort=62302 DstPort=443(https) Seq=2788730329 Ack=0 DataOffset=11 FIN=false SYN=true RST=false PSH=false ACK=false URG=false ECE=false CWR=false NS=false Window=65535 Checksum=35544 Urgent=0 Options=[..9..] Padding=[]}
-			logger.Print(line)
+			log.Print(line)
 			var err error
 			c := 1
 			for row := 0; row < c/16+1; row++ {
@@ -612,7 +489,7 @@ func verbose(v string) error {
 					return fmt.Errorf("Failed to read transport layer: %s", err.Error())
 				}
 				if 0 != row {
-					logger.Print(line)
+					log.Print(line)
 					continue
 				}
 				j := strings.Index(line, string('\t'))
@@ -635,31 +512,31 @@ func verbose(v string) error {
 							i = j + strings.Index(line[j:], "Length=") + 7
 							j = i + strings.Index(line[i:], " ")
 							l3_IPv4UDP_Length = line[i:j]
-							logger.Printf("{udp:{src_port:%s,dst_port:%s,length:%s}}\n", l3_IPv4SrcPort, l3_IPv4DstPort, l3_IPv4UDP_Length)
+							log.Printf("{udp:{src_port:%s,dst_port:%s,length:%s}}\n", l3_IPv4SrcPort, l3_IPv4DstPort, l3_IPv4UDP_Length)
 						} else if "TCP" == l3_SegmentDatagram { //https://en.wikipedia.org/wiki/Transmission_Control_Protocol#TCP_segment_structure
 							i = j + strings.Index(line[j:], "Seq=") + 4
 							j = i + strings.Index(line[i:], " ")
 							l3_IPv4TCP_Seq = line[i:j]
-							logger.Printf("{tcp:{src_port:%s,dst_port:%s,sequence:%s}}\n", l3_IPv4SrcPort, l3_IPv4DstPort, l3_IPv4TCP_Seq)
+							log.Printf("{tcp:{src_port:%s,dst_port:%s,sequence:%s}}\n", l3_IPv4SrcPort, l3_IPv4DstPort, l3_IPv4TCP_Seq)
 						} else if "ICMPv4" == l3_SegmentDatagram {
 							i = j + strings.Index(line[j:], "TypeCode=") + 9
 							j = i + strings.Index(line[i:], " ")
 							l3_ICMPv4_TypeCode = line[i:j]
-							logger.Printf("{icmpv4:{src_port:%s,dst_port:%s,sequence:%s}}\n", l3_IPv4SrcPort, l3_IPv4DstPort, l3_ICMPv4_TypeCode)
+							log.Printf("{icmpv4:{src_port:%s,dst_port:%s,sequence:%s}}\n", l3_IPv4SrcPort, l3_IPv4DstPort, l3_ICMPv4_TypeCode)
 						} else {
-							logger.Print(line)
+							log.Print(line)
 						}
 					case "ARP" == l3_SegmentDatagram:
-						logger.Print(line)
+						log.Print(line)
 					default:
-						logger.Print(line)
+						log.Print(line)
 					}
 				} else {
-					logger.Print(line)
+					log.Print(line)
 				}
 			}
 		case strings.HasPrefix(line, "--- Layer 4 ---"): // DNS	{Contents=[..185..] Payload=[] ID=46223 QR=true OpCode=Query AA=false TC=false RD=true RA=true Z=0 ResponseCode=No Error QDCount=1 ANCount=8 NSCount=0 ARCount=0 Questions=[{Name=[..19..] Type=A Class=IN}] Answers=[..8..] Authorities=[] Additionals=[]}
-			logger.Print(line)
+			log.Print(line)
 			var err error
 			c := 1
 			for row := 0; row < c/16+1; row++ {
@@ -668,7 +545,7 @@ func verbose(v string) error {
 					return fmt.Errorf("Failed to read application layer: %s", err.Error())
 				}
 				if 0 != row {
-					logger.Print(line)
+					log.Print(line)
 					continue
 				}
 				j := strings.Index(line, string(' '))
@@ -682,7 +559,7 @@ func verbose(v string) error {
 					if c, err = strconv.Atoi(l4_PayloadStats[:j]); err != nil {
 						return fmt.Errorf("Failed to read application layer: %s", err.Error())
 					}
-					logger.Printf("{payload:{stats:%s}}\f", l4_PayloadStats)
+					log.Printf("{payload:{stats:%s}}\f", l4_PayloadStats)
 				case "DNS" == l4_DataType:
 					i := j + strings.Index(line[j:], "{Contents=[") + 11
 					j = i + strings.Index(line[i:], "]")
@@ -694,13 +571,13 @@ func verbose(v string) error {
 					l4_DNS_ResponseCode = line[i:j]
 					fmt.Printf("{payload:{application:%s,response_code:%s}}\n"+l4_DataType, l4_DNS_ResponseCode)
 				case "NTP" == l4_DataType:
-					logger.Print(line)
+					log.Print(line)
 				default:
-					logger.Print(line)
+					log.Print(line)
 				}
 			}
 		default:
-			logger.Print(line)
+			log.Print(line)
 		}
 	}
 	fmt.Println()

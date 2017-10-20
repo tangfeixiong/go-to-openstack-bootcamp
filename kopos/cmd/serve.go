@@ -213,7 +213,7 @@ func newServer() *myService {
 		workconfig.SSHUser.Password = hvpassword
 	}
 	if 0 != len(hvkeypath) && hvkeypath != path && 0 == len(workconfig.SSHUser.RSAKeyPath) {
-		workconfig.SSHUser.Password = hvkeypath
+		workconfig.SSHUser.RSAKeyPath = hvkeypath
 	}
 
 	// return new(myService)
