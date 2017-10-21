@@ -34,12 +34,18 @@ Before
        valid_lft forever preferred_lft forever
 3: eth1: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UP qlen 1000
     link/ether 08:00:27:68:ae:d9 brd ff:ff:ff:ff:ff:ff
+4: eth2: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UP qlen 1000
+    link/ether 08:00:27:f6:b8:b3 brd ff:ff:ff:ff:ff:ff
+    inet 192.168.1.102/24 brd 192.168.1.255 scope global dynamic eth2
+       valid_lft 7114sec preferred_lft 7114sec
+    inet6 fe80::c2a0:a308:c009:e870/64 scope link 
+       valid_lft forever preferred_lft forever
 ```
 
 ```
 [vagrant@localhost ~]$ ls /etc/sysconfig/network-scripts/ifcfg*
-/etc/sysconfig/network-scripts/ifcfg-eth0
-/etc/sysconfig/network-scripts/ifcfg-lo
+/etc/sysconfig/network-scripts/ifcfg-eth0  /etc/sysconfig/network-scripts/ifcfg-lo
+/etc/sysconfig/network-scripts/ifcfg-eth2
 ```
 
 Note, it is VirtualBox, the eth0 must be preserved by Vagrant
@@ -50,6 +56,7 @@ Using `nmcli`
 DEVICE  TYPE      STATE                                  CONNECTION
 eth0    ethernet  connected                              System eth0
 eth1    ethernet  connecting (getting IP configuration)  Wired connection 1
+eth2    ethernet  connected                              Wired connection 2 
 lo      loopback  unmanaged                              --
 ```
 
@@ -58,6 +65,7 @@ lo      loopback  unmanaged                              --
 NAME                UUID                                  TYPE            DEVICE
 System eth0         5fb06bd0-0bb0-7ffb-45f1-d6edd65f3e03  802-3-ethernet  eth0  
 Wired connection 1  3c55af49-6222-3b6b-b91d-eb1b82b6005e  802-3-ethernet  eth1  
+Wired connection 2  40ae81b3-2e97-30d3-b588-aecb3e142583  802-3-ethernet  eth2   
 ```
 
 ```

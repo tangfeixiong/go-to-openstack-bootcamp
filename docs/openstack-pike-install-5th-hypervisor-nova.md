@@ -56,6 +56,12 @@ Last login: Sat Oct 21 12:34:03 2017
     link/ether 08:00:27:b4:e4:88 brd ff:ff:ff:ff:ff:ff
     inet6 fe80::5be4:b637:b03:2e08/64 scope link 
        valid_lft forever preferred_lft forever
+4: eth2: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UP qlen 1000
+    link/ether 08:00:27:5b:61:bc brd ff:ff:ff:ff:ff:ff
+    inet 192.168.1.101/24 brd 192.168.1.255 scope global dynamic eth2
+       valid_lft 7157sec preferred_lft 7157sec
+    inet6 fe80::4869:a66b:bf6b:4c4b/64 scope link 
+       valid_lft forever preferred_lft forever
 [vagrant@localhost ~]$ cat /etc/centos-release
 CentOS Linux release 7.4.1708 (Core) 
 ```
@@ -79,11 +85,26 @@ Before
     link/ether 08:00:27:b4:e4:88 brd ff:ff:ff:ff:ff:ff
     inet6 fe80::5be4:b637:b03:2e08/64 scope link 
        valid_lft forever preferred_lft forever
+4: eth2: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UP qlen 1000
+    link/ether 08:00:27:5b:61:bc brd ff:ff:ff:ff:ff:ff
+    inet 192.168.1.101/24 brd 192.168.1.255 scope global dynamic eth2
+       valid_lft 6845sec preferred_lft 6845sec
+    inet6 fe80::4869:a66b:bf6b:4c4b/64 scope link 
+       valid_lft forever preferred_lft forever
+```
+
+```
+[vagrant@localhost ~]$ ip r
+default via 10.0.2.2 dev eth0 proto static metric 100 
+10.0.2.0/24 dev eth0 proto kernel scope link src 10.0.2.15 metric 100 
+10.64.33.0/24 dev eth1 proto kernel scope link src 10.64.33.65 metric 100 
+192.168.1.0/24 dev eth2 proto kernel scope link src 192.168.1.101 metric 100 
 ```
 
 ```
 [vagrant@localhost ~]$ ls /etc/sysconfig/network-scripts/ifcfg*
 /etc/sysconfig/network-scripts/ifcfg-eth0  /etc/sysconfig/network-scripts/ifcfg-lo
+/etc/sysconfig/network-scripts/ifcfg-eth2
 ```
 
 Using `nmcli`
@@ -117,13 +138,16 @@ Wired connection 1  0ab4e0ff-f77e-3886-9ba9-1838e4120850  802-3-ethernet  --
 DEVICE  TYPE      STATE                                  CONNECTION         
 eth0    ethernet  connected                              System eth0        
 eth1    ethernet  connecting (getting IP configuration)  Wired connection 1 
+eth2    ethernet  connected                              Wired connection 2 
 lo      loopback  unmanaged                              --                 
 ```
 
 ```
+[vagrant@localhost ~]$ nmcli con
 NAME                UUID                                  TYPE            DEVICE 
 System eth0         5fb06bd0-0bb0-7ffb-45f1-d6edd65f3e03  802-3-ethernet  eth0   
 Wired connection 1  0ab4e0ff-f77e-3886-9ba9-1838e4120850  802-3-ethernet  eth1   
+Wired connection 2  eb0a2ba8-d0c6-36d2-8959-8ed82367330c  802-3-ethernet  eth2   
 ```
 
 ```
