@@ -1206,6 +1206,10 @@ Enforcing
 ```
 
 ```
+[vagrant@localhost ~]$ sudo sed -i 's/\(^SELINUX=enforcing$\)/#\1\nSELINUX=permissive/' /etc/selinux/config
+```
+
+```
 [vagrant@localhost ~]$ sudo systemctl start httpd.service
 ```
 
@@ -1428,6 +1432,21 @@ total 20
 [Fri Oct 20 22:34:39.298641 2017] [mpm_prefork:notice] [pid 27161] AH00163: Apache/2.4.6 (CentOS) mod_wsgi/3.4 Python/2.7.5 configured -- resuming normal operations
 [Fri Oct 20 22:34:39.298663 2017] [core:notice] [pid 27161] AH00094: Command line: '/usr/sbin/httpd -D FOREGROUND'
 ```
+
+```
+[root@localhost httpd]# tail keystone_access.log 
+10.64.33.64 - - [21/Oct/2017:02:49:53 +0000] "POST /v3/auth/tokens HTTP/1.1" 201 2757 "-" "osc-lib/1.7.0 keystoneauth1/3.1.0 python-requests/2.11.1 CPython/2.7.5"
+10.64.33.64 - - [21/Oct/2017:02:49:55 +0000] "POST /v3/auth/tokens HTTP/1.1" 201 2757 "-" "osc-lib/1.7.0 keystoneauth1/3.1.0 python-requests/2.11.1 CPython/2.7.5"
+10.64.33.64 - - [21/Oct/2017:02:49:57 +0000] "GET / HTTP/1.1" 300 598 "-" "nova/16.0.1 keystonemiddleware.auth_token/4.17.0 keystoneauth1/3.1.0 python-requests/2.11.1 CPython/2.7.5"
+10.64.33.64 - - [21/Oct/2017:02:49:58 +0000] "POST /v3/auth/tokens HTTP/1.1" 201 2758 "-" "nova/16.0.1 keystonemiddleware.auth_token/4.17.0 keystoneauth1/3.1.0 python-requests/2.11.1 CPython/2.7.5"
+10.64.33.64 - - [21/Oct/2017:02:50:00 +0000] "GET /v3/ HTTP/1.1" 200 251 "-" "nova/16.0.1 keystonemiddleware.auth_token/4.17.0 keystoneauth1/3.1.0 python-requests/2.11.1 CPython/2.7.5"
+10.64.33.64 - - [21/Oct/2017:02:50:00 +0000] "GET /v3/auth/tokens HTTP/1.1" 200 2757 "-" "python-keystoneclient"
+10.64.33.64 - - [21/Oct/2017:02:50:10 +0000] "GET /v3 HTTP/1.1" 200 251 "-" "osc-lib/1.7.0 keystoneauth1/3.1.0 python-requests/2.11.1 CPython/2.7.5"
+10.64.33.64 - - [21/Oct/2017:02:50:10 +0000] "POST /v3/auth/tokens HTTP/1.1" 201 2757 "-" "osc-lib/1.7.0 keystoneauth1/3.1.0 python-requests/2.11.1 CPython/2.7.5"
+10.64.33.64 - - [21/Oct/2017:02:50:10 +0000] "POST /v3/auth/tokens HTTP/1.1" 201 2757 "-" "osc-lib/1.7.0 keystoneauth1/3.1.0 python-requests/2.11.1 CPython/2.7.5"
+10.64.33.64 - - [21/Oct/2017:02:50:11 +0000] "GET /v3/auth/tokens HTTP/1.1" 200 2757 "-" "python-keystoneclient"
+```
+
 
 ```
 [vagrant@localhost ~]$ sudo ls /var/log/keystone/

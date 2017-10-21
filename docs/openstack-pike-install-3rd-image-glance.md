@@ -454,7 +454,12 @@ Configure
            └─29416 /usr/bin/python2 /usr/bin/glance-registry
 ```
 
-
+Config Auto Starting
+```
+[vagrant@localhost ~]$ sudo systemctl enable openstack-glance-api.service openstack-glance-registry.service
+Created symlink from /etc/systemd/system/multi-user.target.wants/openstack-glance-api.service to /usr/lib/systemd/system/openstack-glance-api.service.
+Created symlink from /etc/systemd/system/multi-user.target.wants/openstack-glance-registry.service to /usr/lib/systemd/system/openstack-glance-registry.service.
+```
 
 
 ```

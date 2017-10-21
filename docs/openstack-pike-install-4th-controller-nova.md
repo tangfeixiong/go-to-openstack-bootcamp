@@ -391,7 +391,7 @@ Patching
 ```
 
 ```
-[vagrant@localhost ~]$ sudo cat 00-nova-placement-api.conf.orig && echo -e "\n\n<Directory /usr/bin>\n  <IfVersion >= 2.4>\n    Require all granted\n  </IfVersion>\n  <IfVersion < 2.4 >\n    Order allow,deny\n    Allow from all\n  </IfVersion>\n</Directory>" | tee 00-nova-placement-api.conf
+[vagrant@localhost ~]$ sudo cat 00-nova-placement-api.conf.orig > 00-nova-placement-api.conf && echo -e "\n\n<Directory /usr/bin>\n  <IfVersion >= 2.4>\n    Require all granted\n  </IfVersion>\n  <IfVersion < 2.4 >\n    Order allow,deny\n    Allow from all\n  </IfVersion>\n</Directory>" | tee -a 00-nova-placement-api.conf
 Listen 8778
 
 <VirtualHost *:8778>
@@ -816,6 +816,7 @@ Start
  Main PID: 31661 (nova-scheduler)
    CGroup: /system.slice/openstack-nova-scheduler.service
            └─31661 /usr/bin/python2 /usr/bin/nova-scheduler
+```
 
 ```
 [vagrant@localhost ~]$ sudo systemctl start openstack-nova-conductor.service
@@ -848,6 +849,16 @@ Start
 |  4 | nova-scheduler   | localhost.localdomain | internal | enabled | up    | 2017-10-21T02:50:04.000000 |
 |  5 | nova-conductor   | localhost.localdomain | internal | enabled | up    | 2017-10-21T02:50:01.000000 |
 +----+------------------+-----------------------+----------+---------+-------+----------------------------+
+```
+
+Enable auto-starting
+```
+[vagrant@localhost ~]$ sudo systemctl enable openstack-nova-api.service openstack-nova-consoleauth.service openstack-nova-scheduler.service openstack-nova-conductor.service openstack-nova-novncproxy.service
+Created symlink from /etc/systemd/system/multi-user.target.wants/openstack-nova-api.service to /usr/lib/systemd/system/openstack-nova-api.service.
+Created symlink from /etc/systemd/system/multi-user.target.wants/openstack-nova-consoleauth.service to /usr/lib/systemd/system/openstack-nova-consoleauth.service.
+Created symlink from /etc/systemd/system/multi-user.target.wants/openstack-nova-scheduler.service to /usr/lib/systemd/system/openstack-nova-scheduler.service.
+Created symlink from /etc/systemd/system/multi-user.target.wants/openstack-nova-conductor.service to /usr/lib/systemd/system/openstack-nova-conductor.service.
+Created symlink from /etc/systemd/system/multi-user.target.wants/openstack-nova-novncproxy.service to /usr/lib/systemd/system/openstack-nova-novncproxy.service.
 ```
 
 Log

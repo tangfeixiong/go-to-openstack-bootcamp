@@ -46,17 +46,18 @@ Note, it is VirtualBox, the eth0 must be preserved by Vagrant
 
 Using `nmcli`
 ```
-[vagrant@localhost ~]$ nmcli c
-NAME                UUID                                  TYPE            DEVICE
-System eth0         5fb06bd0-0bb0-7ffb-45f1-d6edd65f3e03  802-3-ethernet  eth0  
-Wired connection 1  3c55af49-6222-3b6b-b91d-eb1b82b6005e  802-3-ethernet  eth1  
-```
-```
 [vagrant@localhost ~]$ nmcli d
 DEVICE  TYPE      STATE                                  CONNECTION
 eth0    ethernet  connected                              System eth0
 eth1    ethernet  connecting (getting IP configuration)  Wired connection 1
 lo      loopback  unmanaged                              --
+```
+
+```
+[vagrant@localhost ~]$ nmcli c
+NAME                UUID                                  TYPE            DEVICE
+System eth0         5fb06bd0-0bb0-7ffb-45f1-d6edd65f3e03  802-3-ethernet  eth0  
+Wired connection 1  3c55af49-6222-3b6b-b91d-eb1b82b6005e  802-3-ethernet  eth1  
 ```
 
 ```
@@ -268,6 +269,18 @@ server 1.centos.pool.ntp.org iburst
 server 2.centos.pool.ntp.org iburst
 server 3.centos.pool.ntp.org iburst
 #allow 192.168.0.0/16
+```
+
+Verifying
+```
+[vagrant@localhost ~]$ chronyc sources
+210 Number of sources = 4
+MS Name/IP address         Stratum Poll Reach LastRx Last sample               
+===============================================================================
+^* dns2.ecust.edu.cn             3   8   163   461    -19ms[  -19ms] +/-   94ms
+^+ leontp.ccgs.wa.edu.au         1   8   377  1109    +33ms[  +33ms] +/-  125ms
+^+ biisoni.miuku.net             2   9   371   394    -10ms[  -10ms] +/-  123ms
+^- ntp1.ams1.nl.leaseweb.net     2  10   345   341    +10ms[  +10ms] +/-  236ms
 ```
 
 ### Openstack Repository
