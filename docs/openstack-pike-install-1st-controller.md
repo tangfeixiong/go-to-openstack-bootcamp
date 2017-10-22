@@ -1,13 +1,15 @@
-# OpenStack Pike Installation
+# OpenStack Pike Installation - Controller Prerequiests
 
 ## Table of content
 
 控制节点
 * [网络配置](#network)
 * [SSH客户端排错](#ssh-trouble-shooting)
+* [配置hostname](#hostname)
 * [防火墙](#firewall)
+* [SELinux](#selinux)
 * [NTP服务](#chrony)
-* [Openstack Pike版本YUM仓库](#openstack-Repository)
+* [Openstack Pike版本的YUM仓库](#openstack-Repository)
 * [Openstack 命令工具包](#openstack-client)
 * [MariaDB数据库](#database)
 * [RabbitMQ消息队列](#queue)
@@ -17,7 +19,7 @@
 
 ### Network
 
-Before
+Note, it is a VirtualBox lab with Vagrant, the _eth0_ is reserved by Vagrant
 ```
 [vagrant@localhost ~]$ ip a
 1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN qlen 1
@@ -48,9 +50,7 @@ Before
 /etc/sysconfig/network-scripts/ifcfg-eth2
 ```
 
-Note, it is VirtualBox, the eth0 must be preserved by Vagrant
-
-Using `nmcli`
+Using `nmcli`, 较之于Windows的网络管理
 ```
 [vagrant@localhost ~]$ nmcli d
 DEVICE  TYPE      STATE                                  CONNECTION
@@ -111,8 +111,9 @@ AUTOCONNECT_PRIORITY=-999
 
 ### SSH trouble shooting
 
-trouble shooting
+无法ssh, 显示Perission denied
 ```
+tangf@DESKTOP-H68OQDV ~
 $ ssh vagrant@10.64.33.64
 The authenticity of host '10.64.33.64 (10.64.33.64)' can't be established.
 ECDSA key fingerprint is SHA256:rmUJwM3oz/L+uushIeJGRatrsRIxxxh79M5JMA+Ljzc.
@@ -120,29 +121,6 @@ Are you sure you want to continue connecting (yes/no)? yes
 Warning: Permanently added '10.64.33.64' (ECDSA) to the list of known hosts.
 vagrant@10.64.33.64: Permission denied (publickey,gssapi-keyex,gssapi-with-mic).
 ```
-
-```
-[vagrant@localhost ~]$ sudo cat /etc/ssh/sshd_config  | egrep "^#?Password"
-#PasswordAuthentication yes
-PasswordAuthentication no
-```
-
-```
-tangf@DESKTOP-H68OQDV ~
-$ cat ~/.ssh/id_rsa.pub
-ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCvfIdGduA81WVgf1F5DikDG+1qJEPk0FBYtMPk7WTEkb4p8KkqMKKdrt7Sy7Ig4ZIBwFCCU4rtHiaLeslNxwdjT1l1sH18uiNxjDtP/8RyDrGeED5id84RvIdcqZlS17mtxXg1KcALUOBm8EeRqT5yT1q6/DQWN0Q8aHP5XbVYZ9yotzoU0+uaHqjkf7lwATES/+4NpC/BlRF6uNd2oFC7pymhOhb/FbeJWJpLTHRFtdHVPQm/2VY6UH4auCaz3rDZP5Zd1sT1nsUnExII2y5NIMi7N/PNbU2vPPnXYwOrZiY7I/pGmu95r6oo3DkTyE3VdOaiXX6El6DAeNL1DRo5 tangf@DESKTOP-H68OQDV
-```
-
-```
-[vagrant@localhost ~]$ echo "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCvfIdGduA81WVgf1F5DikDG+1qJEPk0FBYtMPk7WTEkb4p8KkqMKKdrt7Sy7Ig4ZIBwFCCU4rtHiaLeslNxwdjT1l1sH18uiNxjDtP/8RyDrGeED5id84RvIdcqZlS17mtxXg1KcALUOBm8EeRqT5yT1q6/DQWN0Q8aHP5XbVYZ9yotzoU0+uaHqjkf7lwATES/+4NpC/BlRF6uNd2oFC7pymhOhb/FbeJWJpLTHRFtdHVPQm/2VY6UH4auCaz3rDZP5Zd1sT1nsUnExII2y5NIMi7N/PNbU2vPPnXYwOrZiY7I/pGmu95r6oo3DkTyE3VdOaiXX6El6DAeNL1DRo5 tangf@DESKTOP-H68OQDV" >> .ssh/authorized_keys
-```
-
-```
-[vagrant@localhost ~]$ cat .ssh/authorized_keys
-ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA6NF8iallvQVp22WDkTkyrtvp9eWW6A8YVr+kz4TjGYe7gHzIw+niNltGEFHzD8+v1I2YJ6oXevct1YeS0o9HZyN1Q9qgCgzUFtdOKLv6IedplqoPkcmF0aYet2PkEDo3MlTBckFXPITAMzF8dJSIFo9D8HfdOV0IAdx4O7PtixWKn5y2hMNG0zQPyUecp4pzC6kivAIhyfHilFR61RGL+GPXQ2MWZWFYbAGjyiYJnAmCP3NOTd0jMZEnDkbUvxhMmBYSdETk1rRgm+R4LOzFUGaHqHDLKLX+FIPKcF96hrucXzcWyLbIbEgE98OHlnVYCzRdK8jlqm8tehUc9c9WhQ== vagrant insecure public key
-ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCvfIdGduA81WVgf1F5DikDG+1qJEPk0FBYtMPk7WTEkb4p8KkqMKKdrt7Sy7Ig4ZIBwFCCU4rtHiaLeslNxwdjT1l1sH18uiNxjDtP/8RyDrGeED5id84RvIdcqZlS17mtxXg1KcALUOBm8EeRqT5yT1q6/DQWN0Q8aHP5XbVYZ9yotzoU0+uaHqjkf7lwATES/+4NpC/BlRF6uNd2oFC7pymhOhb/FbeJWJpLTHRFtdHVPQm/2VY6UH4auCaz3rDZP5Zd1sT1nsUnExII2y5NIMi7N/PNbU2vPPnXYwOrZiY7I/pGmu95r6oo3DkTyE3VdOaiXX6El6DAeNL1DRo5 tangf@DESKTOP-H68OQDV
-```
-
 
 Trouble shooting
 ```
@@ -209,13 +187,65 @@ debug1: No more authentication methods to try.
 vagrant@10.64.33.64: Permission denied (publickey,gssapi-keyex,gssapi-with-mic).
 ```
 
+查看sshd的配置
+```
+[vagrant@localhost ~]$ sudo cat /etc/ssh/sshd_config  | egrep "^#?Password"
+#PasswordAuthentication yes
+PasswordAuthentication no
+```
 
+客户端上的公钥
+```
+tangf@DESKTOP-H68OQDV ~
+$ cat ~/.ssh/id_rsa.pub
+ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCvfIdGduA81WVgf1F5DikDG+1qJEPk0FBYtMPk7WTEkb4p8KkqMKKdrt7Sy7Ig4ZIBwFCCU4rtHiaLeslNxwdjT1l1sH18uiNxjDtP/8RyDrGeED5id84RvIdcqZlS17mtxXg1KcALUOBm8EeRqT5yT1q6/DQWN0Q8aHP5XbVYZ9yotzoU0+uaHqjkf7lwATES/+4NpC/BlRF6uNd2oFC7pymhOhb/FbeJWJpLTHRFtdHVPQm/2VY6UH4auCaz3rDZP5Zd1sT1nsUnExII2y5NIMi7N/PNbU2vPPnXYwOrZiY7I/pGmu95r6oo3DkTyE3VdOaiXX6El6DAeNL1DRo5 tangf@DESKTOP-H68OQDV
+```
 
+注入，注意将authorized_keys的ACL模式该问600
+```
+[vagrant@localhost ~]$ echo "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCvfIdGduA81WVgf1F5DikDG+1qJEPk0FBYtMPk7WTEkb4p8KkqMKKdrt7Sy7Ig4ZIBwFCCU4rtHiaLeslNxwdjT1l1sH18uiNxjDtP/8RyDrGeED5id84RvIdcqZlS17mtxXg1KcALUOBm8EeRqT5yT1q6/DQWN0Q8aHP5XbVYZ9yotzoU0+uaHqjkf7lwATES/+4NpC/BlRF6uNd2oFC7pymhOhb/FbeJWJpLTHRFtdHVPQm/2VY6UH4auCaz3rDZP5Zd1sT1nsUnExII2y5NIMi7N/PNbU2vPPnXYwOrZiY7I/pGmu95r6oo3DkTyE3VdOaiXX6El6DAeNL1DRo5 tangf@DESKTOP-H68OQDV" >> .ssh/authorized_keys
+```
 
+第一个公钥是vagrant注入的, 当前的登录(vagrant ssh)是使用[与其对应的私钥](https://github.com/hashicorp/vagrant/blob/master/keys/vagrant)
+```
+[vagrant@localhost ~]$ cat .ssh/authorized_keys
+ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA6NF8iallvQVp22WDkTkyrtvp9eWW6A8YVr+kz4TjGYe7gHzIw+niNltGEFHzD8+v1I2YJ6oXevct1YeS0o9HZyN1Q9qgCgzUFtdOKLv6IedplqoPkcmF0aYet2PkEDo3MlTBckFXPITAMzF8dJSIFo9D8HfdOV0IAdx4O7PtixWKn5y2hMNG0zQPyUecp4pzC6kivAIhyfHilFR61RGL+GPXQ2MWZWFYbAGjyiYJnAmCP3NOTd0jMZEnDkbUvxhMmBYSdETk1rRgm+R4LOzFUGaHqHDLKLX+FIPKcF96hrucXzcWyLbIbEgE98OHlnVYCzRdK8jlqm8tehUc9c9WhQ== vagrant insecure public key
+ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCvfIdGduA81WVgf1F5DikDG+1qJEPk0FBYtMPk7WTEkb4p8KkqMKKdrt7Sy7Ig4ZIBwFCCU4rtHiaLeslNxwdjT1l1sH18uiNxjDtP/8RyDrGeED5id84RvIdcqZlS17mtxXg1KcALUOBm8EeRqT5yT1q6/DQWN0Q8aHP5XbVYZ9yotzoU0+uaHqjkf7lwATES/+4NpC/BlRF6uNd2oFC7pymhOhb/FbeJWJpLTHRFtdHVPQm/2VY6UH4auCaz3rDZP5Zd1sT1nsUnExII2y5NIMi7N/PNbU2vPPnXYwOrZiY7I/pGmu95r6oo3DkTyE3VdOaiXX6El6DAeNL1DRo5 tangf@DESKTOP-H68OQDV
+```
+
+使用客户端的公私钥再次登入
 ```
 tangf@DESKTOP-H68OQDV /cygdrive/g/https0x3A0x2F0x2Fapp.vagrantup.com0x2Fboxes0x2Fsearch/centos0x2Fboxes0x2F70x3A7.4
 $ ssh vagrant@10.64.33.64
 Last login: Fri Oct 20 17:33:00 2017 from 10.0.2.2
+```
+
+### Hostname
+
+Backup
+```
+[vagrant@localhost ~]$ sudo cp /etc/hostname etc0x2Fhostname
+```
+
+Name
+```
+[vagrant@localhost ~]$ echo "controller-10-64-33-64" > hostname
+```
+
+Modify
+```
+[vagrant@localhost ~]$ sudo cp hostname /etc/hostname
+```
+
+Set
+```
+[vagrant@localhost ~]$ sudo hostname --file hostname
+```
+
+Check
+```
+[vagrant@localhost ~]$ hostname
+controller-10-64-33-64
 ```
 
 ### Firewall
@@ -226,6 +256,23 @@ Check
 unknown
 ```
 
+### SELinux
+
+Current
+```
+[vagrant@localhost ~]$ sudo getenforce 
+Enforcing
+```
+
+Set
+```
+[vagrant@localhost ~]$ sudo setenforce Permissive
+```
+
+Permanently Modify
+```
+[vagrant@localhost ~]$ sudo sed -i 's/\(^SELINUX=enforcing$\)/#\1\nSELINUX=permissive/' /etc/selinux/config
+```
 
 ### Chrony
 __安装网络时间协议服务__
@@ -292,6 +339,7 @@ MS Name/IP address         Stratum Poll Reach LastRx Last sample
 ```
 
 ### Openstack Repository
+加入OpenStack RDO (newton, ocata, pike)的YUM源
 
 [Pike Repo](https://docs.openstack.org/install-guide/environment-packages-rdo.html)
 ```
@@ -414,7 +462,7 @@ enabled=1
 
 ### Openstack client
 
-CLI
+YUM安装
 ```
 [vagrant@localhost ~]$ sudo yum install -y python-openstackclient
 Loaded plugins: fastestmirror
@@ -584,8 +632,7 @@ openstack 3.12.0
 ```
 
 ### Database
-
-
+MySQL数据库分支(MariaDB)
 
 [MariaDB](https://docs.openstack.org/install-guide/environment-sql-database-rdo.html)
 ```
@@ -998,6 +1045,8 @@ active
 Created symlink from /etc/systemd/system/multi-user.target.wants/mariadb.service to /usr/lib/systemd/system/mariadb.service.
 ```
 
+__Warning: 安装中没有操作root用户口令__
+
 Test
 ```
 [vagrant@localhost ~]$ mysql -u root -e "show databases;"
@@ -1046,8 +1095,9 @@ mysql -u root -e "UPDATE mysql.user SET Password=PASSWORD('$MARIADB_PASS') WHERE
 ```
 
 ### Queue
+消息队列
 
-[Rabbit](https://docs.openstack.org/install-guide/environment-messaging-rdo.html)
+[RabbitMQ](https://docs.openstack.org/install-guide/environment-messaging-rdo.html)
 ```
 [vagrant@localhost ~]$ yum search --verbose rabbitmq-server
 Loading "fastestmirror" plugin
@@ -1361,6 +1411,7 @@ Listing permissions for user "openstack" ...
 ```
 
 ### Cache
+缓存
 
 [Memcached](https://docs.openstack.org/install-guide/environment-memcached-rdo.html)
 ```
@@ -1368,6 +1419,7 @@ Listing permissions for user "openstack" ...
 memcached.x86_64                   1.4.39-1.el7            centos-openstack-pike
 ```
 
+Install
 ```
 [vagrant@localhost ~]$ sudo yum install -y memcached
 Loaded plugins: fastestmirror
@@ -1409,6 +1461,8 @@ Installed:
 Complete!
 ```
 
+__Configure__
+
 Backup
 ```
 [vagrant@localhost ~]$ sudo cp /etc/sysconfig/memcached etc0x2Fsysconfig0x2Fmemcached
@@ -1419,7 +1473,7 @@ Sed
 [vagrant@localhost ~]$ sudo sed 's/^\(OPTIONS="-l.*\)"$/\1,${controller}"/' etc0x2Fsysconfig0x2Fmemcached | env controller=10.64.33.64 envsubst > memcached
 ```
 
-Check
+Detail
 ```
 [vagrant@localhost ~]$ sudo cat memcached 
 PORT="11211"
@@ -1434,12 +1488,15 @@ Modify
 [vagrant@localhost ~]$ sudo cp memcached /etc/sysconfig/memcached 
 ```
 
-Start
+__Run__
+
+Start and enbale Auto-Start when reboot
 ```
 [vagrant@localhost ~]$ sudo systemctl start memcached.service && sudo systemctl enable memcached.service
 Created symlink from /etc/systemd/system/multi-user.target.wants/memcached.service to /usr/lib/systemd/system/memcached.service.
 ```
 
+Check
 ```
 [vagrant@localhost ~]$ systemctl -l status --no-pager memcached.service
 ● memcached.service - memcached daemon

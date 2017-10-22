@@ -2819,11 +2819,11 @@ Created symlink from /etc/systemd/system/multi-user.target.wants/openstack-nova-
 From controller node
 ```
 [vagrant@localhost ~]$ openstack compute service list --service nova-compute
-+----+--------------+-----------------------+------+---------+-------+----------------------------+
-| ID | Binary       | Host                  | Zone | Status  | State | Updated At                 |
-+----+--------------+-----------------------+------+---------+-------+----------------------------+
-|  6 | nova-compute | localhost.localdomain | nova | enabled | up    | 2017-10-21T15:34:56.000000 |
-+----+--------------+-----------------------+------+---------+-------+----------------------------+
++----+--------------+---------------------+------+---------+-------+----------------------------+
+| ID | Binary       | Host                | Zone | Status  | State | Updated At                 |
++----+--------------+---------------------+------+---------+-------+----------------------------+
+|  7 | nova-compute | compute-10-64-33-65 | nova | enabled | up    | 2017-10-22T02:43:40.000000 |
++----+--------------+---------------------+------+---------+-------+----------------------------+
 ```
 
 But
@@ -2838,18 +2838,18 @@ Found 2 cell mappings.
 Skipping cell0 since it does not contain hosts.
 Getting compute nodes from cell 'cell1': e85d2a01-4637-4b5c-abad-3345435fdcbd
 Found 1 unmapped computes in cell: e85d2a01-4637-4b5c-abad-3345435fdcbd
-Checking host mapping for compute host 'localhost.localdomain': 61a37417-a33f-4512-ad04-1c218db039e6
-Creating host mapping for compute host 'localhost.localdomain': 61a37417-a33f-4512-ad04-1c218db039e6
+Checking host mapping for compute host 'compute-10-64-33-65': b2435461-23e3-46dc-a5ac-a11651001523
+Creating host mapping for compute host 'compute-10-64-33-65': b2435461-23e3-46dc-a5ac-a11651001523
 ```
 
 Now
 ```
 [vagrant@localhost ~]$ openstack hypervisor list
-+----+-----------------------+-----------------+-------------+-------+
-| ID | Hypervisor Hostname   | Hypervisor Type | Host IP     | State |
-+----+-----------------------+-----------------+-------------+-------+
-|  1 | localhost.localdomain | QEMU            | 10.64.33.65 | up    |
-+----+-----------------------+-----------------+-------------+-------+
++----+---------------------+-----------------+-------------+-------+
+| ID | Hypervisor Hostname | Hypervisor Type | Host IP     | State |
++----+---------------------+-----------------+-------------+-------+
+|  2 | compute-10-64-33-65 | QEMU            | 10.64.33.65 | up    |
++----+---------------------+-----------------+-------------+-------+
 ```
 
 Alternatively, need to auto schedule newly added node

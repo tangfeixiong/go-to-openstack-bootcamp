@@ -580,7 +580,7 @@ __local_settings__
 
 * Vi
 ```
-SESSION_ENGINE = 'django.contrib.sessions.bachends.cache'
+SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
 
 CACHES = {
     'default': {
@@ -650,6 +650,22 @@ Oct 22 01:42:27 localhost.localdomain systemd[1]: Failed to start The Apache HTT
 Oct 22 01:42:27 localhost.localdomain systemd[1]: Unit httpd.service entered failed state.
 Oct 22 01:42:27 localhost.localdomain systemd[1]: httpd.service failed.
 ```
+
+Error
+```
+[vagrant@localhost ~]$ sudo tail /var/log/httpd/error_log
+[Sun Oct 22 02:07:45.052797 2017] [:error] [pid 2288] [remote 10.0.2.2:72] Traceback (most recent call last):
+[Sun Oct 22 02:07:45.052817 2017] [:error] [pid 2288] [remote 10.0.2.2:72]   File "/usr/lib/python2.7/site-packages/django/core/handlers/wsgi.py", line 170, in __call__
+[Sun Oct 22 02:07:45.052842 2017] [:error] [pid 2288] [remote 10.0.2.2:72]     self.load_middleware()
+[Sun Oct 22 02:07:45.052847 2017] [:error] [pid 2288] [remote 10.0.2.2:72]   File "/usr/lib/python2.7/site-packages/django/core/handlers/base.py", line 52, in load_middleware
+[Sun Oct 22 02:07:45.052854 2017] [:error] [pid 2288] [remote 10.0.2.2:72]     mw_instance = mw_class()
+[Sun Oct 22 02:07:45.052858 2017] [:error] [pid 2288] [remote 10.0.2.2:72]   File "/usr/lib/python2.7/site-packages/django/contrib/sessions/middleware.py", line 11, in __init__
+[Sun Oct 22 02:07:45.052865 2017] [:error] [pid 2288] [remote 10.0.2.2:72]     engine = import_module(settings.SESSION_ENGINE)
+[Sun Oct 22 02:07:45.052868 2017] [:error] [pid 2288] [remote 10.0.2.2:72]   File "/usr/lib64/python2.7/importlib/__init__.py", line 37, in import_module
+[Sun Oct 22 02:07:45.052875 2017] [:error] [pid 2288] [remote 10.0.2.2:72]     __import__(name)
+[Sun Oct 22 02:07:45.052888 2017] [:error] [pid 2288] [remote 10.0.2.2:72] ImportError: No module named bachends.cache
+```
+Misstake 'bachends'
 
 Validate
 ```
@@ -749,128 +765,381 @@ Alias /dashboard/static /usr/share/openstack-dashboard/static
 </Directory>
 ```
 
+![openstack-dashboard-pike.png](./openstack-dashboard-pike.png)
+
 curl
 ```
-[vagrant@localhost ~]$ curl -jkSL http://10.64.33.64
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd"><html><head>
-<meta http-equiv="content-type" content="text/html; charset=UTF-8">
-		<title>Apache HTTP Server Test Page powered by CentOS</title>
-		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+[vagrant@localhost ~]$ curl -jkSL http://localhost/dashboard
 
-    <!-- Bootstrap -->
-    <link href="/noindex/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="noindex/css/open-sans.css" type="text/css" />
 
-<style type="text/css"><!--		 
 
-body {
-  font-family: "Open Sans", Helvetica, sans-serif;
-  font-weight: 100;
-  color: #ccc;
-  background: rgba(10, 24, 55, 1);
-  font-size: 16px;
-}
 
-h2, h3, h4 {
-  font-weight: 200;
-}
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta content='IE=edge' http-equiv='X-UA-Compatible' />
+    <meta content='text/html; charset=utf-8' http-equiv='Content-Type' />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <title>Login - OpenStack Dashboard</title>
+    
+    
+      
 
-h2 {
-  font-size: 28px;
-}
 
-.jumbotron {
-  margin-bottom: 0;
-  color: #333;
-  background: rgb(212,212,221); /* Old browsers */
-  background: radial-gradient(ellipse at center top, rgba(255,255,255,1) 0%,rgba(174,174,183,1) 100%); /* W3C */
-}
+<link rel="stylesheet" href="/dashboard/static/dashboard/css/34f8a8f8d5e5.css" type="text/css" media="screen" />
 
-.jumbotron h1 {
-  font-size: 128px;
-  font-weight: 700;
-  color: white;
-  text-shadow: 0px 2px 0px #abc,
-               0px 4px 10px rgba(0,0,0,0.15),
-               0px 5px 2px rgba(0,0,0,0.1),
-               0px 6px 30px rgba(0,0,0,0.1);
-}
 
-.jumbotron p {
-  font-size: 28px;
-  font-weight: 100;
-}
 
-.main {
-   background: white;
-   color: #234;
-   border-top: 1px solid rgba(0,0,0,0.12);
-   padding-top: 30px;
-   padding-bottom: 40px;
-}
 
-.footer {
-   border-top: 1px solid rgba(255,255,255,0.2);
-   padding-top: 30px;
-}
 
-    --></style>
-</head>
-<body>
-  <div class="jumbotron text-center">
-    <div class="container">
-   	  <h1>Testing 123..</h1>
-  		<p class="lead">This page is used to test the proper operation of the <a href="http://apache.org">Apache HTTP server</a> after it has been installed. If you can read this page it means that this site is working properly. This server is powered by <a href="http://centos.org">CentOS</a>.</p>
-		</div>
-  </div>
-  <div class="main">
-    <div class="container">
-       <div class="row">
-  			<div class="col-sm-6">
-    			<h2>Just visiting?</h2>
-			  		<p class="lead">The website you just visited is either experiencing problems or is undergoing routine maintenance.</p>
-  					<p>If you would like to let the administrators of this website know that you've seen this page instead of the page you expected, you should send them e-mail. In general, mail sent to the name "webmaster" and directed to the website's domain should reach the appropriate person.</p>
-  					<p>For example, if you experienced problems while visiting www.example.com, you should send e-mail to "webmaster@example.com".</p>
-	  			</div>
-  				<div class="col-sm-6">
-	  				<h2>Are you the Administrator?</h2>
-		  			<p>You should add your website content to the directory <tt>/var/www/html/</tt>.</p>
-		  			<p>To prevent this page from ever being used, follow the instructions in the file <tt>/etc/httpd/conf.d/welcome.conf</tt>.</p>
 
-	  				<h2>Promoting Apache and CentOS</h2>
-			  		<p>You are free to use the images below on Apache and CentOS Linux powered HTTP servers.  Thanks for using Apache and CentOS!</p>
-				  	<p><a href="http://httpd.apache.org/"><img src="images/apache_pb.gif" alt="[ Powered by Apache ]"></a> <a href="http://www.centos.org/"><img src="images/poweredby.png" alt="[ Powered by CentOS Linux ]" height="31" width="88"></a></p>
-  				</div>
-	  		</div>
-	    </div>
-		</div>
-	</div>
-	  <div class="footer">
-      <div class="container">
-        <div class="row">
-          <div class="col-sm-6">          
-            <h2>Important note:</h2>
-            <p class="lead">The CentOS Project has nothing to do with this website or its content,
-            it just provides the software that makes the website run.</p>
-            
-            <p>If you have issues with the content of this site, contact the owner of the domain, not the CentOS project. 
-            Unless you intended to visit CentOS.org, the CentOS Project does not have anything to do with this website,
-            the content or the lack of it.</p>
-            <p>For example, if this website is www.example.com, you would find the owner of the example.com domain at the following WHOIS server:</p>
-            <p><a href="http://www.internic.net/whois.html">http://www.internic.net/whois.html</a></p>
-          </div>
-          <div class="col-sm-6">
-            <h2>The CentOS Project</h2>
-            <p>The CentOS Linux distribution is a stable, predictable, manageable and reproduceable platform derived from 
-               the sources of Red Hat Enterprise Linux (RHEL).<p>
-            
-            <p>Additionally to being a popular choice for web hosting, CentOS also provides a rich platform for open source communities to build upon. For more information
-               please visit the <a href="http://www.centos.org/">CentOS website</a>.</p>
-          </div>
+
+
+<link rel="stylesheet" href="/dashboard/static/dashboard/css/79ebfb96924c.css" type="text/css" />
+
+
+<link rel="shortcut icon" href="/dashboard/static/dashboard/img/favicon.ico"/>
+<link rel="apple-touch-icon" sizes="180x180" href="/dashboard/static/dashboard/img/apple-touch-icon.png" />
+<link rel="mask-icon" href="/dashboard/static/dashboard/img/safari-pinned-tab.svg" color="#5bbad5" />
+
+    
+    
+  <style id="anti-clickjack">body{display:none !important;}</style>
+
+  <script type='text/javascript' charset="utf-8">
+    if (self === top) {
+      var antiClickjack = document.getElementById("anti-clickjack");
+      antiClickjack.parentNode.removeChild(antiClickjack);
+    } else {
+      top.location = self.location;
+    }
+  </script>
+
+
+    
+
+
+
+
+
+<script type="text/javascript" src="/dashboard/static/dashboard/js/b5e88d434bd1.js"></script>
+
+<script type='text/javascript' charset='utf-8'>
+  (function (global) {
+    'use strict';
+
+    // make translation info available on client
+    horizon.languageCode = 'en';
+    horizon.languageBidi = 'False';
+    horizon.datepickerLocale = 'en';
+
+    /* Load angular modules extensions list before we include angular/horizon.js */
+    global.horizonPlugInModules = ['horizon.dashboard.project', 'horizon.dashboard.identity'];
+
+    /* Storage for backend configuration variables which the frontend
+     * should be aware of.
+     */
+    var conf = horizon.conf;
+    conf.static_url = "/dashboard/static/";
+    conf.ajax = {
+      queue_limit: 10
+    };
+    conf.auto_fade_alerts = {
+      delay: 3000,
+      fade_duration: 1500,
+      types: ['alert-success', 'alert-info']
+    };
+    conf.disable_password_reveal =
+      false;
+
+  })(this);
+</script>
+
+    <script type="text/javascript" charset="utf-8">
+  /*
+    Added so that we can append Horizon scoped JS events to
+    the DOM load events without running in to the "horizon"
+    name-space not currently being defined since we load the
+    scripts at the bottom of the page.
+  */
+  var addHorizonLoadEvent = function(func) {
+    var old_onload = window.onload;
+
+    if (typeof window.onload != 'function') {
+      window.onload = func;
+    } else {
+      window.onload = function() {
+        old_onload();
+        func();
+      }
+    }
+  }
+</script>
+
+    
+     
+  </head>
+  <body id="splash" ng-app='horizon.app' ng-strict-di>
+    <noscript>
+      <div class="alert alert-danger text-center javascript-disabled">
+        This application requires JavaScript to be enabled in your web browser.
+      </div>
+    </noscript>
+    
+  
+
+
+  
+
+
+  <div class="container login">
+    <div class="row">
+      <div class="col-xs-11 col-sm-8 col-md-6 col-lg-5 horizontal-center">
+        
+<form id="" class="ng-pristine ng-valid ng-scope"
+      method="POST"
+      action="/dashboard/auth/login/"
+      autocomplete="off"
+      ng-controller="hzLoginController">
+  <input type='hidden' name='csrfmiddlewaretoken' value='dWs48FJo8DAF5yQSSXoVUxzm2zagQOW1' />
+
+
+
+  <div class="panel panel-default">
+
+    <div class="panel-heading">
+    
+  
+
+<div class="text-center">
+  <img class="splash-logo" src=/dashboard/static/dashboard/img/logo-splash.svg>
+</div>
+
+  
+      <h3 class="login-title">
+        Log in
+      </h3>
+    
+
+    </div>
+
+    <div class="panel-body">
+    
+      
+      
+        <div class="fake_credentials" style="display: none">
+          <input type="text" name="fake_email" value="" />
+          <input type="password" name="fake_password" value="" />
         </div>
-		  </div>
+      
+      
+
+
+<div class="help_text alert alert-info">
+  
+    If you are not sure which authentication method to use, contact your administrator.
+  
+</div>
+
+      <fieldset hz-login-finder>
+        
+        
+        
+          <input type="hidden" name="next" value="/dashboard/" />
+        
+        
+  <input id="id_region" name="region" type="hidden" value="http://controller-10-64-33-64:5000/v3" />
+
+
+
+
+
+  
+
+<div class="form-group ">
+  
+    
+      <label class="control-label  " for="id_domain">
+          <span class="field-label">Domain</span></label>
+      <span class="hz-icon-required fa fa-asterisk"></span>
+
+
+
+    
+
+    <div class=" ">
+      
+      
+        
+          <input autofocus="autofocus" class="form-control" id="id_domain" name="domain" type="text" />
+        
+      
+      
+    </div>
+  
+  
+</div>
+
+
+  
+
+<div class="form-group ">
+  
+    
+      <label class="control-label  " for="id_username">
+          <span class="field-label">User Name</span></label>
+      <span class="hz-icon-required fa fa-asterisk"></span>
+
+
+
+    
+
+    <div class=" ">
+      
+      
+        
+          <input class="form-control" id="id_username" name="username" type="text" />
+        
+      
+      
+    </div>
+  
+  
+</div>
+
+
+  
+
+<div class="form-group ">
+  
+    
+      <label class="control-label  " for="id_password">
+          <span class="field-label">Password</span></label>
+      <span class="hz-icon-required fa fa-asterisk"></span>
+
+
+
+    
+
+    <div class=" ">
+      
+      
+        
+          <input class="form-control" id="id_password" name="password" type="password" />
+        
+      
+      
+    </div>
+  
+  
+</div>
+
+
+
+      </fieldset>
+    
+    </div>
+
+    <div class="panel-footer">
+      
+        <button id="loginBtn" type="submit" class="btn btn-primary pull-right">
+          <span ng-show="auth_type==='credentials'">Sign In</span>
+          <span ng-hide="auth_type==='credentials'" ng-cloak>Connect</span>
+        </button>
+        <div class="clearfix"></div>
+      
     </div>
   </div>
-</body></html>
+
+
+      
+</form>
+
+      </div>
+    </div>
+  </div>
+
+
+
+
+
+    <div id="footer">
+      
+  
+
+
+    </div>
+    
+      
+
+
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" src="/dashboard/i18n/js/horizon+openstack_dashboard/"></script>
+
+
+
+<script type="text/javascript" src="/dashboard/static/dashboard/js/4fe8c20826af.js"></script>
+
+<script type="text/javascript" src="/dashboard/static/dashboard/js/9ef655b80bce.js"></script>
+
+
+
+
+<script type="text/html" id="modal_template"><div class="modal" data-backdrop="{{modal_backdrop}}"><div class="modal-dialog"><div class="modal-content"><div class='modal-header'><a class='close' data-dismiss='modal' href="#"><span class="fa fa-times"></span></a><h3 class="modal-title">{{title}}</h3></div><div class='modal-body'>
+        {{{body}}}
+      </div><div class='modal-footer'><a href='#' class='btn btn-default cancel' data-dismiss='modal'>{{cancel}}</a><a href='#' class='btn btn-primary'>{{confirm}}</a></div></div></div></div></script>
+
+<script type="text/html" id="empty_row_template"><tr class="odd empty"><td colspan="{{colspan}}">{{no_items_label}}</td></tr></script>
+
+<script type="text/html" id="alert_message_template"><div class="alert alert-dismissable fade in alert-{{type}}"><a class="close" data-dismiss="alert" href="#"><span class="fa fa-times"></span></a><p><strong>{{type_display}}</strong>
+    {{#safe}}
+      {{{message}}}
+    {{/safe}}
+    {{^safe}}
+      {{message}}
+    {{/safe}}
+  </p></div></script>
+
+<script type="text/html" id="loader-modal"><div class="modal loading"><div class="modal-dialog modal-xs"><div class="modal-content"><div class="modal-body"><span class="loader fa fa-spinner fa-spin fa-5x text-center"></span><div class="loader-caption h4 text-center">{{text}}&hellip;</div></div></div></div></div></script>
+
+<script type="text/html" id="loader-inline"><div class="loader-inline"><span class="loader fa fa-spinner fa-spin fa-4x text-center"></span><div class="loader-caption h4 text-center">{{text}}&hellip;</div></div></script>
+
+<script type="text/html" id="membership_template"><ul class="nav nav-pills btn-group btn-group-sm"><li class="member" data-{{step_slug}}-id="{{data_id}}"><span class="display_name">{{display_name}}</span></li><li class="active"><a class="btn btn-primary" href="#add_remove">{{text}}</a></li><li class="dropdown role_options"><a class="dropdown-toggle btn btn-default" data-toggle="dropdown" href="#"><span class="roles_display">{{roles_label}}</span><span class="fa fa-caret-down"></span></a><ul class="dropdown-menu dropdown-menu-right role_dropdown">
+      {{#roles}}
+      <li data-role-id="{{role_id}}"><a target="_blank"><span class="fa fa-check"></span>
+          {{role_name}}
+        </a></li>
+      {{/roles}}
+    </ul></li></ul></script>
+
+<script type="text/html" id="confirm_modal"><div class="confirm-wrapper"><span class="confirm-list">
+      You have selected: {{selection}}. 
+    </span><span class="confirm-text">Please confirm your selection. </span><span class="confirm-help">{{help}}</span></div></script>
+
+<script type="text/html" id="progress-modal"><div class="modal loading"><div class="modal-dialog modal-sm"><div class="modal-content"><div class="modal-body"><div class="modal-progress-loader"><div class="progress-text"><div class="progress"><div class="progress-bar " role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%;"></div></div><span class="progress-bar-text">0%</span></div><div class="progress-label text-center h4">{{text}}</div></div></div></div></div></div></script>
+
+
+
+
+
+
+<script>
+  // Call init on DOM ready.
+  $(document).ready(horizon.init);
+</script>
+
+    
+    <div id="modal_wrapper"></div>
+  </body>
+</html>
 ```
 

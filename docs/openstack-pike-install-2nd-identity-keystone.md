@@ -1,21 +1,29 @@
-# OpenStack Pike Installation
+# OpenStack Pike Installation - Identity
 
 ## Table of content
 
 控制节点
+* [之前章节](./openstack-pike-install-1st-controller.md)
 * [Keystone认证服务](#identity)
+    * [安装包](#packages)
+    * [配置keystone和httpd](#configure)
+    * [启动及httpd排错](#start)
+    * [客户端配置](#client)
+    * [内部组建设置](#system-project)
+    * [相关日志检查](#log)
+    * [用户管理](#user-guide)
 
 ## Controller
 
 ### Identity
-
-[Keystone](https://docs.openstack.org/keystone/pike/install/keystone-install-rdo.html)
+[官方Keystone参考](https://docs.openstack.org/keystone/pike/install/keystone-install-rdo.html)
 
 Database
 ```
 [vagrant@localhost ~]$ mysql -u root -e "CREATE DATABASE keystone;GRANT ALL PRIVILEGES ON keystone.* TO 'keystone'@'localhost' IDENTIFIED BY 'KEYSTONE_DBPASS';GRANT ALL PRIVILEGES ON keystone.* TO 'keystone'@'%' IDENTIFIED BY 'KEYSTONE_DBPASS';"
 ```
 
+Note: insecure root
 ```
 [vagrant@localhost ~]$ mysql -u root -e "SHOW DATABASES;"
 +--------------------+
@@ -28,6 +36,8 @@ Database
 | test               |
 +--------------------+
 ```
+
+### Packages
 
 Install
 ```
@@ -946,7 +956,9 @@ keystone:x:163:163:OpenStack Keystone Daemons:/var/lib/keystone:/sbin/nologin
 apache:x:48:48:Apache:/usr/share/httpd:/sbin/nologin
 ```
 
-Configure
+### Configure
+
+Modify "keystone.conf"
 ```
 [vagrant@localhost ~]$ sudo sed -i 's/^\[DEFAULT\]$/&\ndebug=true\nverbose=true\n/;s%^\[database\]$%&\nconnection=mysql+pymysql://keystone:KEYSTONE_DBPASS@10.64.33.64/keystone\n%;s/^\[token\]$/&\nprovider=fernet\n/' /etc/keystone/keystone.conf
 ```
@@ -1094,6 +1106,8 @@ Apache HTTP server
 [vagrant@localhost ~]$ sudo ln -s /usr/share/keystone/wsgi-keystone.conf /etc/httpd/conf.d/
 ```
 
+### Start
+
 Trouble shooting
 ```
 [vagrant@localhost ~]$ sudo systemctl start httpd.service
@@ -1122,6 +1136,7 @@ Oct 20 22:15:20 localhost.localdomain systemd[1]: Unit httpd.service entered fai
 Oct 20 22:15:20 localhost.localdomain systemd[1]: httpd.service failed.
 ```
 
+缺少wsgi
 ```
 [vagrant@localhost ~]$ sudo yum list | grep mod_wsgi
 mod_wsgi.x86_64                    3.4-12.el7_0            base                 
@@ -1196,6 +1211,7 @@ Oct 20 22:28:09 localhost.localdomain systemd[1]: Unit httpd.service entered fai
 Oct 20 22:28:09 localhost.localdomain systemd[1]: httpd.service failed.
 ```
 
+不允许创建socket
 ```
 [vagrant@localhost ~]$ sudo getenforce 
 Enforcing
@@ -1209,6 +1225,7 @@ Enforcing
 [vagrant@localhost ~]$ sudo sed -i 's/\(^SELINUX=enforcing$\)/#\1\nSELINUX=permissive/' /etc/selinux/config
 ```
 
+Start
 ```
 [vagrant@localhost ~]$ sudo systemctl start httpd.service
 ```
@@ -1250,7 +1267,9 @@ Oct 20 22:34:39 localhost.localdomain systemd[1]: Started The Apache HTTP Server
 Created symlink from /etc/systemd/system/multi-user.target.wants/httpd.service to /usr/lib/systemd/system/httpd.service.
 ```
 
-client
+### Client
+
+客户端环境变量
 ```
 [vagrant@localhost ~]$ cat << EOF > openstack-admin.sh
 > export OS_USERNAME=admin
@@ -1317,9 +1336,9 @@ admin
 +----------------------------------+-----------+--------------+--------------+---------+-----------+------------------------------+
 ```
 
-### Project service
+### Internal Project 
 
-create 
+For _service_
 ```
 [vagrant@localhost ~]$ openstack project create --domain default --description "Service Project" service
 +-------------+----------------------------------+
@@ -1335,7 +1354,67 @@ create
 +-------------+----------------------------------+
 ```
 
-### User
+### Log
+
+HTTP requests
+```
+[vagrant@localhost ~]$ sudo ls /var/log/httpd
+access_log  error_log  keystone_access.log  keystone.log
+```
+
+```
+[vagrant@localhost ~]$ sudo ls -l /var/log/httpd
+total 20
+-rw-r--r--. 1 root root     0 Oct 20 22:34 access_log
+-rw-r--r--. 1 root root   782 Oct 20 22:34 error_log
+-rw-r--r--. 1 root root 13482 Oct 20 23:00 keystone_access.log
+-rw-r--r--. 1 root root     0 Oct 20 22:34 keystone.log
+[vagrant@localhost ~]$ sudo tail /var/log/httpd/error_log
+[Fri Oct 20 22:34:39.284530 2017] [core:notice] [pid 27161] SELinux policy enabled; httpd running as context system_u:system_r:httpd_t:s0
+[Fri Oct 20 22:34:39.285354 2017] [suexec:notice] [pid 27161] AH01232: suEXEC mechanism enabled (wrapper: /usr/sbin/suexec)
+[Fri Oct 20 22:34:39.293713 2017] [auth_digest:notice] [pid 27161] AH01757: generating secret for digest authentication ...
+[Fri Oct 20 22:34:39.294646 2017] [lbmethod_heartbeat:notice] [pid 27161] AH02282: No slotmem from mod_heartmonitor
+[Fri Oct 20 22:34:39.298641 2017] [mpm_prefork:notice] [pid 27161] AH00163: Apache/2.4.6 (CentOS) mod_wsgi/3.4 Python/2.7.5 configured -- resuming normal operations
+[Fri Oct 20 22:34:39.298663 2017] [core:notice] [pid 27161] AH00094: Command line: '/usr/sbin/httpd -D FOREGROUND'
+```
+
+```
+[root@localhost httpd]# tail keystone_access.log 
+10.64.33.64 - - [21/Oct/2017:02:49:53 +0000] "POST /v3/auth/tokens HTTP/1.1" 201 2757 "-" "osc-lib/1.7.0 keystoneauth1/3.1.0 python-requests/2.11.1 CPython/2.7.5"
+10.64.33.64 - - [21/Oct/2017:02:49:55 +0000] "POST /v3/auth/tokens HTTP/1.1" 201 2757 "-" "osc-lib/1.7.0 keystoneauth1/3.1.0 python-requests/2.11.1 CPython/2.7.5"
+10.64.33.64 - - [21/Oct/2017:02:49:57 +0000] "GET / HTTP/1.1" 300 598 "-" "nova/16.0.1 keystonemiddleware.auth_token/4.17.0 keystoneauth1/3.1.0 python-requests/2.11.1 CPython/2.7.5"
+10.64.33.64 - - [21/Oct/2017:02:49:58 +0000] "POST /v3/auth/tokens HTTP/1.1" 201 2758 "-" "nova/16.0.1 keystonemiddleware.auth_token/4.17.0 keystoneauth1/3.1.0 python-requests/2.11.1 CPython/2.7.5"
+10.64.33.64 - - [21/Oct/2017:02:50:00 +0000] "GET /v3/ HTTP/1.1" 200 251 "-" "nova/16.0.1 keystonemiddleware.auth_token/4.17.0 keystoneauth1/3.1.0 python-requests/2.11.1 CPython/2.7.5"
+10.64.33.64 - - [21/Oct/2017:02:50:00 +0000] "GET /v3/auth/tokens HTTP/1.1" 200 2757 "-" "python-keystoneclient"
+10.64.33.64 - - [21/Oct/2017:02:50:10 +0000] "GET /v3 HTTP/1.1" 200 251 "-" "osc-lib/1.7.0 keystoneauth1/3.1.0 python-requests/2.11.1 CPython/2.7.5"
+10.64.33.64 - - [21/Oct/2017:02:50:10 +0000] "POST /v3/auth/tokens HTTP/1.1" 201 2757 "-" "osc-lib/1.7.0 keystoneauth1/3.1.0 python-requests/2.11.1 CPython/2.7.5"
+10.64.33.64 - - [21/Oct/2017:02:50:10 +0000] "POST /v3/auth/tokens HTTP/1.1" 201 2757 "-" "osc-lib/1.7.0 keystoneauth1/3.1.0 python-requests/2.11.1 CPython/2.7.5"
+10.64.33.64 - - [21/Oct/2017:02:50:11 +0000] "GET /v3/auth/tokens HTTP/1.1" 200 2757 "-" "python-keystoneclient"
+```
+
+Service 
+```
+[vagrant@localhost ~]$ sudo ls /var/log/keystone/
+keystone.log
+```
+
+```
+[vagrant@localhost ~]$ sudo tail 10 /var/log/keystone/keystone.log
+tail: cannot open ‘10’ for reading: No such file or directory
+==> /var/log/keystone/keystone.log <==
+2017-10-20 23:00:06.942 27169 INFO keystone.common.wsgi [req-6a15be5f-0f5e-4a55-9cbf-7e3c9bb97f61 e9524a68c74a4c6badcf36cb325b708a b7ce36a2bb124b9095b22ba8557e0fc4 - default default] GET http://10.64.33.64:35357/v3/projects/b7ce36a2bb124b9095b22ba8557e0fc4
+2017-10-20 23:00:06.943 27169 DEBUG keystone.common.authorization [req-6a15be5f-0f5e-4a55-9cbf-7e3c9bb97f61 e9524a68c74a4c6badcf36cb325b708a b7ce36a2bb124b9095b22ba8557e0fc4 - default default] RBAC: Authorizing identity:get_project(project_id=b7ce36a2bb124b9095b22ba8557e0fc4) _build_policy_check_credentials /usr/lib/python2.7/site-packages/keystone/common/authorization.py:137
+2017-10-20 23:00:06.945 27169 DEBUG keystone.policy.backends.rules [req-6a15be5f-0f5e-4a55-9cbf-7e3c9bb97f61 e9524a68c74a4c6badcf36cb325b708a b7ce36a2bb124b9095b22ba8557e0fc4 - default default] enforce identity:get_project: {'is_delegated_auth': False, 'access_token_id': None, 'user_id': u'e9524a68c74a4c6badcf36cb325b708a', 'roles': [u'user'], 'user_domain_id': u'default', 'consumer_id': None, 'trustee_id': None, 'is_domain': False, 'is_admin_project': True, 'trustor_id': None, 'token': <KeystoneToken (audit_id=agRg6402Q-qi7S9iPn514A, audit_chain_id=agRg6402Q-qi7S9iPn514A) at 0x7f9d140579f0>, 'project_id': u'b7ce36a2bb124b9095b22ba8557e0fc4', 'trust_id': None, 'project_domain_id': u'default'} enforce /usr/lib/python2.7/site-packages/keystone/policy/backends/rules.py:33
+2017-10-20 23:00:06.947 27169 DEBUG keystone.common.authorization [req-6a15be5f-0f5e-4a55-9cbf-7e3c9bb97f61 e9524a68c74a4c6badcf36cb325b708a b7ce36a2bb124b9095b22ba8557e0fc4 - default default] RBAC: Authorization granted check_policy /usr/lib/python2.7/site-packages/keystone/common/authorization.py:240
+2017-10-20 23:00:28.644 27166 DEBUG keystone.middleware.auth [req-7a47326f-8390-4a7f-839a-052f09ee1400 - - - - -] There is either no auth token in the request or the certificate issuer is not trusted. No auth context will be set. fill_context /usr/lib/python2.7/site-packages/keystone/middleware/auth.py:203
+2017-10-20 23:00:28.644 27166 INFO keystone.common.wsgi [req-7a47326f-8390-4a7f-839a-052f09ee1400 - - - - -] GET http://10.64.33.64:5000/v3/
+2017-10-20 23:00:28.651 27163 DEBUG keystone.middleware.auth [req-49791b1b-fd98-41e5-89fb-30745b997a1a - - - - -] There is either no auth token in the request or the certificate issuer is not trusted. No auth context will be set. fill_context /usr/lib/python2.7/site-packages/keystone/middleware/auth.py:203
+2017-10-20 23:00:28.652 27163 INFO keystone.common.wsgi [req-49791b1b-fd98-41e5-89fb-30745b997a1a - - - - -] POST http://10.64.33.64:5000/v3/auth/tokens
+2017-10-20 23:00:28.959 27163 DEBUG keystone.auth.core [req-49791b1b-fd98-41e5-89fb-30745b997a1a - - - - -] MFA Rules not processed for user `e9524a68c74a4c6badcf36cb325b708a`. Rule list: `[]` (Enabled: `True`). check_auth_methods_against_rules /usr/lib/python2.7/site-packages/keystone/auth/core.py:388
+2017-10-20 23:00:28.993 27163 DEBUG keystone.common.fernet_utils [req-49791b1b-fd98-41e5-89fb-30745b997a1a - - - - -] Loaded 2 Fernet keys from /etc/keystone/fernet-keys/, but `[fernet_tokens] max_active_keys = 3`; perhaps there have not been enough key rotations to reach `max_active_keys` yet? load_keys /usr/lib/python2.7/site-packages/keystone/common/fernet_utils.py:306
+```
+
+### User guide
 
 demo
 ```
@@ -1410,61 +1489,4 @@ demo
 | project_id | b7ce36a2bb124b9095b22ba8557e0fc4                                                                                                                                                        |
 | user_id    | e9524a68c74a4c6badcf36cb325b708a                                                                                                                                                        |
 +------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-```
-
-```
-[vagrant@localhost ~]$ sudo ls /var/log/httpd
-access_log  error_log  keystone_access.log  keystone.log
-```
-
-```
-[vagrant@localhost ~]$ sudo ls -l /var/log/httpd
-total 20
--rw-r--r--. 1 root root     0 Oct 20 22:34 access_log
--rw-r--r--. 1 root root   782 Oct 20 22:34 error_log
--rw-r--r--. 1 root root 13482 Oct 20 23:00 keystone_access.log
--rw-r--r--. 1 root root     0 Oct 20 22:34 keystone.log
-[vagrant@localhost ~]$ sudo tail /var/log/httpd/error_log
-[Fri Oct 20 22:34:39.284530 2017] [core:notice] [pid 27161] SELinux policy enabled; httpd running as context system_u:system_r:httpd_t:s0
-[Fri Oct 20 22:34:39.285354 2017] [suexec:notice] [pid 27161] AH01232: suEXEC mechanism enabled (wrapper: /usr/sbin/suexec)
-[Fri Oct 20 22:34:39.293713 2017] [auth_digest:notice] [pid 27161] AH01757: generating secret for digest authentication ...
-[Fri Oct 20 22:34:39.294646 2017] [lbmethod_heartbeat:notice] [pid 27161] AH02282: No slotmem from mod_heartmonitor
-[Fri Oct 20 22:34:39.298641 2017] [mpm_prefork:notice] [pid 27161] AH00163: Apache/2.4.6 (CentOS) mod_wsgi/3.4 Python/2.7.5 configured -- resuming normal operations
-[Fri Oct 20 22:34:39.298663 2017] [core:notice] [pid 27161] AH00094: Command line: '/usr/sbin/httpd -D FOREGROUND'
-```
-
-```
-[root@localhost httpd]# tail keystone_access.log 
-10.64.33.64 - - [21/Oct/2017:02:49:53 +0000] "POST /v3/auth/tokens HTTP/1.1" 201 2757 "-" "osc-lib/1.7.0 keystoneauth1/3.1.0 python-requests/2.11.1 CPython/2.7.5"
-10.64.33.64 - - [21/Oct/2017:02:49:55 +0000] "POST /v3/auth/tokens HTTP/1.1" 201 2757 "-" "osc-lib/1.7.0 keystoneauth1/3.1.0 python-requests/2.11.1 CPython/2.7.5"
-10.64.33.64 - - [21/Oct/2017:02:49:57 +0000] "GET / HTTP/1.1" 300 598 "-" "nova/16.0.1 keystonemiddleware.auth_token/4.17.0 keystoneauth1/3.1.0 python-requests/2.11.1 CPython/2.7.5"
-10.64.33.64 - - [21/Oct/2017:02:49:58 +0000] "POST /v3/auth/tokens HTTP/1.1" 201 2758 "-" "nova/16.0.1 keystonemiddleware.auth_token/4.17.0 keystoneauth1/3.1.0 python-requests/2.11.1 CPython/2.7.5"
-10.64.33.64 - - [21/Oct/2017:02:50:00 +0000] "GET /v3/ HTTP/1.1" 200 251 "-" "nova/16.0.1 keystonemiddleware.auth_token/4.17.0 keystoneauth1/3.1.0 python-requests/2.11.1 CPython/2.7.5"
-10.64.33.64 - - [21/Oct/2017:02:50:00 +0000] "GET /v3/auth/tokens HTTP/1.1" 200 2757 "-" "python-keystoneclient"
-10.64.33.64 - - [21/Oct/2017:02:50:10 +0000] "GET /v3 HTTP/1.1" 200 251 "-" "osc-lib/1.7.0 keystoneauth1/3.1.0 python-requests/2.11.1 CPython/2.7.5"
-10.64.33.64 - - [21/Oct/2017:02:50:10 +0000] "POST /v3/auth/tokens HTTP/1.1" 201 2757 "-" "osc-lib/1.7.0 keystoneauth1/3.1.0 python-requests/2.11.1 CPython/2.7.5"
-10.64.33.64 - - [21/Oct/2017:02:50:10 +0000] "POST /v3/auth/tokens HTTP/1.1" 201 2757 "-" "osc-lib/1.7.0 keystoneauth1/3.1.0 python-requests/2.11.1 CPython/2.7.5"
-10.64.33.64 - - [21/Oct/2017:02:50:11 +0000] "GET /v3/auth/tokens HTTP/1.1" 200 2757 "-" "python-keystoneclient"
-```
-
-
-```
-[vagrant@localhost ~]$ sudo ls /var/log/keystone/
-keystone.log
-```
-
-```
-[vagrant@localhost ~]$ sudo tail 10 /var/log/keystone/keystone.log
-tail: cannot open ‘10’ for reading: No such file or directory
-==> /var/log/keystone/keystone.log <==
-2017-10-20 23:00:06.942 27169 INFO keystone.common.wsgi [req-6a15be5f-0f5e-4a55-9cbf-7e3c9bb97f61 e9524a68c74a4c6badcf36cb325b708a b7ce36a2bb124b9095b22ba8557e0fc4 - default default] GET http://10.64.33.64:35357/v3/projects/b7ce36a2bb124b9095b22ba8557e0fc4
-2017-10-20 23:00:06.943 27169 DEBUG keystone.common.authorization [req-6a15be5f-0f5e-4a55-9cbf-7e3c9bb97f61 e9524a68c74a4c6badcf36cb325b708a b7ce36a2bb124b9095b22ba8557e0fc4 - default default] RBAC: Authorizing identity:get_project(project_id=b7ce36a2bb124b9095b22ba8557e0fc4) _build_policy_check_credentials /usr/lib/python2.7/site-packages/keystone/common/authorization.py:137
-2017-10-20 23:00:06.945 27169 DEBUG keystone.policy.backends.rules [req-6a15be5f-0f5e-4a55-9cbf-7e3c9bb97f61 e9524a68c74a4c6badcf36cb325b708a b7ce36a2bb124b9095b22ba8557e0fc4 - default default] enforce identity:get_project: {'is_delegated_auth': False, 'access_token_id': None, 'user_id': u'e9524a68c74a4c6badcf36cb325b708a', 'roles': [u'user'], 'user_domain_id': u'default', 'consumer_id': None, 'trustee_id': None, 'is_domain': False, 'is_admin_project': True, 'trustor_id': None, 'token': <KeystoneToken (audit_id=agRg6402Q-qi7S9iPn514A, audit_chain_id=agRg6402Q-qi7S9iPn514A) at 0x7f9d140579f0>, 'project_id': u'b7ce36a2bb124b9095b22ba8557e0fc4', 'trust_id': None, 'project_domain_id': u'default'} enforce /usr/lib/python2.7/site-packages/keystone/policy/backends/rules.py:33
-2017-10-20 23:00:06.947 27169 DEBUG keystone.common.authorization [req-6a15be5f-0f5e-4a55-9cbf-7e3c9bb97f61 e9524a68c74a4c6badcf36cb325b708a b7ce36a2bb124b9095b22ba8557e0fc4 - default default] RBAC: Authorization granted check_policy /usr/lib/python2.7/site-packages/keystone/common/authorization.py:240
-2017-10-20 23:00:28.644 27166 DEBUG keystone.middleware.auth [req-7a47326f-8390-4a7f-839a-052f09ee1400 - - - - -] There is either no auth token in the request or the certificate issuer is not trusted. No auth context will be set. fill_context /usr/lib/python2.7/site-packages/keystone/middleware/auth.py:203
-2017-10-20 23:00:28.644 27166 INFO keystone.common.wsgi [req-7a47326f-8390-4a7f-839a-052f09ee1400 - - - - -] GET http://10.64.33.64:5000/v3/
-2017-10-20 23:00:28.651 27163 DEBUG keystone.middleware.auth [req-49791b1b-fd98-41e5-89fb-30745b997a1a - - - - -] There is either no auth token in the request or the certificate issuer is not trusted. No auth context will be set. fill_context /usr/lib/python2.7/site-packages/keystone/middleware/auth.py:203
-2017-10-20 23:00:28.652 27163 INFO keystone.common.wsgi [req-49791b1b-fd98-41e5-89fb-30745b997a1a - - - - -] POST http://10.64.33.64:5000/v3/auth/tokens
-2017-10-20 23:00:28.959 27163 DEBUG keystone.auth.core [req-49791b1b-fd98-41e5-89fb-30745b997a1a - - - - -] MFA Rules not processed for user `e9524a68c74a4c6badcf36cb325b708a`. Rule list: `[]` (Enabled: `True`). check_auth_methods_against_rules /usr/lib/python2.7/site-packages/keystone/auth/core.py:388
-2017-10-20 23:00:28.993 27163 DEBUG keystone.common.fernet_utils [req-49791b1b-fd98-41e5-89fb-30745b997a1a - - - - -] Loaded 2 Fernet keys from /etc/keystone/fernet-keys/, but `[fernet_tokens] max_active_keys = 3`; perhaps there have not been enough key rotations to reach `max_active_keys` yet? load_keys /usr/lib/python2.7/site-packages/keystone/common/fernet_utils.py:306
 ```
