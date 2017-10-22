@@ -34,8 +34,8 @@ Wired connection 1  3c55af49-6222-3b6b-b91d-eb1b82b6005e  802-3-ethernet  eth1
 ```
 
 ```
-[vagrant@localhost ~]$ cat /etc/sysconfig/network-scripts/ifcfg-
-ifcfg-eth0                ifcfg-lo                  ifcfg-Wired_connection_1  
+[vagrant@localhost ~]$ ls /etc/sysconfig/network-scripts/ifcfg-*
+/etc/sysconfig/network-scripts/ifcfg-eth0  /etc/sysconfig/network-scripts/ifcfg-lo  /etc/sysconfig/network-scripts/ifcfg-Wired_connection_1
 ```
 
 ```
@@ -604,7 +604,7 @@ Modify "metadata_agent.ini"
 
 Sed "nova.conf"
 ```
-[vagrant@localhost ~]$ sudo sed 's%^\[neutron]$%&\nurl=http://${controller}:9696\nauth_url=http://${controller}:35357\nauth_type=password\nproject_domain_name=default\nuser_domain_name=default\nregion_name=RegionOne\nproject_name=service\nusername=neutron\npassword=SERVICE_PASS\service_metadata_proxy=true\nmetadata_proxy_shared_secret=METADATA_SECRET\n%' nova.conf | env controller=10.64.33.64 envsubst > nova.conf.neutron
+[vagrant@localhost ~]$ sudo sed 's%^\[neutron]$%&\nurl=http://${controller}:9696\nauth_url=http://${controller}:35357\nauth_type=password\nproject_domain_name=default\nuser_domain_name=default\nregion_name=RegionOne\nproject_name=service\nusername=neutron\npassword=SERVICE_PASS\nservice_metadata_proxy=true\nmetadata_proxy_shared_secret=METADATA_SECRET\n%' nova.conf | env controller=10.64.33.64 envsubst > nova.conf.neutron
 ```
 
 Modify "nova.conf"
@@ -1173,5 +1173,3 @@ cli
 | ea6174e3-62d2-48f4-a268-236883c00f9d | Linux bridge agent | localhost.localdomain | None              | :-)   | UP    | neutron-linuxbridge-agent |
 +--------------------------------------+--------------------+-----------------------+-------------------+-------+-------+---------------------------+
 ```
-
-

@@ -1409,6 +1409,31 @@ Installed:
 Complete!
 ```
 
+Backup
+```
+[vagrant@localhost ~]$ sudo cp /etc/sysconfig/memcached etc0x2Fsysconfig0x2Fmemcached
+```
+
+Sed
+```
+[vagrant@localhost ~]$ sudo sed 's/^\(OPTIONS="-l.*\)"$/\1,${controller}"/' etc0x2Fsysconfig0x2Fmemcached | env controller=10.64.33.64 envsubst > memcached
+```
+
+Check
+```
+[vagrant@localhost ~]$ sudo cat memcached 
+PORT="11211"
+USER="memcached"
+MAXCONN="1024"
+CACHESIZE="64"
+OPTIONS="-l 127.0.0.1,::1,10.64.33.64"
+```
+
+Modify
+```
+[vagrant@localhost ~]$ sudo cp memcached /etc/sysconfig/memcached 
+```
+
 Start
 ```
 [vagrant@localhost ~]$ sudo systemctl start memcached.service && sudo systemctl enable memcached.service
