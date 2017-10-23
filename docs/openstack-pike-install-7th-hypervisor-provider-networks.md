@@ -76,26 +76,6 @@ Modify
 
 
 
-### Hostname
-
-Backup
-```
-[vagrant@localhost ~]$ sudo cp /etc/hostname etc0x2Fhostname
-[vagrant@localhost ~]$ sudo echo "compute-10-64-33-65" > hostname
-```
-
-Modify
-```
-[vagrant@localhost ~]$ sudo hostname --file hostname
-```
-
-Check
-```
-[vagrant@localhost ~]$ sudo cp hostname /etc/hostname
-[vagrant@localhost ~]$ hostname
-compute-10-64-33-65
-```
-
 
 ### Delivery Packages
 

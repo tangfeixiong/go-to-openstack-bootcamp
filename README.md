@@ -232,20 +232,31 @@ test create
 OpenStack DevOps
 ----------------
 
-[Markdown](https://daringfireball.net/projects/markdown/)
+### OpenStack Pike
 
-[Sphinx - Python Documentation Generator](http://sphinx-doc.org/contents.html)
+General [doc](./docs)
+* ./docs/openstack-pike-install-1st-controller.md
+* ./docs/openstack-pike-install-2nd-identity-keystone.md
+* ./docs/openstack-pike-install-3rd-image-glance.md
+* ./docs/openstack-pike-install-4th-controller-nova.md
+* ./docs/openstack-pike-install-5th-hypervisor-nova.md
 
-### OpenStack-Grizzly版在Ubuntu-Precise即12.04.3-LTS的安装实验-
+Provider networks
+* ./docs/openstack-pike-install-6th-controller-provider-networks.md
+* ./docs/openstack-pike-install-7th-hypervisor-provider-networks.md
+* ./docs/openstack-pike-install-8th-dashboard.md
+
+
+### OpenStack Grizzly版在Ubuntu Precise (12.04.3 LTS)的安装实验
 
 参考[mseknibilel](https://github.com/mseknibilel/OpenStack-Grizzly-Install-Guide/tree/OVS_SingleNode)的安装指南，向作者致谢
 
 #### 准备
 
 1. 切换到超级用户root
-    sudo su或sudo -i
 su是linux命令，Switch User的意思，但当前用户没有执行该命令的权限
 sudo命令即Super User Do，使当前用户可以执行root命令
+    sudo su或sudo -i
 
 2. 添加Grizzly的apt-get在线安装仓库
 apt-get的在线安装仓库配置文件在/etc/apt-get目录下
@@ -270,3 +281,10 @@ echo deb http://ubuntu-cloud.archive.canonical.com/ubuntu precise-updates/grizzl
     apt-get update
     apt-get upgrade
     apt-get dist-upgrade
+
+Appendix
+---------
+
+[Markdown](https://daringfireball.net/projects/markdown/)
+
+[Sphinx - Python Documentation Generator](http://sphinx-doc.org/contents.html)

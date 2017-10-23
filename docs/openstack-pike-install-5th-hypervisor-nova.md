@@ -4,14 +4,18 @@
 
 计算节点
 * [网络配置](#network)
-* [SSH客户端排错](#ssh-trouble-shooting)
+* [SSH客户端](#ssh-client)
 * [防火墙](#firewall)
 * [NTP服务](#chrony)
-* [Openstack Pike版本YUM仓库](#openstack-Repository)
-* [Openstack 命令工具包](#openstack-client)
-* [MariaDB数据库](#database)
-* [RabbitMQ消息队列](#queue)
-* [Memcached缓存](#cache)
+* [主机名](#hostname)
+* [SELinux](#selinux)
+* [Openstack Pike版本YUM仓库](#pike-repo)
+* [YUM安装](#packages)
+* [配置](#configure)
+* [启动](#start)
+    * [检查服务](#verify)
+    * [注册cell](#cell)
+    * [检查cell](#verifying)
 
 ## Compute Node
 
@@ -315,6 +319,8 @@ ONBOOT=yes
 AUTOCONNECT_PRIORITY=-999
 ```
 
+### SSH client
+
 X509 pub
 ```
 [vagrant@localhost ~]$ cat .ssh/authorized_keys 
@@ -331,11 +337,15 @@ ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA6NF8iallvQVp22WDkTkyrtvp9eWW6A8YVr+kz4TjGYe7
 ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCvfIdGduA81WVgf1F5DikDG+1qJEPk0FBYtMPk7WTEkb4p8KkqMKKdrt7Sy7Ig4ZIBwFCCU4rtHiaLeslNxwdjT1l1sH18uiNxjDtP/8RyDrGeED5id84RvIdcqZlS17mtxXg1KcALUOBm8EeRqT5yT1q6/DQWN0Q8aHP5XbVYZ9yotzoU0+uaHqjkf7lwATES/+4NpC/BlRF6uNd2oFC7pymhOhb/FbeJWJpLTHRFtdHVPQm/2VY6UH4auCaz3rDZP5Zd1sT1nsUnExII2y5NIMi7N/PNbU2vPPnXYwOrZiY7I/pGmu95r6oo3DkTyE3VdOaiXX6El6DAeNL1DRo5 tangf@DESKTOP-H68OQDV
 ```
 
-Firewall
+### Firewall
+
+Close
 ```
 [vagrant@localhost ~]$ systemctl is-active firewalld.service
 unknown
 ```
+
+### Chrony
 
 NTP服务
 ```
@@ -372,7 +382,29 @@ MS Name/IP address         Stratum Poll Reach LastRx Last sample
 ^- ntp2.itcompliance.dk          3   6    17     5    -11ms[  -11ms] +/-  203ms
 ```
 
-SELinux
+### Hostname
+
+Backup
+```
+[vagrant@localhost ~]$ sudo cp /etc/hostname etc0x2Fhostname
+[vagrant@localhost ~]$ sudo echo "compute-10-64-33-65" > hostname
+```
+
+Modify
+```
+[vagrant@localhost ~]$ sudo hostname --file hostname
+```
+
+Check
+```
+[vagrant@localhost ~]$ sudo cp hostname /etc/hostname
+[vagrant@localhost ~]$ hostname
+compute-10-64-33-65
+```
+
+### SELinux
+
+Modify
 ```
 [vagrant@localhost ~]$ getenforce 
 Enforcing
@@ -390,6 +422,8 @@ usage:  setenforce [ Enforcing | Permissive | 1 | 0 ]
 ```
 [vagrant@localhost ~]$ sudo sed -i 's/\(^SELINUX=enforcing$\)/#\1\nSELINUX=permissive/' /etc/selinux/config
 ```
+
+### Pike Repo
 
 Openstack Pike Repository
 ```
@@ -508,7 +542,7 @@ Dependency Installed:
 Complete!
 ```
 
-### compute
+### Packages
 
 [Nova](https://docs.openstack.org/nova/pike/install/compute-install-rdo.html)
 ```
@@ -2690,22 +2724,120 @@ Dependency Updated:
 Complete!
 ```
 
+### Configure
+
 Virtualization
 ```
 [vagrant@localhost ~]$ egrep -c '(vmx|svm)' /proc/cpuinfo 
 0
 ```
 
-Configure
+Modify
 ```
 [vagrant@localhost ~]$ sudo sed   's%^\[DEFAULT\]$%&\ndebug=true\nverbose=true\nenabled_apis=osapi_compute,metadata\ntransport_url=rabbit://openstack:RABBIT_PASS@${controller}\nmy_ip=${my_ip}\nuser_neutron=True\nfirewall_driver=nova.virt.firewall.NoopFirewallDriver\n%;s/^\[api\]$/&\nauth_strategy=keystone\n/;s%^\[keystone_authtoken\]$%&\nauth_uri=http://${controller}:5000\nauth_url=http://${controller}:35357\nmemcached_servers=${controller}:11211\nauth_type=password\nproject_domain_name=default\nuser_domain_name=default\nproject_name=service\nusername=nova\npassword=SERVICE_PASS\n%;s%^\[vnc\]$%&\nenabled=True\nvncserver_listen=0.0.0.0\nvncserver_proxyclient_address=$my_ip\nnovncproxy_base_url=http://${controller}:6080/vnc_auto.html\n%;s%^\[glance\]$%&\napi_servers=http://${controller}:9292\n%;s%^\[oslo_concurrency\]$%&\nlock_path=/var/lib/nova/tmp\n%;s%^\[placement\]$%&\nos_region_name=RegionOne\nproject_domain_name=Default\nproject_name=service\nauth_type=password\nuser_domain_name=Default\nauth_url=http://${controller}:35357/v3\nusername=placement\npassword=SERVICE_PASS\n%;s/^\[libvirt\]$/&\nvirt_type=${virt_type}\n/' /etc/nova/nova.conf | env controller=10.64.33.64 my_ip=10.64.33.65 virt_type=qemu envsubst > nova.conf
 ```
 
+Update
 ```
 [vagrant@localhost ~]$ sudo cp nova.conf /etc/nova/nova.conf 
 ```
 
-Start
+View
+```
+[vagrant@compute-10-64-33-65 ~]$ sudo grep -e '^[^#]' /etc/nova/nova.conf 
+[DEFAULT]
+debug=true
+verbose=true
+enabled_apis=osapi_compute,metadata
+transport_url=rabbit://openstack:RABBIT_PASS@10.64.33.64
+my_ip=10.64.33.65
+user_neutron=True
+firewall_driver=nova.virt.firewall.NoopFirewallDriver
+[api]
+auth_strategy=keystone
+[api_database]
+[barbican]
+[cache]
+[cells]
+[cinder]
+[compute]
+[conductor]
+[console]
+[consoleauth]
+[cors]
+[crypto]
+[database]
+[ephemeral_storage_encryption]
+[filter_scheduler]
+[glance]
+api_servers=http://10.64.33.64:9292
+[guestfs]
+[healthcheck]
+[hyperv]
+[ironic]
+[key_manager]
+[keystone_authtoken]
+auth_uri=http://10.64.33.64:5000
+auth_url=http://10.64.33.64:35357
+memcached_servers=10.64.33.64:11211
+auth_type=password
+project_domain_name=default
+user_domain_name=default
+project_name=service
+username=nova
+password=SERVICE_PASS
+[libvirt]
+virt_type=qemu
+[matchmaker_redis]
+[metrics]
+[mks]
+[neutron]
+[notifications]
+[osapi_v21]
+[oslo_concurrency]
+lock_path=/var/lib/nova/tmp
+[oslo_messaging_amqp]
+[oslo_messaging_kafka]
+[oslo_messaging_notifications]
+[oslo_messaging_rabbit]
+[oslo_messaging_zmq]
+[oslo_middleware]
+[oslo_policy]
+[pci]
+[placement]
+os_region_name=RegionOne
+project_domain_name=Default
+project_name=service
+auth_type=password
+user_domain_name=Default
+auth_url=http://10.64.33.64:35357/v3
+username=placement
+password=SERVICE_PASS
+[quota]
+[rdp]
+[remote_debug]
+[scheduler]
+[serial_console]
+[service_user]
+[spice]
+[trusted_computing]
+[upgrade_levels]
+[vendordata_dynamic_auth]
+[vmware]
+[vnc]
+enabled=True
+vncserver_listen=0.0.0.0
+vncserver_proxyclient_address=10.64.33.65
+novncproxy_base_url=http://10.64.33.64:6080/vnc_auto.html
+[workarounds]
+[wsgi]
+[xenserver]
+[xvp]
+```
+
+### Start
+
+Libvirtd
 ```
 [vagrant@localhost ~]$ sudo systemctl start libvirtd.service 
 ```
@@ -2770,7 +2902,9 @@ Start
            └─5281 /usr/bin/python2 /usr/bin/nova-compute
 ```
 
-Verifying (note: in controller node)
+#### Verify
+
+note: in controller node
 ```
 [vagrant@localhost ~]$ openstack compute service list
 +----+------------------+-----------------------+----------+---------+-------+----------------------------+
@@ -2814,7 +2948,7 @@ Created symlink from /etc/systemd/system/multi-user.target.wants/openstack-nova-
 ```
 
 
-### Cell
+#### Cell
 
 From controller node
 ```
@@ -2856,7 +2990,6 @@ Alternatively, need to auto schedule newly added node
 ```
 sed -i 's/#discover_hosts_in_cells_interval=-1/discover_hosts_in_cells_interval=300/' /etc/nova/nova.conf
 ```
-
 ### Verifying
 
 From controller node
