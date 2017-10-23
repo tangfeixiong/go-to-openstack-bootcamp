@@ -1,49 +1,29 @@
-# OpenStack Pike Installation
+# OpenStack Pike Installation － nova controller
 
 ## Table of content
 
 控制节点
 * [之前章节](./openstack-pike-install-3rd-image-glance.md)
-* [Nova服务](#compute)
+* [Nova控制器](#controller)
+    * [服务发现](#service-discovery)
+    * [YUM安装](#packages)
+    * [配置](#configure)
+    * [初始化数据库](#database)
+    * [启动](#start)
+    * [检查服务](#verfifying)
 
 ## Controller
 
-### Compute
-
 [Nova](https://docs.openstack.org/nova/pike/install/install-rdo.html)
-
-
-Database
-```
-[vagrant@localhost ~]$ mysql -u root -e "CREATE DATABASE nova_api;GRANT ALL PRIVILEGES ON nova_api.* TO 'nova'@'localhost' IDENTIFIED BY 'SERVICE_DBPASS';GRANT ALL PRIVILEGES ON nova_api.* TO 'nova'@'%' IDENTIFIED BY 'SERVICE_DBPASS';"
-[vagrant@localhost ~]$ mysql -u root -e "CREATE DATABASE nova;GRANT ALL PRIVILEGES ON nova.* TO 'nova'@'localhost' IDENTIFIED BY 'SERVICE_DBPASS';GRANT ALL PRIVILEGES ON nova.* TO 'nova'@'%' IDENTIFIED BY 'SERVICE_DBPASS';"
-[vagrant@localhost ~]$ mysql -u root -e "CREATE DATABASE nova_cell0;GRANT ALL PRIVILEGES ON nova_cell0.* TO 'nova'@'localhost' IDENTIFIED BY 'SERVICE_DBPASS';GRANT ALL PRIVILEGES ON nova_cell0.* TO 'nova'@'%' IDENTIFIED BY 'SERVICE_DBPASS';"
-```
-
-```
-[vagrant@localhost ~]$ mysql -u root -e "show databases;"
-+--------------------+
-| Database           |
-+--------------------+
-| glance             |
-| information_schema |
-| keystone           |
-| mysql              |
-| nova               |
-| nova_api           |
-| nova_cell0         |
-| performance_schema |
-| test               |
-+--------------------+
-```
-
 
 Client
 ```
 [vagrant@localhost ~]$ . openstack-admin.sh 
 ```
 
-Registration
+### Service Discovery
+
+Auth
 ```
 [vagrant@localhost ~]$ openstack user create --domain default --password SERVICE_PASS nova 
 +---------------------+----------------------------------+
@@ -67,6 +47,10 @@ Registration
 | name        | nova                             |
 | type        | compute                          |
 +-------------+----------------------------------+
+```
+
+Service registry
+```
 [vagrant@localhost ~]$ openstack endpoint create --region RegionOne compute public http://10.64.33.64:8774/v2.1
 +--------------+----------------------------------+
 | Field        | Value                            |
@@ -111,6 +95,7 @@ Registration
 +--------------+----------------------------------+
 ```
 
+New _placement_ service
 ```
 [vagrant@localhost ~]$ openstack user create --domain default --password SERVICE_PASS placement
 +---------------------+----------------------------------+
@@ -177,6 +162,8 @@ Registration
 | url          | http://10.64.33.64:8778          |
 +--------------+----------------------------------+
 ```
+
+### Packages
 
 Install
 ```
@@ -381,9 +368,103 @@ Complete!
 [vagrant@localhost ~]$ 
 ```
 
-Configure
+### Configure
+
+Modify "nova.conf"
 ```
 [vagrant@localhost ~]$ sudo sed -i  's%^\[DEFAULT\]$%&\ndebug=true\nverbose=true\ntransport_url=rabbit://openstack:RABBIT_PASS@10.64.33.64\nmy_ip=10.64.33.64\nuser_neutron=True\nfirewall_driver=nova.virt.firewall_NoopFirewallDriver\n%;s%^\[api_database\]$%&\nconnection=mysql+pymysql://nova:SERVICE_DBPASS@10.64.33.64/nova_api\n%;s%^\[database\]$%&\nconnection=mysql+pymysql://nova:SERVICE_DBPASS@10.64.33.64/nova\n%;s/^\[api\]$/&\nauth_strategy=keystone\n/;s%^\[keystone_authtoken\]$%&\nauth_uri=http://10.64.33.64:5000\nauth_url=http://10.64.33.64:35357\nmemcached_servers=10.64.33.64:11211\nauth_type=password\nproject_domain_name=default\nuser_domain_name=default\nproject_name=service\nusername=nova\npassword=SERVICE_PASS\n%;s/^\[vnc\]$/&\nenabled=true\nvncserver_listen=$my_ip\nvncserver_proxyclient_address=$my_ip\n/;s%^\[glance\]$%&\napi_servers=http://10.64.33.64:9292\n%;s%^\[oslo_concurrency\]$%&\nlock_path=/var/lib/nova/tmp\n%;s%^\[placement\]$%&\nos_region_name=RegionOne\nproject_domain_name=Default\nproject_name=service\nauth_type=password\nuser_domain_name=Default\nauth_url=http://10.64.33.64:35357/v3\nusername=placement\npassword=SERVICE_PASS\n%' /etc/nova/nova.conf
+```
+
+Look at "nova.conf"
+```
+[vagrant@controller-10-64-33-64 ~]$ sudo cat /etc/nova/nova.conf | egrep '^[^#]'
+[DEFAULT]
+debug=true
+verbose=true
+transport_url=rabbit://openstack:RABBIT_PASS@10.64.33.64
+my_ip=10.64.33.64
+user_neutron=True
+firewall_driver=nova.virt.firewall_NoopFirewallDriver
+[api]
+auth_strategy=keystone
+[api_database]
+connection=mysql+pymysql://nova:SERVICE_DBPASS@10.64.33.64/nova_api
+[barbican]
+[cache]
+[cells]
+[cinder]
+[compute]
+[conductor]
+[console]
+[consoleauth]
+[cors]
+[crypto]
+[database]
+connection=mysql+pymysql://nova:SERVICE_DBPASS@10.64.33.64/nova
+[ephemeral_storage_encryption]
+[filter_scheduler]
+[glance]
+api_servers=http://10.64.33.64:9292
+[guestfs]
+[healthcheck]
+[hyperv]
+[ironic]
+[key_manager]
+[keystone_authtoken]
+auth_uri=http://10.64.33.64:5000
+auth_url=http://10.64.33.64:35357
+memcached_servers=10.64.33.64:11211
+auth_type=password
+project_domain_name=default
+user_domain_name=default
+project_name=service
+username=nova
+password=SERVICE_PASS
+[libvirt]
+[matchmaker_redis]
+[metrics]
+[mks]
+[neutron]
+[notifications]
+[osapi_v21]
+[oslo_concurrency]
+lock_path=/var/lib/nova/tmp
+[oslo_messaging_amqp]
+[oslo_messaging_kafka]
+[oslo_messaging_notifications]
+[oslo_messaging_rabbit]
+[oslo_messaging_zmq]
+[oslo_middleware]
+[oslo_policy]
+[pci]
+[placement]
+os_region_name=RegionOne
+project_domain_name=Default
+project_name=service
+auth_type=password
+user_domain_name=Default
+auth_url=http://10.64.33.64:35357/v3
+username=placement
+password=SERVICE_PASS
+[quota]
+[rdp]
+[remote_debug]
+[scheduler]
+[serial_console]
+[service_user]
+[spice]
+[trusted_computing]
+[upgrade_levels]
+[vendordata_dynamic_auth]
+[vmware]
+[vnc]
+enabled=true
+vncserver_listen=10.64.33.64
+vncserver_proxyclient_address=10.64.33.64
+[workarounds]
+[wsgi]
+[xenserver]
+[xvp]
 ```
 
 Patching
@@ -468,6 +549,32 @@ Alias /nova-placement-api /usr/bin/nova-placement-api
 
 Oct 21 02:35:37 localhost.localdomain systemd[1]: Starting The Apache HTTP Server...
 Oct 21 02:35:37 localhost.localdomain systemd[1]: Started The Apache HTTP Server.
+```
+
+### Database
+
+nova_api, nova, nova_cell0
+```
+[vagrant@localhost ~]$ mysql -u root -e "CREATE DATABASE nova_api;GRANT ALL PRIVILEGES ON nova_api.* TO 'nova'@'localhost' IDENTIFIED BY 'SERVICE_DBPASS';GRANT ALL PRIVILEGES ON nova_api.* TO 'nova'@'%' IDENTIFIED BY 'SERVICE_DBPASS';"
+[vagrant@localhost ~]$ mysql -u root -e "CREATE DATABASE nova;GRANT ALL PRIVILEGES ON nova.* TO 'nova'@'localhost' IDENTIFIED BY 'SERVICE_DBPASS';GRANT ALL PRIVILEGES ON nova.* TO 'nova'@'%' IDENTIFIED BY 'SERVICE_DBPASS';"
+[vagrant@localhost ~]$ mysql -u root -e "CREATE DATABASE nova_cell0;GRANT ALL PRIVILEGES ON nova_cell0.* TO 'nova'@'localhost' IDENTIFIED BY 'SERVICE_DBPASS';GRANT ALL PRIVILEGES ON nova_cell0.* TO 'nova'@'%' IDENTIFIED BY 'SERVICE_DBPASS';"
+```
+
+```
+[vagrant@localhost ~]$ mysql -u root -e "show databases;"
++--------------------+
+| Database           |
++--------------------+
+| glance             |
+| information_schema |
+| keystone           |
+| mysql              |
+| nova               |
+| nova_api           |
+| nova_cell0         |
+| performance_schema |
+| test               |
++--------------------+
 ```
 
 ```
@@ -782,8 +889,9 @@ oslo_config.cfg.ConfigFilesPermissionDeniedError: Failed to open some config fil
 +-------+--------------------------------------+-------------------------------------+--------------------------------------------------+
 ```
 
+### Start
 
-Start
+Systemctl
 ```
 [vagrant@localhost ~]$ sudo systemctl start openstack-nova-api.service
 [vagrant@localhost ~]$ systemctl -l status openstack-nova-api.service
@@ -841,6 +949,9 @@ Start
            └─31710 /usr/bin/python2 /usr/bin/nova-novncproxy --web /usr/share/novnc/
 ```
 
+### Verifying
+
+Registry
 ```
 [vagrant@localhost ~]$ openstack compute service list
 +----+------------------+-----------------------+----------+---------+-------+----------------------------+
@@ -852,7 +963,7 @@ Start
 +----+------------------+-----------------------+----------+---------+-------+----------------------------+
 ```
 
-Enable auto-starting
+Set auto-starting when reboot
 ```
 [vagrant@localhost ~]$ sudo systemctl enable openstack-nova-api.service openstack-nova-consoleauth.service openstack-nova-scheduler.service openstack-nova-conductor.service openstack-nova-novncproxy.service
 Created symlink from /etc/systemd/system/multi-user.target.wants/openstack-nova-api.service to /usr/lib/systemd/system/openstack-nova-api.service.

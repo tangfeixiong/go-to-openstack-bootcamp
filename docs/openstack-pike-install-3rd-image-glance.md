@@ -1,4 +1,4 @@
-# OpenStack Pike Installation
+# OpenStack Pike Installation － image
 
 ## Table of content
 
