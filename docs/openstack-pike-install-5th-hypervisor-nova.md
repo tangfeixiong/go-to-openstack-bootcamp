@@ -3060,6 +3060,8 @@ ConnectFailure: Unable to establish connection to http://10.64.33.64:8778/: HTTP
 ```
 
 Check  "/etc/httpd/conf.d/00-nova-placement-api.conf" and "httpd.service"
+
+But
 ```
 [vagrant@localhost ~]$ sudo nova-status upgrade check
 +-------------------------------------------------------------------+
@@ -3083,4 +3085,24 @@ Check  "/etc/httpd/conf.d/00-nova-placement-api.conf" and "httpd.service"
 |   http://docs.openstack.org/developer/nova/placement.html         |
 |   for more details.                                               |
 +-------------------------------------------------------------------+
+```
+
+Update `hostname` then `su -s /bin/sh -c "nova-manage cell_v2 discover_hosts --verbose" nova`
+```
+[vagrant@controller-10-64-33-64 ~]$ sudo nova-status upgrade check
++---------------------------+
+| Upgrade Check Results     |
++---------------------------+
+| Check: Cells v2           |
+| Result: Success           |
+| Details: None             |
++---------------------------+
+| Check: Placement API      |
+| Result: Success           |
+| Details: None             |
++---------------------------+
+| Check: Resource Providers |
+| Result: Success           |
+| Details: None             |
++---------------------------+
 ```
