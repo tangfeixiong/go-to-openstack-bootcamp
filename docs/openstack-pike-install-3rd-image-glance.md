@@ -3,7 +3,14 @@
 ## Table of content
 
 控制节点
+* [之前章节](./openstack-pike-install-1st-controller.md)
+* [之前Keystone部署中重要操作](./openstack-pike-install-2nd-keystone.md#system-project)
 * [Glance镜像服务](#image)
+    * [在数据库中登记image服务](#service-discovery)
+    * [安装及配置](#packages)
+    * [启动](#start)
+    * [检查日志](#logs)
+    * [cirros镜像](#create)
 
 ## Controller
 
@@ -17,7 +24,9 @@ Client
 [vagrant@localhost ~]$ . openstack-admin.sh 
 ```
 
-Registration
+### Service Discovery
+
+创建glance用户
 ```
 [vagrant@localhost ~]$ openstack user create --domain default --password SERVICE_PASS glance 
 +---------------------+----------------------------------+
@@ -30,7 +39,15 @@ Registration
 | options             | {}                               |
 | password_expires_at | None                             |
 +---------------------+----------------------------------+
+```
+
+分配角色
+```
 [vagrant@localhost ~]$ openstack role add --project service --user glance admin
+```
+
+登记服务
+```
 [vagrant@localhost ~]$ openstack service create --name glance --description "OpenStack Image" image
 +-------------+----------------------------------+
 | Field       | Value                            |
@@ -41,6 +58,10 @@ Registration
 | name        | glance                           |
 | type        | image                            |
 +-------------+----------------------------------+
+```
+
+服务发现
+```
 [vagrant@localhost ~]$ openstack endpoint create --region RegionOne image public http://10.64.33.64:9292
 +--------------+----------------------------------+
 | Field        | Value                            |
@@ -85,7 +106,9 @@ Registration
 +--------------+----------------------------------+
 ```
 
-Packages
+### Packages
+
+Install
 ```
 [vagrant@localhost ~]$ sudo yum install -y openstack-glance
 Loaded plugins: fastestmirror
@@ -351,7 +374,87 @@ Dependency Installed:
 Complete!
 ```
 
+Configure
+```
+[vagrant@localhost ~]$ sudo sed -i 's/^\[DEFAULT\]$/&\ndebug=true\nverbose=true\n/;s%^\[database\]$%&\nconnection=mysql+pymysql://glance:SERVICE_DBPASS@10.64.33.64/glance\n%;s%^\[keystone_authtoken\]$%&\nauth_uri=http://10.64.33.64:5000\nauth_url=http://10.64.33.64:35357\nmemcached_servers=10.64.33.64:11211\nauth_type=password\nproject_domain_name=default\nuser_domain_name=default\nproject_name=service\nusername=glance\npassword=SERVICE_PASS\n%;s/^\[paste_deploy\]$/&\nflavor=keystone\n/;s%^\[glance_store\]$%&\nstores=file,http\ndefault_store=file\nfilesystem_store_datadir=/var/lib/glance/images/\n%' /etc/glance/glance-api.conf
+```
 
+```
+[vagrant@localhost ~]$ sudo sed -i 's/^\[DEFAULT\]$/&\ndebug=true\nverbose=true\n/;s%^\[database\]$%&\nconnection=mysql+pymysql://glance:SERVICE_DBPASS@10.64.33.64/glance\n%;s%^\[keystone_authtoken\]$%&\nauth_uri=http://10.64.33.64:5000\nauth_url=http://10.64.33.64:35357\nmemcached_servers=10.64.33.64:11211\nauth_type=password\nproject_domain_name=default\nuser_domain_name=default\nproject_name=service\nusername=glance\npassword=SERVICE_PASS\n%;s/^\[paste_deploy\]$/&\nflavor=keystone\n/' /etc/glance/glance-registry.conf
+```
+
+View "glance-api.conf"
+```
+[vagrant@controller-10-64-33-64 ~]$ sudo cat /etc/glance/glance-api.conf | egrep '^[^#]'
+[DEFAULT]
+debug=true
+verbose=true
+[cors]
+[database]
+connection=mysql+pymysql://glance:SERVICE_DBPASS@10.64.33.64/glance
+[glance_store]
+stores=file,http
+default_store=file
+filesystem_store_datadir=/var/lib/glance/images/
+[image_format]
+[keystone_authtoken]
+auth_uri=http://10.64.33.64:5000
+auth_url=http://10.64.33.64:35357
+memcached_servers=10.64.33.64:11211
+auth_type=password
+project_domain_name=default
+user_domain_name=default
+project_name=service
+username=glance
+password=SERVICE_PASS
+[matchmaker_redis]
+[oslo_concurrency]
+[oslo_messaging_amqp]
+[oslo_messaging_kafka]
+[oslo_messaging_notifications]
+[oslo_messaging_rabbit]
+[oslo_messaging_zmq]
+[oslo_middleware]
+[oslo_policy]
+[paste_deploy]
+flavor=keystone
+[profiler]
+[store_type_location_strategy]
+[task]
+[taskflow_executor]
+```
+
+View "glance-registry.conf"
+```
+[vagrant@controller-10-64-33-64 ~]$ sudo cat /etc/glance/glance-registry.conf | egrep '^[^#]'
+[DEFAULT]
+debug=true
+verbose=true
+[database]
+connection=mysql+pymysql://glance:SERVICE_DBPASS@10.64.33.64/glance
+[keystone_authtoken]
+auth_uri=http://10.64.33.64:5000
+auth_url=http://10.64.33.64:35357
+memcached_servers=10.64.33.64:11211
+auth_type=password
+project_domain_name=default
+user_domain_name=default
+project_name=service
+username=glance
+password=SERVICE_PASS
+[matchmaker_redis]
+[oslo_messaging_amqp]
+[oslo_messaging_kafka]
+[oslo_messaging_notifications]
+[oslo_messaging_rabbit]
+[oslo_messaging_zmq]
+[oslo_policy]
+[paste_deploy]
+flavor=keystone
+[profiler]
+```
+
+### Start
 
 Database
 ```
@@ -424,15 +527,6 @@ Upgraded database to: pike01, current revision(s): pike01
 ```
 
 
-Configure
-```
-[vagrant@localhost ~]$ sudo sed -i 's/^\[DEFAULT\]$/&\ndebug=true\nverbose=true\n/;s%^\[database\]$%&\nconnection=mysql+pymysql://glance:SERVICE_DBPASS@10.64.33.64/glance\n%;s%^\[keystone_authtoken\]$%&\nauth_uri=http://10.64.33.64:5000\nauth_url=http://10.64.33.64:35357\nmemcached_servers=10.64.33.64:11211\nauth_type=password\nproject_domain_name=default\nuser_domain_name=default\nproject_name=service\nusername=glance\npassword=SERVICE_PASS\n%;s/^\[paste_deploy\]$/&\nflavor=keystone\n/;s%^\[glance_store\]$%&\nstores=file,http\ndefault_store=file\nfilesystem_store_datadir=/var/lib/glance/images/\n%' /etc/glance/glance-api.conf
-```
-
-```
-[vagrant@localhost ~]$ sudo sed -i 's/^\[DEFAULT\]$/&\ndebug=true\nverbose=true\n/;s%^\[database\]$%&\nconnection=mysql+pymysql://glance:SERVICE_DBPASS@10.64.33.64/glance\n%;s%^\[keystone_authtoken\]$%&\nauth_uri=http://10.64.33.64:5000\nauth_url=http://10.64.33.64:35357\nmemcached_servers=10.64.33.64:11211\nauth_type=password\nproject_domain_name=default\nuser_domain_name=default\nproject_name=service\nusername=glance\npassword=SERVICE_PASS\n%;s/^\[paste_deploy\]$/&\nflavor=keystone\n/' /etc/glance/glance-registry.conf
-```
-
 ```
 [vagrant@localhost ~]$ sudo systemctl start openstack-glance-api.service
 [vagrant@localhost ~]$ systemctl -l status openstack-glance-api.service
@@ -454,14 +548,14 @@ Configure
            └─29416 /usr/bin/python2 /usr/bin/glance-registry
 ```
 
-Config Auto Starting
+Set Auto Starting when reboot
 ```
 [vagrant@localhost ~]$ sudo systemctl enable openstack-glance-api.service openstack-glance-registry.service
 Created symlink from /etc/systemd/system/multi-user.target.wants/openstack-glance-api.service to /usr/lib/systemd/system/openstack-glance-api.service.
 Created symlink from /etc/systemd/system/multi-user.target.wants/openstack-glance-registry.service to /usr/lib/systemd/system/openstack-glance-registry.service.
 ```
 
-
+Networking
 ```
 [vagrant@localhost ~]$ sudo netstat -tpnl
 Active Internet connections (only servers)
@@ -485,6 +579,9 @@ tcp6       0      0 :::5000                 :::*                    LISTEN      
 tcp6       0      0 :::5672                 :::*                    LISTEN      23134/beam          
 ```
 
+### Logs
+
+Verifying
 ```
 [vagrant@localhost ~]$ sudo tail /var/log/glance/api.log
 2017-10-21 00:37:50.698 29381 DEBUG glance_store.backend [-] Attempting to import store file _load_store /usr/lib/python2.7/site-packages/glance_store/backend.py:231
@@ -513,7 +610,7 @@ tcp6       0      0 :::5672                 :::*                    LISTEN      
 2017-10-21 00:38:24.401 29416 INFO eventlet.wsgi.server [-] (29416) wsgi starting up on http://0.0.0.0:9191
 ```
 
-Verifying
+### Create
 
 Cirros
 ```

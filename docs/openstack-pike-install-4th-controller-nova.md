@@ -3,6 +3,7 @@
 ## Table of content
 
 控制节点
+* [之前章节](./openstack-pike-install-3rd-image-glance.md)
 * [Nova服务](#compute)
 
 ## Controller

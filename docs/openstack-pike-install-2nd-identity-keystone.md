@@ -963,10 +963,62 @@ Modify "keystone.conf"
 [vagrant@localhost ~]$ sudo sed -i 's/^\[DEFAULT\]$/&\ndebug=true\nverbose=true\n/;s%^\[database\]$%&\nconnection=mysql+pymysql://keystone:KEYSTONE_DBPASS@10.64.33.64/keystone\n%;s/^\[token\]$/&\nprovider=fernet\n/' /etc/keystone/keystone.conf
 ```
 
+Modification of "keystone.conf"
+```
+[vagrant@controller-10-64-33-64 ~]$ sudo cat /etc/keystone/keystone.conf | egrep '^[^#]'
+[DEFAULT]
+debug=true
+verbose=true
+[assignment]
+[auth]
+[cache]
+[catalog]
+[cors]
+[credential]
+[database]
+connection=mysql+pymysql://keystone:KEYSTONE_DBPASS@10.64.33.64/keystone
+[domain_config]
+[endpoint_filter]
+[endpoint_policy]
+[eventlet_server]
+[federation]
+[fernet_tokens]
+[healthcheck]
+[identity]
+[identity_mapping]
+[ldap]
+[matchmaker_redis]
+[memcache]
+[oauth1]
+[oslo_messaging_amqp]
+[oslo_messaging_kafka]
+[oslo_messaging_notifications]
+[oslo_messaging_rabbit]
+[oslo_messaging_zmq]
+[oslo_middleware]
+[oslo_policy]
+[paste_deploy]
+[policy]
+[profiler]
+[resource]
+[revoke]
+[role]
+[saml]
+[security_compliance]
+[shadow_users]
+[signing]
+[token]
+provider=fernet
+[tokenless_auth]
+[trust]
+```
+
+Create tables
 ```
 [vagrant@localhost ~]$ sudo su -s /bin/sh -c "keystone-manage db_sync" keystone
 ```
 
+Now have a look at
 ```
 [vagrant@localhost ~]$ mysql -u keystone --password=KEYSTONE_DBPASS -e "show tables in keystone;"
 +------------------------+
@@ -1013,19 +1065,27 @@ Modify "keystone.conf"
 +------------------------+
 ```
 
-Using _fernet_
+Using _fernet_ token encryption/decrption
 ```
 [vagrant@localhost ~]$ sudo keystone-manage fernet_setup --keystone-user keystone --keystone-group keystone
 ```
 
+Initialize _admin_ user rows
 ```
 [vagrant@localhost ~]$ sudo keystone-manage credential_setup --keystone-user keystone --keystone-group keystone
 ```
 
+Initialize _keystone_ service catalog
 ```
 [vagrant@localhost ~]$ sudo keystone-manage bootstrap --bootstrap-password ADMIN_PASS --bootstrap-admin-url http://10.64.33.64:35357/v3/ --bootstrap-internal-url http://10.64.33.64:5000/v3/ --bootstrap-public-url http://10.64.33.64:5000/v3/ --bootstrap-region-id RegionOne
 ```
 
+Look at location of _fernet_ key
+```
+[vagrant@controller-10-64-33-64 ~]$ sudo ls /etc/keystone/fernet-keys
+```
+
+Look at initial rows
 ```
 [vagrant@localhost ~]$ mysql -u keystone --password=KEYSTONE_DBPASS -e "select * from keystone.project;"
 +----------------------------------+--------------------------+-------+-----------------------------------------------+---------+--------------------------+-----------+-----------+
