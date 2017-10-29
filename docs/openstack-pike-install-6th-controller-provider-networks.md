@@ -542,7 +542,7 @@ Backup "ml2_conf.ini"
 
 Sed "ml2_conf.ini"
 ```
-[vagrant@localhost ~]$ sudo sed 's/^\[ml2\]$/&\ntype_drivers=flat,vlan\ntenant_network_types=\nmechanism_drivers=linuxbridge\nextension_drivers=port_security\n/;s/^\[ml2_type_flat\]$/&\nflat_networks=provider\n/;s/^\[securitygroup\]$/enable_ipset=true\n/' etc0x2Fneutron0x2Fplugins0x2Fml20x2Fml2_conf.ini > ml2_conf.ini.provider-networks
+[vagrant@localhost ~]$ sudo sed 's/^\[ml2\]$/&\ntype_drivers=flat,vlan\ntenant_network_types=\nmechanism_drivers=linuxbridge\nextension_drivers=port_security\n/;s/^\[ml2_type_flat\]$/&\nflat_networks=provider\n/;s/^\[securitygroup\]$/&\nenable_ipset=true\n/' etc0x2Fneutron0x2Fplugins0x2Fml20x2Fml2_conf.ini > ml2_conf.ini.provider-networks
 ```
 
 Modify "ml2_conf.ini"
@@ -553,6 +553,25 @@ Modify "ml2_conf.ini"
 Specify current plugin
 ```
 [vagrant@localhost ~]$ sudo ln -s /etc/neutron/plugins/ml2/ml2_conf.ini /etc/neutron/plugin.ini
+```
+
+View "ml2_conf.ini"
+```
+[vagrant@controller-10-64-33-64 ~]$ sudo cat /etc/neutron/plugin.ini | egrep '^[^#]'
+[DEFAULT]
+[ml2]
+type_drivers=flat,vlan
+tenant_network_types=
+mechanism_drivers=linuxbridge
+extension_drivers=port_security
+[ml2_type_flat]
+flat_networks=provider
+[ml2_type_geneve]
+[ml2_type_gre]
+[ml2_type_vlan]
+[ml2_type_vxlan]
+[securitygroup]
+enable_ipset=true
 ```
 
 Backup "linuxbridge_agent.ini"
@@ -568,6 +587,20 @@ Sed "linuxbridge_agent.ini"
 Modify "linuxbridge_agen.ini"
 ```
 [vagrant@localhost ~]$ sudo cp linuxbridge_agent.ini.provider-networks /etc/neutron/plugins/ml2/linuxbridge_agent.ini 
+```
+
+View "linuxbridge_agent.ini"
+```
+[vagrant@controller-10-64-33-64 ~]$ sudo cat /etc/neutron/plugins/ml2/linuxbridge_agent.ini | egrep '^[^#]'
+[DEFAULT]
+[agent]
+[linux_bridge]
+physical_interface_mappings=provider:eth2
+[securitygroup]
+enable_security_group=true
+firewall_driver=neutron.agent.linux.iptables_firewall.IptablesFirewallDriver
+[vxlan]
+enable_vxlan=false
 ```
 
 Backup "dhcp_agent.ini"

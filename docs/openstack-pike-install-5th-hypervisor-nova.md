@@ -2941,7 +2941,7 @@ Log
 2017-10-21 15:27:19.236 5281 DEBUG oslo_service.periodic_task [req-12469637-7fda-42c1-a612-8f2f0ae7d4e5 - - - - -] Running periodic task ComputeManager._check_instance_build_time run_periodic_tasks /usr/lib/python2.7/site-packages/oslo_service/periodic_task.py:215
 ```
 
-Enable auto-staring
+Set auto-staring for reboot
 ```
 [vagrant@localhost ~]$ sudo systemctl enable openstack-nova-compute.service 
 Created symlink from /etc/systemd/system/multi-user.target.wants/openstack-nova-compute.service to /usr/lib/systemd/system/openstack-nova-compute.service.
@@ -2990,6 +2990,7 @@ Alternatively, need to auto schedule newly added node
 ```
 sed -i 's/#discover_hosts_in_cells_interval=-1/discover_hosts_in_cells_interval=300/' /etc/nova/nova.conf
 ```
+
 ### Verifying
 
 From controller node
