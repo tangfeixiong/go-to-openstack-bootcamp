@@ -1,3 +1,6 @@
 /bin
 /kopos/bin
 **/_vendor
+/examples
+/guacamole
+/Users
