@@ -1,6 +1,7 @@
 # OpenStack Pike Installation － 创建虚拟机步骤
 
 ## Table of contents
+
 控制节点
 * 确认环境
 * [套餐](#flavor)
@@ -9,9 +10,11 @@
 * [准备虚拟网络](#dhcp-networking)
 * [创建虚拟网络](#provider-network)
 * [创建虚拟机](#launch)
+
 计算节点
 * [iproute2调试](#vm-networking)
 * [arp和virsh调试][#debug]
+
 虚拟机如何从DHCP服务器正常获取IP地址
 * [在VirtualBox中开启混杂模式](#promiscuous)
 
