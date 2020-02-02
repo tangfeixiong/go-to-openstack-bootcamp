@@ -1227,4 +1227,4 @@ $ exit
 login as 'cirros' user. default password: 'cubswin:)'. use 'sudo' for root.
 cirros1-subnet1 login: 
 ```
-按strl-]返回主机终端模式
+按ctrl-]返回主机终端模式
