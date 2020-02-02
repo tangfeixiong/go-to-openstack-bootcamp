@@ -1,0 +1,291 @@
+
+https://docs.openstack.org/horizon/train/install/install-ubuntu.html
+
+root@wei-ThinkPad-X1-Extreme:~# apt-get install -y openstack-dashboard
+Reading package lists... Done
+Building dependency tree       
+Reading state information... Done
+The following packages were automatically installed and are no longer required:
+  fonts-liberation2 fonts-opensymbol gir1.2-geocodeglib-1.0
+  gir1.2-gst-plugins-base-1.0 gir1.2-gstreamer-1.0 gir1.2-gudev-1.0
+  gir1.2-udisks-2.0 grilo-plugins-0.3-base gstreamer1.0-gtk3
+  libboost-date-time1.65.1 libboost-filesystem1.65.1 libboost-iostreams1.65.1
+  libboost-locale1.65.1 libcdr-0.1-1 libclucene-contribs1v5 libclucene-core1v5
+  libcmis-0.5-5v5 libcolamd2 libdazzle-1.0-0 libe-book-0.1-1
+  libedataserverui-1.2-2 libeot0 libepubgen-0.1-1 libetonyek-0.1-1 libexiv2-14
+  libfreerdp-client2-2 libfreerdp2-2 libgc1c2 libgee-0.8-2 libgexiv2-2
+  libgom-1.0-0 libgpgmepp6 libgpod-common libgpod4 liblangtag-common
+  liblangtag1 liblirc-client0 libllvm8 libmediaart-2.0-0 libmspub-0.1-1
+  libodfgen-0.1-1 libqqwing2v5 libraw16 librevenge-0.0-0 libsgutils2-2
+  libssh-4 libsuitesparseconfig5 libvncclient1 libwinpr2-2 libxapian30
+  libxmlsec1-nss lp-solve media-player-info syslinux syslinux-common
+  syslinux-legacy usb-creator-common
+Use 'apt autoremove' to remove them.
+The following additional packages will be installed:
+  openstack-dashboard-common python-django-common python3-bson
+  python3-bson-ext python3-csscompressor python3-django python3-django-appconf
+  python3-django-babel python3-django-compressor python3-django-debreach
+  python3-django-horizon python3-django-openstack-auth python3-django-pyscss
+  python3-gridfs python3-heatclient python3-pint python3-pymongo
+  python3-pymongo-ext python3-pyscss python3-rcssmin python3-rjsmin
+Suggested packages:
+  bpython3 geoip-database-contrib ipython3 libgdal1 python-django-doc
+  python3-flup python3-sqlite python-django-appconf-doc
+  python-django-babel-doc python-pymongo-doc
+The following NEW packages will be installed:
+  openstack-dashboard openstack-dashboard-common python-django-common
+  python3-bson python3-bson-ext python3-csscompressor python3-django
+  python3-django-appconf python3-django-babel python3-django-compressor
+  python3-django-debreach python3-django-horizon python3-django-openstack-auth
+  python3-django-pyscss python3-gridfs python3-heatclient python3-pint
+  python3-pymongo python3-pymongo-ext python3-pyscss python3-rcssmin
+  python3-rjsmin
+0 upgraded, 22 newly installed, 0 to remove and 0 not upgraded.
+Need to get 12.8 MB of archives.
+After this operation, 88.1 MB of additional disk space will be used.
+Get:1 http://ubuntu-cloud.archive.canonical.com/ubuntu bionic-updates/stein/main amd64 python3-django-debreach all 1.5.2-0ubuntu1~cloud0 [7,404 B]
+Get:2 http://cn.archive.ubuntu.com/ubuntu bionic-updates/main amd64 python-django-common all 1:1.11.11-1ubuntu1.6 [1,522 kB]
+Get:3 http://ubuntu-cloud.archive.canonical.com/ubuntu bionic-updates/train/main amd64 python3-heatclient all 1.18.0-0ubuntu1~cloud0 [120 kB]
+Get:4 http://cn.archive.ubuntu.com/ubuntu bionic-updates/main amd64 python3-django all 1:1.11.11-1ubuntu1.6 [900 kB]
+Get:5 http://cn.archive.ubuntu.com/ubuntu bionic/main amd64 python3-bson amd64 3.6.1+dfsg1-1 [31.8 kB]
+Get:6 http://cn.archive.ubuntu.com/ubuntu bionic/main amd64 python3-bson-ext amd64 3.6.1+dfsg1-1 [20.5 kB]
+Get:7 http://cn.archive.ubuntu.com/ubuntu bionic/universe amd64 python3-csscompressor all 0.9.4-2 [56.6 kB]
+Get:8 http://cn.archive.ubuntu.com/ubuntu bionic/universe amd64 python3-django-babel all 0.6.2-1 [11.6 kB]
+Get:9 http://cn.archive.ubuntu.com/ubuntu bionic/universe amd64 python3-django-appconf all 1.0.2-3 [7,404 B]
+Get:10 http://cn.archive.ubuntu.com/ubuntu bionic/universe amd64 python3-rcssmin amd64 1.0.6-1ubuntu3 [18.0 kB]
+Get:11 http://cn.archive.ubuntu.com/ubuntu bionic/universe amd64 python3-rjsmin amd64 1.0.12+dfsg1-2ubuntu3 [17.2 kB]
+Get:12 http://cn.archive.ubuntu.com/ubuntu bionic/universe amd64 python3-django-compressor all 2.2-4 [61.7 kB]
+Get:13 http://cn.archive.ubuntu.com/ubuntu bionic/universe amd64 python3-pyscss amd64 1.3.5-2build2 [105 kB]
+Get:14 http://cn.archive.ubuntu.com/ubuntu bionic/universe amd64 python3-django-pyscss all 2.0.2-8 [9,112 B]
+Get:15 http://cn.archive.ubuntu.com/ubuntu bionic/main amd64 python3-gridfs all 3.6.1+dfsg1-1 [15.0 kB]
+Get:16 http://cn.archive.ubuntu.com/ubuntu bionic/universe amd64 python3-pint all 0.8.1-2 [98.3 kB]
+Get:17 http://cn.archive.ubuntu.com/ubuntu bionic/main amd64 python3-pymongo amd64 3.6.1+dfsg1-1 [125 kB]
+Get:18 http://cn.archive.ubuntu.com/ubuntu bionic/main amd64 python3-pymongo-ext amd64 3.6.1+dfsg1-1 [11.0 kB]
+Get:19 http://ubuntu-cloud.archive.canonical.com/ubuntu bionic-updates/train/main amd64 openstack-dashboard-common all 3:16.0.0-0ubuntu1~cloud0 [24.2 kB]
+Get:20 http://ubuntu-cloud.archive.canonical.com/ubuntu bionic-updates/train/main amd64 python3-django-openstack-auth all 3:16.0.0-0ubuntu1~cloud0 [60.4 kB]
+Get:21 http://ubuntu-cloud.archive.canonical.com/ubuntu bionic-updates/train/main amd64 python3-django-horizon all 3:16.0.0-0ubuntu1~cloud0 [9,586 kB]
+Get:22 http://ubuntu-cloud.archive.canonical.com/ubuntu bionic-updates/train/main amd64 openstack-dashboard all 3:16.0.0-0ubuntu1~cloud0 [17.5 kB]
+Fetched 12.8 MB in 20min 23s (10.5 kB/s)                                       
+Selecting previously unselected package python-django-common.
+(Reading database ... 228315 files and directories currently installed.)
+Preparing to unpack .../00-python-django-common_1%3a1.11.11-1ubuntu1.6_all.deb ...
+Unpacking python-django-common (1:1.11.11-1ubuntu1.6) ...
+Selecting previously unselected package python3-django.
+Preparing to unpack .../01-python3-django_1%3a1.11.11-1ubuntu1.6_all.deb ...
+Unpacking python3-django (1:1.11.11-1ubuntu1.6) ...
+Selecting previously unselected package python3-bson.
+Preparing to unpack .../02-python3-bson_3.6.1+dfsg1-1_amd64.deb ...
+Unpacking python3-bson (3.6.1+dfsg1-1) ...
+Selecting previously unselected package python3-bson-ext.
+Preparing to unpack .../03-python3-bson-ext_3.6.1+dfsg1-1_amd64.deb ...
+Unpacking python3-bson-ext (3.6.1+dfsg1-1) ...
+Selecting previously unselected package python3-csscompressor.
+Preparing to unpack .../04-python3-csscompressor_0.9.4-2_all.deb ...
+Unpacking python3-csscompressor (0.9.4-2) ...
+Selecting previously unselected package python3-django-babel.
+Preparing to unpack .../05-python3-django-babel_0.6.2-1_all.deb ...
+Unpacking python3-django-babel (0.6.2-1) ...
+Selecting previously unselected package python3-django-appconf.
+Preparing to unpack .../06-python3-django-appconf_1.0.2-3_all.deb ...
+Unpacking python3-django-appconf (1.0.2-3) ...
+Selecting previously unselected package python3-rcssmin.
+Preparing to unpack .../07-python3-rcssmin_1.0.6-1ubuntu3_amd64.deb ...
+Unpacking python3-rcssmin (1.0.6-1ubuntu3) ...
+Selecting previously unselected package python3-rjsmin.
+Preparing to unpack .../08-python3-rjsmin_1.0.12+dfsg1-2ubuntu3_amd64.deb ...
+Unpacking python3-rjsmin (1.0.12+dfsg1-2ubuntu3) ...
+Selecting previously unselected package python3-django-compressor.
+Preparing to unpack .../09-python3-django-compressor_2.2-4_all.deb ...
+Unpacking python3-django-compressor (2.2-4) ...
+Selecting previously unselected package python3-django-debreach.
+Preparing to unpack .../10-python3-django-debreach_1.5.2-0ubuntu1~cloud0_all.deb ...
+Unpacking python3-django-debreach (1.5.2-0ubuntu1~cloud0) ...
+Selecting previously unselected package python3-pyscss.
+Preparing to unpack .../11-python3-pyscss_1.3.5-2build2_amd64.deb ...
+Unpacking python3-pyscss (1.3.5-2build2) ...
+Selecting previously unselected package python3-django-pyscss.
+Preparing to unpack .../12-python3-django-pyscss_2.0.2-8_all.deb ...
+Unpacking python3-django-pyscss (2.0.2-8) ...
+Selecting previously unselected package python3-gridfs.
+Preparing to unpack .../13-python3-gridfs_3.6.1+dfsg1-1_all.deb ...
+Unpacking python3-gridfs (3.6.1+dfsg1-1) ...
+Selecting previously unselected package python3-heatclient.
+Preparing to unpack .../14-python3-heatclient_1.18.0-0ubuntu1~cloud0_all.deb ...
+Unpacking python3-heatclient (1.18.0-0ubuntu1~cloud0) ...
+Selecting previously unselected package python3-pint.
+Preparing to unpack .../15-python3-pint_0.8.1-2_all.deb ...
+Unpacking python3-pint (0.8.1-2) ...
+Selecting previously unselected package python3-pymongo.
+Preparing to unpack .../16-python3-pymongo_3.6.1+dfsg1-1_amd64.deb ...
+Unpacking python3-pymongo (3.6.1+dfsg1-1) ...
+Selecting previously unselected package python3-pymongo-ext.
+Preparing to unpack .../17-python3-pymongo-ext_3.6.1+dfsg1-1_amd64.deb ...
+Unpacking python3-pymongo-ext (3.6.1+dfsg1-1) ...
+Selecting previously unselected package openstack-dashboard-common.
+Preparing to unpack .../18-openstack-dashboard-common_3%3a16.0.0-0ubuntu1~cloud0_all.deb ...
+Unpacking openstack-dashboard-common (3:16.0.0-0ubuntu1~cloud0) ...
+Selecting previously unselected package python3-django-openstack-auth.
+Preparing to unpack .../19-python3-django-openstack-auth_3%3a16.0.0-0ubuntu1~cloud0_all.deb ...
+Unpacking python3-django-openstack-auth (3:16.0.0-0ubuntu1~cloud0) ...
+Selecting previously unselected package python3-django-horizon.
+Preparing to unpack .../20-python3-django-horizon_3%3a16.0.0-0ubuntu1~cloud0_all.deb ...
+Unpacking python3-django-horizon (3:16.0.0-0ubuntu1~cloud0) ...
+Selecting previously unselected package openstack-dashboard.
+Preparing to unpack .../21-openstack-dashboard_3%3a16.0.0-0ubuntu1~cloud0_all.deb ...
+Unpacking openstack-dashboard (3:16.0.0-0ubuntu1~cloud0) ...
+Setting up openstack-dashboard-common (3:16.0.0-0ubuntu1~cloud0) ...
+Setting up python3-pint (0.8.1-2) ...
+Setting up python3-gridfs (3.6.1+dfsg1-1) ...
+Setting up python3-pyscss (1.3.5-2build2) ...
+update-alternatives: using /usr/bin/python3-pyscss to provide /usr/bin/pyscss (pyscss) in auto mode
+update-alternatives: using /usr/bin/python3-less2scss to provide /usr/bin/less2scss (less2scss) in auto mode
+Setting up python3-rcssmin (1.0.6-1ubuntu3) ...
+Setting up python3-heatclient (1.18.0-0ubuntu1~cloud0) ...
+Setting up python3-csscompressor (0.9.4-2) ...
+Setting up python-django-common (1:1.11.11-1ubuntu1.6) ...
+Setting up python3-rjsmin (1.0.12+dfsg1-2ubuntu3) ...
+Setting up python3-bson (3.6.1+dfsg1-1) ...
+Setting up python3-bson-ext (3.6.1+dfsg1-1) ...
+Setting up python3-django (1:1.11.11-1ubuntu1.6) ...
+Setting up python3-django-babel (0.6.2-1) ...
+Setting up python3-pymongo (3.6.1+dfsg1-1) ...
+Setting up python3-pymongo-ext (3.6.1+dfsg1-1) ...
+Setting up python3-django-debreach (1.5.2-0ubuntu1~cloud0) ...
+Setting up python3-django-appconf (1.0.2-3) ...
+Setting up python3-django-compressor (2.2-4) ...
+Setting up python3-django-pyscss (2.0.2-8) ...
+Setting up python3-django-openstack-auth (3:16.0.0-0ubuntu1~cloud0) ...
+Setting up python3-django-horizon (3:16.0.0-0ubuntu1~cloud0) ...
+update-alternatives: using /usr/lib/python3/dist-packages/openstack_dashboard to provide /usr/share/openstack-dashboard/openstack_dashboard (openstack_dashboard) in auto mode
+Setting up openstack-dashboard (3:16.0.0-0ubuntu1~cloud0) ...
+Adding system user `horizon' (UID 136) ...
+Adding new user `horizon' (UID 136) with group `horizon' ...
+Not creating home directory `/var/lib/openstack-dashboard'.
+Collecting and compressing static assets...
+apache2_invoke: Enable configuration openstack-dashboard.conf
+Processing triggers for man-db (2.8.3-2ubuntu0.1) ...
+
+
+root@wei-ThinkPad-X1-Extreme:~# systemctl reload apache2.service
+
+
+
+## Admin/User guide
+
+### VM Image
+
+Reference 
+
+- https://docs.openstack.org/horizon/train/admin/manage-images.html
+- https://docs.openstack.org/horizon/train/user/manage-images.html#upload-an-image
+
+(./img-train/Screenshot from 2020-02-01 17-24-36.png)
+
+Community
+
++ https://mirrors.tuna.tsinghua.edu.cn/ubuntu-cloud-images/
++ https://cloud.centos.org/centos/7/images/
++ https://cloud-images.ubuntu.com/releases/bionic/release/
++ http://download.cirros-cloud.net/
+
+Operation
+
+(./img-train/Screenshot from 2020-02-01 17-58-40.png)
+
+
+### VM Flavor
+
+https://docs.openstack.org/horizon/train/admin/manage-flavors.html
+
+### Access and Security
+
+__Security Group__
+
+https://docs.openstack.org/horizon/train/user/configure-access-and-security-for-instances.html
+
+Operation
+
+(./img-train/Screenshot from 2020-02-01 18-16-37.png)
+
+
+__key pair__
+
+wei@wei-ThinkPad-X1-Extreme:~$ chmod 400 Downloads/keypair-train.pem 
+
+(./img-train/Screenshot from 2020-02-01 18-28-24.png)
+
+
+### VPC
+
+https://docs.openstack.org/neutron/train/admin/archives/use.html
+
+(./img-train/Screenshot from 2020-02-01 19-00-42.png)
+
+https://docs.openstack.org/horizon/train/user/create-networks.html#create-a-network
+
+(./img-train/Screenshot from 2020-02-01 19-14-41.png)
+
+
+### launch
+
+https://docs.openstack.org/horizon/train/user/launch-instances.html
+
+(./img-train/Screenshot from 2020-02-01 19-40-40.png)
+
+root@wei-ThinkPad-X1-Extreme:~# ip a
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+       valid_lft forever preferred_lft forever
+    inet6 ::1/128 scope host 
+       valid_lft forever preferred_lft forever
+2: enp0s31f6: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc fq_codel master brq0e3e8576-77 state DOWN group default qlen 1000
+    link/ether 48:2a:e3:28:43:fa brd ff:ff:ff:ff:ff:ff
+3: wlp0s20f3: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP group default qlen 1000
+    link/ether 20:79:18:28:b4:0f brd ff:ff:ff:ff:ff:ff
+    inet 192.168.0.106/24 brd 192.168.0.255 scope global dynamic noprefixroute wlp0s20f3
+       valid_lft 579325sec preferred_lft 579325sec
+    inet6 fe80::d124:7c48:3db:601/64 scope link noprefixroute 
+       valid_lft forever preferred_lft forever
+12: brqcb0c8be8-b3: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1450 qdisc noqueue state UP group default qlen 1000
+    link/ether 6a:19:1b:6b:93:5d brd ff:ff:ff:ff:ff:ff
+14: vxlan-4: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1450 qdisc noqueue master brqcb0c8be8-b3 state UNKNOWN group default qlen 1000
+    link/ether e2:e1:70:54:26:9f brd ff:ff:ff:ff:ff:ff
+15: tapfb409ad1-b7@if2: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1450 qdisc noqueue master brqcb0c8be8-b3 state UP group default qlen 1000
+    link/ether 6a:19:1b:6b:93:5d brd ff:ff:ff:ff:ff:ff link-netnsid 0
+16: tap9b7855b5-6f@if3: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue master brq0e3e8576-77 state UP group default qlen 1000
+    link/ether f6:f9:16:a8:05:30 brd ff:ff:ff:ff:ff:ff link-netnsid 0
+17: tapacc343dc-8c@if2: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1450 qdisc noqueue master brqcb0c8be8-b3 state UP group default qlen 1000
+    link/ether 6e:a9:62:ac:8a:bf brd ff:ff:ff:ff:ff:ff link-netnsid 1
+18: brq0e3e8576-77: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP group default qlen 1000
+    link/ether 48:2a:e3:28:43:fa brd ff:ff:ff:ff:ff:ff
+    inet6 fe80::a4e9:51ff:fe06:5dde/64 scope link 
+       valid_lft forever preferred_lft forever
+19: tap2c50da6d-8a: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1450 qdisc fq_codel master brqcb0c8be8-b3 state UNKNOWN group default qlen 1000
+    link/ether fe:16:3e:22:1e:08 brd ff:ff:ff:ff:ff:ff
+    inet6 fe80::fc16:3eff:fe22:1e08/64 scope link 
+       valid_lft forever preferred_lft forever
+
+root@wei-ThinkPad-X1-Extreme:~# ip netns exec qrouter-ca10c594-6bb5-4b5b-a3f6-a60196b195b0 ip r
+10.20.30.0/24 dev qr-fb409ad1-b7 proto kernel scope link src 10.20.30.1 
+192.168.0.0/24 dev qg-9b7855b5-6f proto kernel scope link src 192.168.0.202 
+
+root@wei-ThinkPad-X1-Extreme:~# ip net exec qdhcp-cb0c8be8-b36b-4bb6-935d-4024d44c38bc ping -c3 10.20.30.164
+PING 10.20.30.164 (10.20.30.164) 56(84) bytes of data.
+64 bytes from 10.20.30.164: icmp_seq=1 ttl=64 time=0.413 ms
+64 bytes from 10.20.30.164: icmp_seq=2 ttl=64 time=0.419 ms
+64 bytes from 10.20.30.164: icmp_seq=3 ttl=64 time=0.499 ms
+
+--- 10.20.30.164 ping statistics ---
+3 packets transmitted, 3 received, 0% packet loss, time 2035ms
+rtt min/avg/max/mdev = 0.413/0.443/0.499/0.046 ms
+
+root@wei-ThinkPad-X1-Extreme:~# ip netns exec qrouter-ca10c594-6bb5-4b5b-a3f6-a60196b195b0 ssh cirros@10.20.30.164
+The authenticity of host '10.20.30.164 (10.20.30.164)' can't be established.
+ECDSA key fingerprint is SHA256:Y/LUJvx9EcRyRTEEoyKLc6lYjvLLv6EJITZooqoKri8.
+Are you sure you want to continue connecting (yes/no)? yes
+Warning: Permanently added '10.20.30.164' (ECDSA) to the list of known hosts.
+cirros@10.20.30.164's password: 
+
+
+

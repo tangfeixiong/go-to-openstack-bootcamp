@@ -1,0 +1,87 @@
+
+https://askubuntu.com/questions/1050816/ubuntu-18-04-as-a-router
+
+root@wei-ThinkPad-X1-Extreme:~# ufw enable
+Firewall is active and enabled on system startup
+root@wei-ThinkPad-X1-Extreme:~# ufw logging on
+Logging enabled
+
+root@wei-ThinkPad-X1-Extreme:~# cat /etc/default/ufw | grep DEFAULT_FORWARD_POLICY
+DEFAULT_FORWARD_POLICY="DROP"
+
+root@wei-ThinkPad-X1-Extreme:~# sed -i "s/DEFAULT_FORWARD_POLICY=\"DROP\"/# &\nDEFAULT_FORWARD_POLICY=\"ACCEPT\"/" /etc/default/ufw 
+
+
+root@wei-ThinkPad-X1-Extreme:~# cat /etc/default/ufw | grep DEFAULT_FORWARD_POLICY
+# DEFAULT_FORWARD_POLICY="DROP"
+DEFAULT_FORWARD_POLICY="ACCEPT"
+
+
+root@wei-ThinkPad-X1-Extreme:~# cat /etc/sysctl.conf | grep "net.ipv4.ip_forward"
+#net.ipv4.ip_forward=1
+root@wei-ThinkPad-X1-Extreme:~# cat /etc/sysctl.conf | grep "net.ipv4.conf.all.forwarding"
+root@wei-ThinkPad-X1-Extreme:~# cat /etc/sysctl.conf | grep "net.ipv6.conf.default.forwarding"
+
+
+root@wei-ThinkPad-X1-Extreme:~# sed -i "1 i net.ipv4.ip_forward=1\nnet.ipv4.conf.all.forwarding=1\nnet.ipv6.conf.default.forwarding=1\n" /etc/sysctl.conf 
+
+
+root@wei-ThinkPad-X1-Extreme:~# cat >snat.rules <<EOF
+> # nat Table rules
+> *nat
+> :POSTROUTING ACCEPT [0:0]
+> # Forward traffic from tap1 through wifi
+> -A POSTROUTING -s 192.168.192.0/24 -o wlp0s20f3 -j MASQUERADE
+> 
+> COMMIT
+> EOF
+
+root@wei-ThinkPad-X1-Extreme:~# vi /etc/ufw/before.rules 
+
+root@wei-ThinkPad-X1-Extreme:~# ufw disable && ufw enable
+Firewall stopped and disabled on system startup
+Firewall is active and enabled on system startup
+
+root@wei-ThinkPad-X1-Extreme:~# iptables -t nat -L POSTROUTING -v -n
+Chain POSTROUTING (policy ACCEPT 59 packets, 3731 bytes)
+ pkts bytes target     prot opt in     out     source               destination         
+    0     0 MASQUERADE  all  --  *      wlp0s20f3  192.168.192.0/24     0.0.0.0/0         
+
+
+
+wei@wei-ThinkPad-X1-Extreme:~/go-to-openstack-bootcamp/docs$ ip netns
+qrouter-f46292f9-3e0d-427e-83dc-13d803537360 (id: 2)
+qdhcp-13d1dd1d-71d5-4b2e-8876-45158bdfe7f8 (id: 0)
+qdhcp-cb0c8be8-b36b-4bb6-935d-4024d44c38bc (id: 1)
+
+  
+root@wei-ThinkPad-X1-Extreme:~# ip netns exec qrouter-f46292f9-3e0d-427e-83dc-13d803537360 ssh cirros@10.20.30.146
+The authenticity of host '10.20.30.146 (10.20.30.146)' can't be established.
+ECDSA key fingerprint is SHA256:emZ7n+O6y3FvNm+Gm1KCNxu08ZgqK9H+FxOS0oHG38w.
+Are you sure you want to continue connecting (yes/no)? yes
+Warning: Permanently added '10.20.30.146' (ECDSA) to the list of known hosts.
+cirros@10.20.30.146's password: 
+
+
+$ ping -c3 192.168.0.106
+PING 192.168.0.106 (192.168.0.106): 56 data bytes
+64 bytes from 192.168.0.106: seq=0 ttl=63 time=0.479 ms
+64 bytes from 192.168.0.106: seq=1 ttl=63 time=0.435 ms
+64 bytes from 192.168.0.106: seq=2 ttl=63 time=0.445 ms
+
+--- 192.168.0.106 ping statistics ---
+3 packets transmitted, 3 packets received, 0% packet loss
+round-trip min/avg/max = 0.435/0.453/0.479 ms
+
+
+$ ping -c3 114.114.114.114
+PING 114.114.114.114 (114.114.114.114): 56 data bytes
+64 bytes from 114.114.114.114: seq=0 ttl=78 time=21.120 ms
+64 bytes from 114.114.114.114: seq=1 ttl=84 time=18.630 ms
+64 bytes from 114.114.114.114: seq=2 ttl=73 time=18.824 ms
+
+--- 114.114.114.114 ping statistics ---
+3 packets transmitted, 3 packets received, 0% packet loss
+round-trip min/avg/max = 18.630/19.524/21.120 ms
+
+

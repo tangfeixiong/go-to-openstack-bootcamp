@@ -1,6 +1,33 @@
 OpenStack Boot Camp
 ====================
 
+Table of contents
+-----------------
+
+Openstack (Train) bash install hands-on
+
+1. [./docs/openstack-train-devops1-env.txt](./docs/openstack-train-devops1-env.txt)
+1. [./docs/openstack-train-devops2-db-queue-cache.txt](./docs/openstack-train-devops2-db-queue-cache.txt)
+1. [./docs/openstack-train-devops3-keystone.txt](./docs/openstack-train-devops3-keystone.txt)
+1. [./docs/openstack-train-devops4-glance.txt](./docs/openstack-train-devops4-glance.txt)
+1. [./docs/openstack-train-devops5-placement.txt](./docs/openstack-train-devops5-placement.txt)
+1. [./docs/openstack-train-devops6-nova.txt](./docs/openstack-train-devops6-nova.txt)
+1. [./docs/openstack-train-devops7-neutron.txt](./docs/openstack-train-devops7-neutron.txt)
+1. [./docs/openstack-train-devops8-dashboard.txt](./docs/openstack-train-devops8-dashboard.txt) 
+1. [./docs/openstack-train-devops9-linux-as-router.txt](./docs/openstack-train-devops9-linux-as-router.txt)
+
+Openstack (pike) bash install hands-on
+
+2. [./docs/openstack-pike-install-1st-controller.md](./docs/openstack-pike-install-1st-controller.md)
+2. [./docs/openstack-pike-install-2nd-identity-keystone.md](./docs/openstack-pike-install-2nd-identity-keystone.md)
+2. [./docs/openstack-pike-install-3rd-image-glance.md](./docs/openstack-pike-install-3rd-image-glance.md)
+2. [./docs/openstack-pike-install-4th-controller-nova.md](./docs/openstack-pike-install-4th-controller-nova.md]
+2. [./docs/openstack-pike-install-5th-hypervisor-nova.md](./docs/openstack-pike-install-5th-hypervisor-nova.md)
+2. [./docs/openstack-pike-install-6th-controller-provider-networks.md](./docs/openstack-pike-install-6th-controller-provider-networks.md]
+2. [./docs/openstack-pike-install-7th-hypervisor-provider-networks.md](./docs/openstack-pike-install-7th-hypervisor-provider-networks.md)
+2. [./docs/openstack-pike-install-8th-dashboard.md](./docs/openstack-pike-install-8th-dashboard.md)
+2. [./docs/openstack-pike-install-9th-guide.md](./docs/openstack-pike-install-9th-guide.md)
+
 Kopos
 -----
 

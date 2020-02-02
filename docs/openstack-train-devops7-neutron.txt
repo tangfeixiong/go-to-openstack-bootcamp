@@ -1,0 +1,1534 @@
+
+
+
+Neutron Networking
+
+
+root@wei-ThinkPad-X1-Extreme:~# mysql -u root --password=MARIADB_PASS --execute="CREATE DATABASE IF NOT EXISTS neutron;GRANT ALL PRIVILEGES ON neutron.* TO 'neutron'@'localhost' IDENTIFIED BY 'NEUTRON_DBPASS';GRANT ALL PRIVILEGES ON neutron.* TO 'neutron'@'%' IDENTIFIED BY 'NEUTRON_DBPASS';"
+
+
+
+root@wei-ThinkPad-X1-Extreme:~# openstack user create --domain default --password NEUTRON_PASS neutron
++---------------------+----------------------------------+
+| Field               | Value                            |
++---------------------+----------------------------------+
+| domain_id           | default                          |
+| enabled             | True                             |
+| id                  | 3b7d01f4ad3649d2bf2c0a7e9386c98a |
+| name                | neutron                          |
+| options             | {}                               |
+| password_expires_at | None                             |
++---------------------+----------------------------------+
+
+
+
+root@wei-ThinkPad-X1-Extreme:~# openstack role add --project service --user neutron admin
+
+
+root@wei-ThinkPad-X1-Extreme:~# openstack service create --name neutron --description "Openstack Networking" network
++-------------+----------------------------------+
+| Field       | Value                            |
++-------------+----------------------------------+
+| description | Openstack Networking             |
+| enabled     | True                             |
+| id          | 9a0e86bc7d884b55b2167c8e4e23130b |
+| name        | neutron                          |
+| type        | network                          |
++-------------+----------------------------------+
+
+
+root@wei-ThinkPad-X1-Extreme:~# openstack endpoint create --region RegionOne network public http://controller:9696
++--------------+----------------------------------+
+| Field        | Value                            |
++--------------+----------------------------------+
+| enabled      | True                             |
+| id           | e9171d474dc84342a7b9339df8fa1cba |
+| interface    | public                           |
+| region       | RegionOne                        |
+| region_id    | RegionOne                        |
+| service_id   | 9a0e86bc7d884b55b2167c8e4e23130b |
+| service_name | neutron                          |
+| service_type | network                          |
+| url          | http://controller:9696           |
++--------------+----------------------------------+
+root@wei-ThinkPad-X1-Extreme:~# openstack endpoint create --region RegionOne network internal http://controller:9696
++--------------+----------------------------------+
+| Field        | Value                            |
++--------------+----------------------------------+
+| enabled      | True                             |
+| id           | b57bf0afce254503ad7d9bfdcfc5e5b4 |
+| interface    | internal                         |
+| region       | RegionOne                        |
+| region_id    | RegionOne                        |
+| service_id   | 9a0e86bc7d884b55b2167c8e4e23130b |
+| service_name | neutron                          |
+| service_type | network                          |
+| url          | http://controller:9696           |
++--------------+----------------------------------+
+root@wei-ThinkPad-X1-Extreme:~# openstack endpoint create --region RegionOne network admin http://controller:9696
++--------------+----------------------------------+
+| Field        | Value                            |
++--------------+----------------------------------+
+| enabled      | True                             |
+| id           | ad2afb67f63f4cb4a17975628e5ed2cd |
+| interface    | admin                            |
+| region       | RegionOne                        |
+| region_id    | RegionOne                        |
+| service_id   | 9a0e86bc7d884b55b2167c8e4e23130b |
+| service_name | neutron                          |
+| service_type | network                          |
+| url          | http://controller:9696           |
++--------------+----------------------------------+
+
+
+
+
+
+root@wei-ThinkPad-X1-Extreme:~# apt-get install -y neutron-server neutron-plugin-ml2 neutron-linuxbridge-agent neutron-l3-agent neutron-dhcp-agent neutron-metadata-agent
+Reading package lists... Done
+Building dependency tree       
+Reading state information... Done
+The following packages were automatically installed and are no longer required:
+  fonts-liberation2 fonts-opensymbol gir1.2-geocodeglib-1.0
+  gir1.2-gst-plugins-base-1.0 gir1.2-gstreamer-1.0 gir1.2-gudev-1.0
+  gir1.2-udisks-2.0 grilo-plugins-0.3-base gstreamer1.0-gtk3
+  libboost-date-time1.65.1 libboost-filesystem1.65.1 libboost-iostreams1.65.1
+  libboost-locale1.65.1 libcdr-0.1-1 libclucene-contribs1v5 libclucene-core1v5
+  libcmis-0.5-5v5 libcolamd2 libdazzle-1.0-0 libe-book-0.1-1
+  libedataserverui-1.2-2 libeot0 libepubgen-0.1-1 libetonyek-0.1-1 libexiv2-14
+  libfreerdp-client2-2 libfreerdp2-2 libgc1c2 libgee-0.8-2 libgexiv2-2
+  libgom-1.0-0 libgpgmepp6 libgpod-common libgpod4 liblangtag-common
+  liblangtag1 liblirc-client0 libllvm8 libmediaart-2.0-0 libmspub-0.1-1
+  libodfgen-0.1-1 libqqwing2v5 libraw16 librevenge-0.0-0 libsgutils2-2
+  libssh-4 libsuitesparseconfig5 libvncclient1 libwinpr2-2 libxapian30
+  libxmlsec1-nss lp-solve media-player-info syslinux syslinux-common
+  syslinux-legacy usb-creator-common
+Use 'apt autoremove' to remove them.
+The following additional packages will be installed:
+  conntrack dnsmasq-utils haproxy ipset ipvsadm keepalived libipset3
+  neutron-common neutron-fwaas-common python3-designateclient python3-logutils
+  python3-neutron python3-neutron-fwaas python3-neutron-lib python3-os-ken
+  python3-pecan python3-setproctitle python3-singledispatch python3-tinyrpc
+  python3-waitress python3-webtest radvd
+Suggested packages:
+  vim-haproxy haproxy-doc heartbeat ldirectord python3-zmq
+  python-neutron-lib-doc python-pecan-doc python-tinyrpc-doc
+  python-waitress-doc python-webtest-doc
+The following NEW packages will be installed:
+  conntrack dnsmasq-utils haproxy ipset ipvsadm keepalived libipset3
+  neutron-common neutron-dhcp-agent neutron-fwaas-common neutron-l3-agent
+  neutron-linuxbridge-agent neutron-metadata-agent neutron-plugin-ml2
+  neutron-server python3-designateclient python3-logutils python3-neutron
+  python3-neutron-fwaas python3-neutron-lib python3-os-ken python3-pecan
+  python3-setproctitle python3-singledispatch python3-tinyrpc python3-waitress
+  python3-webtest radvd
+0 upgraded, 28 newly installed, 0 to remove and 0 not upgraded.
+Need to get 4,764 kB of archives.
+After this operation, 40.7 MB of additional disk space will be used.
+Get:1 http://cn.archive.ubuntu.com/ubuntu bionic-updates/main amd64 haproxy amd64 1.8.8-1ubuntu0.9 [1,117 kB]
+Get:2 http://ubuntu-cloud.archive.canonical.com/ubuntu bionic-updates/train/main amd64 neutron-common all 2:15.0.0-0ubuntu1~cloud0 [51.7 kB]
+Get:3 http://ubuntu-cloud.archive.canonical.com/ubuntu bionic-updates/train/main amd64 python3-os-ken all 0.4.1-0ubuntu1~cloud0 [771 kB]
+Get:4 http://cn.archive.ubuntu.com/ubuntu bionic/main amd64 conntrack amd64 1:1.4.4+snapshot20161117-6ubuntu2 [30.6 kB]
+Get:5 http://cn.archive.ubuntu.com/ubuntu bionic/main amd64 dnsmasq-utils amd64 2.79-1 [12.9 kB]
+Get:6 http://cn.archive.ubuntu.com/ubuntu bionic-updates/main amd64 keepalived amd64 1:1.3.9-1ubuntu0.18.04.2 [244 kB]
+Get:7 http://ubuntu-cloud.archive.canonical.com/ubuntu bionic-updates/train/main amd64 python3-pecan all 1.3.3-0ubuntu2~cloud0 [104 kB]
+Get:8 http://ubuntu-cloud.archive.canonical.com/ubuntu bionic-updates/train/main amd64 python3-neutron-lib all 1.29.1-0ubuntu1~cloud0 [188 kB]
+Get:9 http://ubuntu-cloud.archive.canonical.com/ubuntu bionic-updates/train/main amd64 python3-neutron all 2:15.0.0-0ubuntu1~cloud0 [1,607 kB]
+Get:10 http://cn.archive.ubuntu.com/ubuntu bionic/main amd64 libipset3 amd64 6.34-1 [43.9 kB]
+Get:11 http://cn.archive.ubuntu.com/ubuntu bionic/main amd64 ipset amd64 6.34-1 [33.7 kB]
+Get:12 http://cn.archive.ubuntu.com/ubuntu bionic/universe amd64 python3-designateclient all 2.9.0-0ubuntu1 [45.2 kB]
+Get:13 http://cn.archive.ubuntu.com/ubuntu bionic/universe amd64 python3-tinyrpc all 0.6-1 [17.0 kB]
+Get:14 http://cn.archive.ubuntu.com/ubuntu bionic/universe amd64 python3-logutils all 0.3.3-5 [16.7 kB]
+Get:15 http://cn.archive.ubuntu.com/ubuntu bionic/universe amd64 python3-singledispatch all 3.4.0.3-2 [7,022 B]
+Get:16 http://cn.archive.ubuntu.com/ubuntu bionic/main amd64 python3-waitress all 1.0.1-1 [53.4 kB]
+Get:17 http://cn.archive.ubuntu.com/ubuntu bionic/main amd64 python3-webtest all 2.0.28-1ubuntu1 [27.9 kB]
+Get:18 http://cn.archive.ubuntu.com/ubuntu bionic/main amd64 python3-setproctitle amd64 1.1.10-1build2 [14.8 kB]
+Get:19 http://cn.archive.ubuntu.com/ubuntu bionic/main amd64 radvd amd64 1:2.16-3 [59.0 kB]
+Get:20 http://cn.archive.ubuntu.com/ubuntu bionic-updates/main amd64 ipvsadm amd64 1:1.28-3ubuntu0.18.04.1 [35.5 kB]
+Get:21 http://ubuntu-cloud.archive.canonical.com/ubuntu bionic-updates/train/main amd64 neutron-metadata-agent all 2:15.0.0-0ubuntu1~cloud0 [25.4 kB]
+Get:22 http://ubuntu-cloud.archive.canonical.com/ubuntu bionic-updates/train/main amd64 neutron-dhcp-agent all 2:15.0.0-0ubuntu1~cloud0 [25.5 kB]
+Get:23 http://ubuntu-cloud.archive.canonical.com/ubuntu bionic-updates/train/main amd64 neutron-fwaas-common all 1:15.0.0-0ubuntu1~cloud0 [7,180 B]
+Get:24 http://ubuntu-cloud.archive.canonical.com/ubuntu bionic-updates/train/main amd64 python3-neutron-fwaas all 1:15.0.0-0ubuntu1~cloud0 [127 kB]
+Get:25 http://ubuntu-cloud.archive.canonical.com/ubuntu bionic-updates/train/main amd64 neutron-l3-agent all 2:15.0.0-0ubuntu1~cloud0 [25.5 kB]
+Get:26 http://ubuntu-cloud.archive.canonical.com/ubuntu bionic-updates/train/main amd64 neutron-linuxbridge-agent all 2:15.0.0-0ubuntu1~cloud0 [25.9 kB]
+Get:27 http://ubuntu-cloud.archive.canonical.com/ubuntu bionic-updates/train/main amd64 neutron-plugin-ml2 all 2:15.0.0-0ubuntu1~cloud0 [22.5 kB]
+Get:28 http://ubuntu-cloud.archive.canonical.com/ubuntu bionic-updates/train/main amd64 neutron-server all 2:15.0.0-0ubuntu1~cloud0 [25.5 kB]
+Fetched 4,764 kB in 11s (420 kB/s)                                             
+Selecting previously unselected package haproxy.
+(Reading database ... 223247 files and directories currently installed.)
+Preparing to unpack .../00-haproxy_1.8.8-1ubuntu0.9_amd64.deb ...
+Unpacking haproxy (1.8.8-1ubuntu0.9) ...
+Selecting previously unselected package conntrack.
+Preparing to unpack .../01-conntrack_1%3a1.4.4+snapshot20161117-6ubuntu2_amd64.deb ...
+Unpacking conntrack (1:1.4.4+snapshot20161117-6ubuntu2) ...
+Selecting previously unselected package dnsmasq-utils.
+Preparing to unpack .../02-dnsmasq-utils_2.79-1_amd64.deb ...
+Unpacking dnsmasq-utils (2.79-1) ...
+Selecting previously unselected package keepalived.
+Preparing to unpack .../03-keepalived_1%3a1.3.9-1ubuntu0.18.04.2_amd64.deb ...
+Unpacking keepalived (1:1.3.9-1ubuntu0.18.04.2) ...
+Selecting previously unselected package libipset3:amd64.
+Preparing to unpack .../04-libipset3_6.34-1_amd64.deb ...
+Unpacking libipset3:amd64 (6.34-1) ...
+Selecting previously unselected package ipset.
+Preparing to unpack .../05-ipset_6.34-1_amd64.deb ...
+Unpacking ipset (6.34-1) ...
+Selecting previously unselected package neutron-common.
+Preparing to unpack .../06-neutron-common_2%3a15.0.0-0ubuntu1~cloud0_all.deb ...
+Unpacking neutron-common (2:15.0.0-0ubuntu1~cloud0) ...
+Selecting previously unselected package python3-designateclient.
+Preparing to unpack .../07-python3-designateclient_2.9.0-0ubuntu1_all.deb ...
+Unpacking python3-designateclient (2.9.0-0ubuntu1) ...
+Selecting previously unselected package python3-tinyrpc.
+Preparing to unpack .../08-python3-tinyrpc_0.6-1_all.deb ...
+Unpacking python3-tinyrpc (0.6-1) ...
+Selecting previously unselected package python3-os-ken.
+Preparing to unpack .../09-python3-os-ken_0.4.1-0ubuntu1~cloud0_all.deb ...
+Unpacking python3-os-ken (0.4.1-0ubuntu1~cloud0) ...
+Selecting previously unselected package python3-logutils.
+Preparing to unpack .../10-python3-logutils_0.3.3-5_all.deb ...
+Unpacking python3-logutils (0.3.3-5) ...
+Selecting previously unselected package python3-singledispatch.
+Preparing to unpack .../11-python3-singledispatch_3.4.0.3-2_all.deb ...
+Unpacking python3-singledispatch (3.4.0.3-2) ...
+Selecting previously unselected package python3-waitress.
+Preparing to unpack .../12-python3-waitress_1.0.1-1_all.deb ...
+Unpacking python3-waitress (1.0.1-1) ...
+Selecting previously unselected package python3-webtest.
+Preparing to unpack .../13-python3-webtest_2.0.28-1ubuntu1_all.deb ...
+Unpacking python3-webtest (2.0.28-1ubuntu1) ...
+Selecting previously unselected package python3-pecan.
+Preparing to unpack .../14-python3-pecan_1.3.3-0ubuntu2~cloud0_all.deb ...
+Unpacking python3-pecan (1.3.3-0ubuntu2~cloud0) ...
+Selecting previously unselected package python3-setproctitle:amd64.
+Preparing to unpack .../15-python3-setproctitle_1.1.10-1build2_amd64.deb ...
+Unpacking python3-setproctitle:amd64 (1.1.10-1build2) ...
+Selecting previously unselected package python3-neutron-lib.
+Preparing to unpack .../16-python3-neutron-lib_1.29.1-0ubuntu1~cloud0_all.deb ...
+Unpacking python3-neutron-lib (1.29.1-0ubuntu1~cloud0) ...
+Selecting previously unselected package python3-neutron.
+Preparing to unpack .../17-python3-neutron_2%3a15.0.0-0ubuntu1~cloud0_all.deb ...
+Unpacking python3-neutron (2:15.0.0-0ubuntu1~cloud0) ...
+Selecting previously unselected package neutron-metadata-agent.
+Preparing to unpack .../18-neutron-metadata-agent_2%3a15.0.0-0ubuntu1~cloud0_all.deb ...
+Unpacking neutron-metadata-agent (2:15.0.0-0ubuntu1~cloud0) ...
+Selecting previously unselected package neutron-dhcp-agent.
+Preparing to unpack .../19-neutron-dhcp-agent_2%3a15.0.0-0ubuntu1~cloud0_all.deb ...
+Unpacking neutron-dhcp-agent (2:15.0.0-0ubuntu1~cloud0) ...
+Selecting previously unselected package neutron-fwaas-common.
+Preparing to unpack .../20-neutron-fwaas-common_1%3a15.0.0-0ubuntu1~cloud0_all.deb ...
+Unpacking neutron-fwaas-common (1:15.0.0-0ubuntu1~cloud0) ...
+Selecting previously unselected package python3-neutron-fwaas.
+Preparing to unpack .../21-python3-neutron-fwaas_1%3a15.0.0-0ubuntu1~cloud0_all.deb ...
+Unpacking python3-neutron-fwaas (1:15.0.0-0ubuntu1~cloud0) ...
+Selecting previously unselected package radvd.
+Preparing to unpack .../22-radvd_1%3a2.16-3_amd64.deb ...
+Unpacking radvd (1:2.16-3) ...
+Selecting previously unselected package neutron-l3-agent.
+Preparing to unpack .../23-neutron-l3-agent_2%3a15.0.0-0ubuntu1~cloud0_all.deb ...
+Unpacking neutron-l3-agent (2:15.0.0-0ubuntu1~cloud0) ...
+Selecting previously unselected package neutron-linuxbridge-agent.
+Preparing to unpack .../24-neutron-linuxbridge-agent_2%3a15.0.0-0ubuntu1~cloud0_all.deb ...
+Unpacking neutron-linuxbridge-agent (2:15.0.0-0ubuntu1~cloud0) ...
+Selecting previously unselected package neutron-plugin-ml2.
+Preparing to unpack .../25-neutron-plugin-ml2_2%3a15.0.0-0ubuntu1~cloud0_all.deb ...
+Unpacking neutron-plugin-ml2 (2:15.0.0-0ubuntu1~cloud0) ...
+Selecting previously unselected package neutron-server.
+Preparing to unpack .../26-neutron-server_2%3a15.0.0-0ubuntu1~cloud0_all.deb ...
+Unpacking neutron-server (2:15.0.0-0ubuntu1~cloud0) ...
+Selecting previously unselected package ipvsadm.
+Preparing to unpack .../27-ipvsadm_1%3a1.28-3ubuntu0.18.04.1_amd64.deb ...
+Unpacking ipvsadm (1:1.28-3ubuntu0.18.04.1) ...
+Setting up python3-setproctitle:amd64 (1.1.10-1build2) ...
+Setting up python3-logutils (0.3.3-5) ...
+Setting up conntrack (1:1.4.4+snapshot20161117-6ubuntu2) ...
+Setting up haproxy (1.8.8-1ubuntu0.9) ...
+Created symlink /etc/systemd/system/multi-user.target.wants/haproxy.service → /lib/systemd/system/haproxy.service.
+Setting up python3-tinyrpc (0.6-1) ...
+Setting up python3-waitress (1.0.1-1) ...
+update-alternatives: using /usr/bin/waitress-serve-python3 to provide /usr/bin/waitress-serve (waitress-serve) in auto mode
+Setting up neutron-fwaas-common (1:15.0.0-0ubuntu1~cloud0) ...
+Setting up python3-singledispatch (3.4.0.3-2) ...
+Setting up radvd (1:2.16-3) ...
+Job for radvd.service failed because the control process exited with error code.
+See "systemctl status radvd.service" and "journalctl -xe" for details.
+invoke-rc.d: initscript radvd, action "start" failed.
+● radvd.service - Router advertisement daemon for IPv6
+   Loaded: loaded (/lib/systemd/system/radvd.service; disabled; vendor preset: enabled)
+   Active: failed (Result: exit-code) since Sat 2020-02-01 05:15:50 CST; 6ms ago
+     Docs: man:radvd(8)
+  Process: 7229 ExecStartPre=/usr/sbin/radvd --logmethod stderr_clean --configtest (code=exited, status=1/FAILURE)
+
+2月 01 05:15:50 wei-ThinkPad-X1-Extreme systemd[1]: Starting Router advertisement daemon for IPv6...
+2月 01 05:15:50 wei-ThinkPad-X1-Extreme radvd[7229]: can't open /etc/radvd.conf: No such file or directory
+2月 01 05:15:50 wei-ThinkPad-X1-Extreme radvd[7229]: Insecure file permissions, but continuing anyway
+2月 01 05:15:50 wei-ThinkPad-X1-Extreme radvd[7229]: exiting, failed to read config file
+2月 01 05:15:50 wei-ThinkPad-X1-Extreme systemd[1]: radvd.service: Control process exited, code=exited status=1
+2月 01 05:15:50 wei-ThinkPad-X1-Extreme systemd[1]: radvd.service: Failed with result 'exit-code'.
+2月 01 05:15:50 wei-ThinkPad-X1-Extreme systemd[1]: Failed to start Router advertisement daemon for IPv6.
+Setting up libipset3:amd64 (6.34-1) ...
+Setting up ipvsadm (1:1.28-3ubuntu0.18.04.1) ...
+Setting up dnsmasq-utils (2.79-1) ...
+Setting up keepalived (1:1.3.9-1ubuntu0.18.04.2) ...
+Created symlink /etc/systemd/system/multi-user.target.wants/keepalived.service → /lib/systemd/system/keepalived.service.
+Setting up ipset (6.34-1) ...
+Setting up python3-designateclient (2.9.0-0ubuntu1) ...
+update-alternatives: using /usr/bin/python3-designate to provide /usr/bin/designate (designate) in auto mode
+Setting up python3-os-ken (0.4.1-0ubuntu1~cloud0) ...
+Setting up neutron-common (2:15.0.0-0ubuntu1~cloud0) ...
+Adding system user `neutron' (UID 135) ...
+Adding new user `neutron' (UID 135) with group `neutron' ...
+Not creating home directory `/var/lib/neutron'.
+Setting up python3-webtest (2.0.28-1ubuntu1) ...
+Setting up python3-pecan (1.3.3-0ubuntu2~cloud0) ...
+Setting up python3-neutron-lib (1.29.1-0ubuntu1~cloud0) ...
+Setting up python3-neutron (2:15.0.0-0ubuntu1~cloud0) ...
+Setting up neutron-plugin-ml2 (2:15.0.0-0ubuntu1~cloud0) ...
+Setting up python3-neutron-fwaas (1:15.0.0-0ubuntu1~cloud0) ...
+Setting up neutron-linuxbridge-agent (2:15.0.0-0ubuntu1~cloud0) ...
+Created symlink /etc/systemd/system/multi-user.target.wants/neutron-linuxbridge-cleanup.service → /lib/systemd/system/neutron-linuxbridge-cleanup.service.
+Created symlink /etc/systemd/system/multi-user.target.wants/neutron-linuxbridge-agent.service → /lib/systemd/system/neutron-linuxbridge-agent.service.
+Setting up neutron-server (2:15.0.0-0ubuntu1~cloud0) ...
+Created symlink /etc/systemd/system/multi-user.target.wants/neutron-server.service → /lib/systemd/system/neutron-server.service.
+Setting up neutron-metadata-agent (2:15.0.0-0ubuntu1~cloud0) ...
+Created symlink /etc/systemd/system/multi-user.target.wants/neutron-metadata-agent.service → /lib/systemd/system/neutron-metadata-agent.service.
+Setting up neutron-l3-agent (2:15.0.0-0ubuntu1~cloud0) ...
+Created symlink /etc/systemd/system/multi-user.target.wants/neutron-l3-agent.service → /lib/systemd/system/neutron-l3-agent.service.
+Setting up neutron-dhcp-agent (2:15.0.0-0ubuntu1~cloud0) ...
+Created symlink /etc/systemd/system/multi-user.target.wants/neutron-dhcp-agent.service → /lib/systemd/system/neutron-dhcp-agent.service.
+Processing triggers for man-db (2.8.3-2ubuntu0.1) ...
+Processing triggers for dbus (1.12.2-1ubuntu1.1) ...
+Processing triggers for rsyslog (8.32.0-1ubuntu4) ...
+Processing triggers for ureadahead (0.100.0-21) ...
+Processing triggers for libc-bin (2.27-3ubuntu1) ...
+Processing triggers for systemd (237-3ubuntu10.33) ...
+
+
+root@wei-ThinkPad-X1-Extreme:~# systemctl list-unit-files --type service | grep radvd.service
+radvd.service                              disabled       
+
+
+root@wei-ThinkPad-X1-Extreme:~# systemctl status -l radvd.service
+● radvd.service - Router advertisement daemon for IPv6
+   Loaded: loaded (/lib/systemd/system/radvd.service; disabled; vendor preset: e
+   Active: failed (Result: exit-code) since Sat 2020-02-01 05:15:50 CST; 7h ago
+     Docs: man:radvd(8)
+
+2月 01 05:15:50 wei-ThinkPad-X1-Extreme systemd[1]: Starting Router advertisemen
+2月 01 05:15:50 wei-ThinkPad-X1-Extreme radvd[7229]: can't open /etc/radvd.conf:
+2月 01 05:15:50 wei-ThinkPad-X1-Extreme radvd[7229]: Insecure file permissions, 
+2月 01 05:15:50 wei-ThinkPad-X1-Extreme radvd[7229]: exiting, failed to read con
+2月 01 05:15:50 wei-ThinkPad-X1-Extreme systemd[1]: radvd.service: Control proce
+2月 01 05:15:50 wei-ThinkPad-X1-Extreme systemd[1]: radvd.service: Failed with r
+2月 01 05:15:50 wei-ThinkPad-X1-Extreme systemd[1]: Failed to start Router adver
+
+
+root@wei-ThinkPad-X1-Extreme:~# sed -i "s%connection = sqlite:////var/lib/neutron/neutron.sqlite%# &\nconnection=mysql+pymysql://neutron:NEUTRON_DBPASS@localhost/neutron%;s%^\[DEFAULT\]%&\ncore_plugin=ml2\nservice_plugins=router\nallow_overlapping_ips=true\ntransport_url=rabbit://openstack:RABBIT_PASS@localhost:5672/\nauth_strategy=keystone\n%;s%^\[keystone_authtoken\]$%&\nwww_authenticate_uri=http://controller:5000/\nauth_url=http://controller:5000/\nmemcached_servers=localhost:11211\nauth_type=password\nproject_domain_name=default\nuser_domain_name=default\nproject_name=service\nusername=neutron\npassword=NEUTRON_PASS%" /etc/neutron/neutron.conf
+
+
+root@wei-ThinkPad-X1-Extreme:~# sed -i "s%^core_plugin = ml2$%# &%" /etc/neutron/neutron.conf
+
+root@wei-ThinkPad-X1-Extreme:~# sed -i "s/^\[DEFAULT\]$/&\nnotify_nova_on_port_status_changes=true\nnotify_nova_on_port_data_changes=true\n/;s%^\[nova\]$%&\nauth_url=http://controller:5000/\nauth_type=password\nproject_domain_name=default\nuser_domain_name=default\nregion_name=RegionOne\nproject_name=service\nusername=nova\npassword=NOVA_PASS%;s%^\[oslo_concurrency\]$%&\nlock_path=/var/lib/neutron/tmp%" /etc/neutron/neutron.conf
+
+
+root@wei-ThinkPad-X1-Extreme:~# sed -i "s/^\[ml2\]$/&\ntype_drivers=flat,vlan,vxlan\ntenant_network_types=vxlan\nmechanism_drivers=linuxbridge,l2population\nextension_drivers=port_security/;s/^\[ml2_type_flat\]$/&\nflat_networks=provider/;s/^\[ml2_type_vxlan\]$/&\nvni_ranges=1:1000/;s/^\[securitygroup\]$/&\nenable_ipset=true/" /etc/neutron/plugins/ml2/ml2_conf.ini
+
+
+
+
+root@wei-ThinkPad-X1-Extreme:~# sed -i "s/^\[linux_bridge\]$/&\nphysical_interface_mappings=provider:enp0s31f6/;s/^\[vxlan\]$/&\nenable_vxlan=true\nlocal_ip=192.168.0.106\nl2_population=true/;s/^\[securitygroup\]$/&\nenable_security_group=true\nfirewall_driver=neutron.agent.linux.iptables_firewall.IptablesFirewallDriver/" /etc/neutron/plugins/ml2/linuxbridge_agent.ini
+
+
+
+
+root@wei-ThinkPad-X1-Extreme:~# sed -i "1 i net.bridge.bridge-nf-call-iptables=1\nnet.bridge.bridge-nf-call-ip6tables=1" /etc/sysctl.conf
+
+
+root@wei-ThinkPad-X1-Extreme:~# sysctl -p /etc/sysctl.conf 
+net.bridge.bridge-nf-call-iptables = 1
+net.bridge.bridge-nf-call-ip6tables = 1
+
+root@wei-ThinkPad-X1-Extreme:~# cat /proc/sys/net/bridge/bridge-nf-call-iptables 
+1
+
+
+
+root@wei-ThinkPad-X1-Extreme:~# sed -i "s/^\[DEFAULT\]$/&\ninterface_driver=linuxbridge/" /etc/neutron/l3_agent.ini
+
+
+root@wei-ThinkPad-X1-Extreme:~# sed -i "s/^\[DEFAULT\]$/&\ninterface_driver=linuxbridge\ndhcp_driver=neutron.agent.linux.dhcp.Dnsmasq\nenable_isolated_metadata=true/" /etc/neutron/dhcp_agent.ini
+
+
+
+root@wei-ThinkPad-X1-Extreme:~# sed -i "s/^\[DEFAULT\]$/&\nnova_metadata_host=controller\nmetadata_proxy_shared_secret=METADATA_SECRET/" /etc/neutron/metadata_agent.ini
+
+
+
+root@wei-ThinkPad-X1-Extreme:~# su -s /bin/sh -c "neutron-db-manage --config-file /etc/neutron/neutron.conf --config-file /etc/neutron/plugins/ml2/ml2_conf.ini upgrade head" neutron
+INFO  [alembic.runtime.migration] Context impl MySQLImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+  Running upgrade for neutron ...
+INFO  [alembic.runtime.migration] Context impl MySQLImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade  -> kilo
+INFO  [alembic.runtime.migration] Running upgrade kilo -> 354db87e3225
+INFO  [alembic.runtime.migration] Running upgrade 354db87e3225 -> 599c6a226151
+INFO  [alembic.runtime.migration] Running upgrade 599c6a226151 -> 52c5312f6baf
+INFO  [alembic.runtime.migration] Running upgrade 52c5312f6baf -> 313373c0ffee
+INFO  [alembic.runtime.migration] Running upgrade 313373c0ffee -> 8675309a5c4f
+INFO  [alembic.runtime.migration] Running upgrade 8675309a5c4f -> 45f955889773
+INFO  [alembic.runtime.migration] Running upgrade 45f955889773 -> 26c371498592
+INFO  [alembic.runtime.migration] Running upgrade 26c371498592 -> 1c844d1677f7
+INFO  [alembic.runtime.migration] Running upgrade 1c844d1677f7 -> 1b4c6e320f79
+INFO  [alembic.runtime.migration] Running upgrade 1b4c6e320f79 -> 48153cb5f051
+INFO  [alembic.runtime.migration] Running upgrade 48153cb5f051 -> 9859ac9c136
+INFO  [alembic.runtime.migration] Running upgrade 9859ac9c136 -> 34af2b5c5a59
+INFO  [alembic.runtime.migration] Running upgrade 34af2b5c5a59 -> 59cb5b6cf4d
+INFO  [alembic.runtime.migration] Running upgrade 59cb5b6cf4d -> 13cfb89f881a
+INFO  [alembic.runtime.migration] Running upgrade 13cfb89f881a -> 32e5974ada25
+INFO  [alembic.runtime.migration] Running upgrade 32e5974ada25 -> ec7fcfbf72ee
+INFO  [alembic.runtime.migration] Running upgrade ec7fcfbf72ee -> dce3ec7a25c9
+INFO  [alembic.runtime.migration] Running upgrade dce3ec7a25c9 -> c3a73f615e4
+INFO  [alembic.runtime.migration] Running upgrade c3a73f615e4 -> 659bf3d90664
+INFO  [alembic.runtime.migration] Running upgrade 659bf3d90664 -> 1df244e556f5
+INFO  [alembic.runtime.migration] Running upgrade 1df244e556f5 -> 19f26505c74f
+INFO  [alembic.runtime.migration] Running upgrade 19f26505c74f -> 15be73214821
+INFO  [alembic.runtime.migration] Running upgrade 15be73214821 -> b4caf27aae4
+INFO  [alembic.runtime.migration] Running upgrade b4caf27aae4 -> 15e43b934f81
+INFO  [alembic.runtime.migration] Running upgrade 15e43b934f81 -> 31ed664953e6
+INFO  [alembic.runtime.migration] Running upgrade 31ed664953e6 -> 2f9e956e7532
+INFO  [alembic.runtime.migration] Running upgrade 2f9e956e7532 -> 3894bccad37f
+INFO  [alembic.runtime.migration] Running upgrade 3894bccad37f -> 0e66c5227a8a
+INFO  [alembic.runtime.migration] Running upgrade 0e66c5227a8a -> 45f8dd33480b
+INFO  [alembic.runtime.migration] Running upgrade 45f8dd33480b -> 5abc0278ca73
+INFO  [alembic.runtime.migration] Running upgrade kilo -> 30018084ec99
+INFO  [alembic.runtime.migration] Running upgrade 30018084ec99 -> 4ffceebfada
+INFO  [alembic.runtime.migration] Running upgrade 4ffceebfada -> 5498d17be016
+INFO  [alembic.runtime.migration] Running upgrade 5498d17be016 -> 2a16083502f3
+INFO  [alembic.runtime.migration] Running upgrade 2a16083502f3 -> 2e5352a0ad4d
+INFO  [alembic.runtime.migration] Running upgrade 2e5352a0ad4d -> 11926bcfe72d
+INFO  [alembic.runtime.migration] Running upgrade 11926bcfe72d -> 4af11ca47297
+INFO  [alembic.runtime.migration] Running upgrade 4af11ca47297 -> 1b294093239c
+INFO  [alembic.runtime.migration] Running upgrade 1b294093239c -> 8a6d8bdae39
+INFO  [alembic.runtime.migration] Running upgrade 8a6d8bdae39 -> 2b4c2465d44b
+INFO  [alembic.runtime.migration] Running upgrade 2b4c2465d44b -> e3278ee65050
+INFO  [alembic.runtime.migration] Running upgrade e3278ee65050 -> c6c112992c9
+INFO  [alembic.runtime.migration] Running upgrade c6c112992c9 -> 5ffceebfada
+INFO  [alembic.runtime.migration] Running upgrade 5ffceebfada -> 4ffceebfcdc
+INFO  [alembic.runtime.migration] Running upgrade 4ffceebfcdc -> 7bbb25278f53
+INFO  [alembic.runtime.migration] Running upgrade 7bbb25278f53 -> 89ab9a816d70
+INFO  [alembic.runtime.migration] Running upgrade 5abc0278ca73 -> d3435b514502
+INFO  [alembic.runtime.migration] Running upgrade d3435b514502 -> 30107ab6a3ee
+INFO  [alembic.runtime.migration] Running upgrade 30107ab6a3ee -> c415aab1c048
+INFO  [alembic.runtime.migration] Running upgrade c415aab1c048 -> a963b38d82f4
+INFO  [alembic.runtime.migration] Running upgrade 89ab9a816d70 -> c879c5e1ee90
+INFO  [alembic.runtime.migration] Running upgrade c879c5e1ee90 -> 8fd3918ef6f4
+INFO  [alembic.runtime.migration] Running upgrade 8fd3918ef6f4 -> 4bcd4df1f426
+INFO  [alembic.runtime.migration] Running upgrade 4bcd4df1f426 -> b67e765a3524
+INFO  [alembic.runtime.migration] Running upgrade a963b38d82f4 -> 3d0e74aa7d37
+INFO  [alembic.runtime.migration] Running upgrade 3d0e74aa7d37 -> 030a959ceafa
+INFO  [alembic.runtime.migration] Running upgrade 030a959ceafa -> a5648cfeeadf
+INFO  [alembic.runtime.migration] Running upgrade a5648cfeeadf -> 0f5bef0f87d4
+INFO  [alembic.runtime.migration] Running upgrade 0f5bef0f87d4 -> 67daae611b6e
+INFO  [alembic.runtime.migration] Running upgrade 67daae611b6e -> 6b461a21bcfc
+INFO  [alembic.runtime.migration] Running upgrade 6b461a21bcfc -> 5cd92597d11d
+INFO  [alembic.runtime.migration] Running upgrade 5cd92597d11d -> 929c968efe70
+INFO  [alembic.runtime.migration] Running upgrade 929c968efe70 -> a9c43481023c
+INFO  [alembic.runtime.migration] Running upgrade a9c43481023c -> 804a3c76314c
+INFO  [alembic.runtime.migration] Running upgrade 804a3c76314c -> 2b42d90729da
+INFO  [alembic.runtime.migration] Running upgrade 2b42d90729da -> 62c781cb6192
+INFO  [alembic.runtime.migration] Running upgrade 62c781cb6192 -> c8c222d42aa9
+INFO  [alembic.runtime.migration] Running upgrade c8c222d42aa9 -> 349b6fd605a6
+INFO  [alembic.runtime.migration] Running upgrade 349b6fd605a6 -> 7d32f979895f
+INFO  [alembic.runtime.migration] Running upgrade 7d32f979895f -> 594422d373ee
+INFO  [alembic.runtime.migration] Running upgrade 594422d373ee -> 61663558142c
+INFO  [alembic.runtime.migration] Running upgrade 61663558142c -> 867d39095bf4, port forwarding
+INFO  [alembic.runtime.migration] Running upgrade 867d39095bf4 -> d72db3e25539, modify uniq port forwarding
+INFO  [alembic.runtime.migration] Running upgrade d72db3e25539 -> cada2437bf41
+INFO  [alembic.runtime.migration] Running upgrade cada2437bf41 -> 195176fb410d, router gateway IP QoS
+INFO  [alembic.runtime.migration] Running upgrade 195176fb410d -> fb0167bd9639
+INFO  [alembic.runtime.migration] Running upgrade fb0167bd9639 -> 0ff9e3881597
+INFO  [alembic.runtime.migration] Running upgrade 0ff9e3881597 -> 9bfad3f1e780
+INFO  [alembic.runtime.migration] Running upgrade 9bfad3f1e780 -> 63fd95af7dcd
+INFO  [alembic.runtime.migration] Running upgrade 63fd95af7dcd -> c613d0b82681
+Traceback (most recent call last):
+  File "/usr/lib/python3/dist-packages/sqlalchemy/engine/base.py", line 1236, in _execute_context
+    cursor, statement, parameters, context
+  File "/usr/lib/python3/dist-packages/sqlalchemy/engine/default.py", line 536, in do_execute
+    cursor.execute(statement, parameters)
+  File "/usr/lib/python3/dist-packages/pymysql/cursors.py", line 165, in execute
+    result = self._query(query)
+  File "/usr/lib/python3/dist-packages/pymysql/cursors.py", line 321, in _query
+    conn.query(q)
+  File "/usr/lib/python3/dist-packages/pymysql/connections.py", line 860, in query
+    self._affected_rows = self._read_query_result(unbuffered=unbuffered)
+  File "/usr/lib/python3/dist-packages/pymysql/connections.py", line 1061, in _read_query_result
+    result.read()
+  File "/usr/lib/python3/dist-packages/pymysql/connections.py", line 1349, in read
+    first_packet = self.connection._read_packet()
+  File "/usr/lib/python3/dist-packages/pymysql/connections.py", line 1018, in _read_packet
+    packet.check_error()
+  File "/usr/lib/python3/dist-packages/pymysql/connections.py", line 384, in check_error
+    err.raise_mysql_exception(self._data)
+  File "/usr/lib/python3/dist-packages/pymysql/err.py", line 107, in raise_mysql_exception
+    raise errorclass(errno, errval)
+pymysql.err.InternalError: (1832, "Cannot change column 'network_id': used in a foreign key constraint 'subnets_ibfk_1'")
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/usr/bin/neutron-db-manage", line 10, in <module>
+    sys.exit(main())
+  File "/usr/lib/python3/dist-packages/neutron/db/migration/cli.py", line 657, in main
+    return_val |= bool(CONF.command.func(config, CONF.command.name))
+  File "/usr/lib/python3/dist-packages/neutron/db/migration/cli.py", line 181, in do_upgrade
+    desc=branch, sql=CONF.command.sql)
+  File "/usr/lib/python3/dist-packages/neutron/db/migration/cli.py", line 82, in do_alembic_command
+    getattr(alembic_command, cmd)(config, *args, **kwargs)
+  File "/usr/lib/python3/dist-packages/alembic/command.py", line 254, in upgrade
+    script.run_env()
+  File "/usr/lib/python3/dist-packages/alembic/script/base.py", line 427, in run_env
+    util.load_python_file(self.dir, 'env.py')
+  File "/usr/lib/python3/dist-packages/alembic/util/pyfiles.py", line 81, in load_python_file
+    module = load_module_py(module_id, path)
+  File "/usr/lib/python3/dist-packages/alembic/util/compat.py", line 82, in load_module_py
+    spec.loader.exec_module(module)
+  File "<frozen importlib._bootstrap_external>", line 678, in exec_module
+  File "<frozen importlib._bootstrap>", line 219, in _call_with_frames_removed
+  File "/usr/lib/python3/dist-packages/neutron/db/migration/alembic_migrations/env.py", line 120, in <module>
+    run_migrations_online()
+  File "/usr/lib/python3/dist-packages/neutron/db/migration/alembic_migrations/env.py", line 114, in run_migrations_online
+    context.run_migrations()
+  File "<string>", line 8, in run_migrations
+  File "/usr/lib/python3/dist-packages/alembic/runtime/environment.py", line 836, in run_migrations
+    self.get_context().run_migrations(**kw)
+  File "/usr/lib/python3/dist-packages/alembic/runtime/migration.py", line 330, in run_migrations
+    step.migration_fn(**kw)
+  File "/usr/lib/python3/dist-packages/neutron/db/migration/alembic_migrations/versions/train/expand/c613d0b82681_subnet_force_network_id.py", line 35, in upgrade
+    existing_type=sa.String(36))
+  File "<string>", line 8, in alter_column
+  File "<string>", line 3, in alter_column
+  File "/usr/lib/python3/dist-packages/alembic/operations/ops.py", line 1444, in alter_column
+    return operations.invoke(alt)
+  File "/usr/lib/python3/dist-packages/alembic/operations/base.py", line 319, in invoke
+    return fn(self, operation)
+  File "/usr/lib/python3/dist-packages/alembic/operations/toimpl.py", line 53, in alter_column
+    **operation.kw
+  File "/usr/lib/python3/dist-packages/alembic/ddl/mysql.py", line 68, in alter_column
+    else existing_autoincrement
+  File "/usr/lib/python3/dist-packages/alembic/ddl/impl.py", line 115, in _exec
+    return conn.execute(construct, *multiparams, **params)
+  File "/usr/lib/python3/dist-packages/sqlalchemy/engine/base.py", line 980, in execute
+    return meth(self, multiparams, params)
+  File "/usr/lib/python3/dist-packages/sqlalchemy/sql/ddl.py", line 72, in _execute_on_connection
+    return connection._execute_ddl(self, multiparams, params)
+  File "/usr/lib/python3/dist-packages/sqlalchemy/engine/base.py", line 1042, in _execute_ddl
+    compiled,
+  File "/usr/lib/python3/dist-packages/sqlalchemy/engine/base.py", line 1240, in _execute_context
+    e, statement, parameters, cursor, context
+  File "/usr/lib/python3/dist-packages/sqlalchemy/engine/base.py", line 1456, in _handle_dbapi_exception
+    util.raise_from_cause(newraise, exc_info)
+  File "/usr/lib/python3/dist-packages/sqlalchemy/util/compat.py", line 296, in raise_from_cause
+    reraise(type(exception), exception, tb=exc_tb, cause=cause)
+  File "/usr/lib/python3/dist-packages/sqlalchemy/util/compat.py", line 276, in reraise
+    raise value.with_traceback(tb)
+  File "/usr/lib/python3/dist-packages/sqlalchemy/engine/base.py", line 1236, in _execute_context
+    cursor, statement, parameters, context
+  File "/usr/lib/python3/dist-packages/sqlalchemy/engine/default.py", line 536, in do_execute
+    cursor.execute(statement, parameters)
+  File "/usr/lib/python3/dist-packages/pymysql/cursors.py", line 165, in execute
+    result = self._query(query)
+  File "/usr/lib/python3/dist-packages/pymysql/cursors.py", line 321, in _query
+    conn.query(q)
+  File "/usr/lib/python3/dist-packages/pymysql/connections.py", line 860, in query
+    self._affected_rows = self._read_query_result(unbuffered=unbuffered)
+  File "/usr/lib/python3/dist-packages/pymysql/connections.py", line 1061, in _read_query_result
+    result.read()
+  File "/usr/lib/python3/dist-packages/pymysql/connections.py", line 1349, in read
+    first_packet = self.connection._read_packet()
+  File "/usr/lib/python3/dist-packages/pymysql/connections.py", line 1018, in _read_packet
+    packet.check_error()
+  File "/usr/lib/python3/dist-packages/pymysql/connections.py", line 384, in check_error
+    err.raise_mysql_exception(self._data)
+  File "/usr/lib/python3/dist-packages/pymysql/err.py", line 107, in raise_mysql_exception
+    raise errorclass(errno, errval)
+oslo_db.exception.DBError: (pymysql.err.InternalError) (1832, "Cannot change column 'network_id': used in a foreign key constraint 'subnets_ibfk_1'") [SQL: 'ALTER TABLE subnets MODIFY network_id VARCHAR(36) NOT NULL'] (Background on this error at: http://sqlalche.me/e/2j85)
+
+
+root@wei-ThinkPad-X1-Extreme:~# mysql -u root --password=MARIADB_PASS --execute="use neutron;alter table subnets drop foreign key subnets_ibfk_1;"
+
+
+root@wei-ThinkPad-X1-Extreme:~# su -s /bin/sh -c "neutron-db-manage --config-file /etc/neutron/neutron.conf --config-file /etc/neutron/plugins/ml2/ml2_conf.ini upgrade head" neutron
+INFO  [alembic.runtime.migration] Context impl MySQLImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+  Running upgrade for neutron ...
+INFO  [alembic.runtime.migration] Context impl MySQLImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade 63fd95af7dcd -> c613d0b82681
+INFO  [alembic.runtime.migration] Running upgrade b67e765a3524 -> a84ccf28f06a
+INFO  [alembic.runtime.migration] Running upgrade a84ccf28f06a -> 7d9d8eeec6ad
+INFO  [alembic.runtime.migration] Running upgrade 7d9d8eeec6ad -> a8b517cff8ab
+INFO  [alembic.runtime.migration] Running upgrade a8b517cff8ab -> 3b935b28e7a0
+INFO  [alembic.runtime.migration] Running upgrade 3b935b28e7a0 -> b12a3ef66e62
+INFO  [alembic.runtime.migration] Running upgrade b12a3ef66e62 -> 97c25b0d2353
+INFO  [alembic.runtime.migration] Running upgrade 97c25b0d2353 -> 2e0d7a8a1586
+INFO  [alembic.runtime.migration] Running upgrade 2e0d7a8a1586 -> 5c85685d616d
+  OK
+INFO  [alembic.runtime.migration] Context impl MySQLImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+  Running upgrade for neutron-fwaas ...
+INFO  [alembic.runtime.migration] Context impl MySQLImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade  -> start_neutron_fwaas, start neutron-fwaas chain
+INFO  [alembic.runtime.migration] Running upgrade start_neutron_fwaas -> 4202e3047e47, add_index_tenant_id
+INFO  [alembic.runtime.migration] Running upgrade 4202e3047e47 -> 540142f314f4, FWaaS router insertion
+INFO  [alembic.runtime.migration] Running upgrade 540142f314f4 -> 796c68dffbb, cisco_csr_fwaas
+INFO  [alembic.runtime.migration] Running upgrade 796c68dffbb -> kilo, kilo
+INFO  [alembic.runtime.migration] Running upgrade kilo -> c40fbb377ad, Initial Liberty no-op script.
+INFO  [alembic.runtime.migration] Running upgrade c40fbb377ad -> 4b47ea298795, add reject rule
+INFO  [alembic.runtime.migration] Running upgrade 4b47ea298795 -> d6a12e637e28, neutron-fwaas v2.0
+Traceback (most recent call last):
+  File "/usr/lib/python3/dist-packages/sqlalchemy/engine/base.py", line 1236, in _execute_context
+    cursor, statement, parameters, context
+  File "/usr/lib/python3/dist-packages/sqlalchemy/engine/default.py", line 536, in do_execute
+    cursor.execute(statement, parameters)
+  File "/usr/lib/python3/dist-packages/pymysql/cursors.py", line 165, in execute
+    result = self._query(query)
+  File "/usr/lib/python3/dist-packages/pymysql/cursors.py", line 321, in _query
+    conn.query(q)
+  File "/usr/lib/python3/dist-packages/pymysql/connections.py", line 860, in query
+    self._affected_rows = self._read_query_result(unbuffered=unbuffered)
+  File "/usr/lib/python3/dist-packages/pymysql/connections.py", line 1061, in _read_query_result
+    result.read()
+  File "/usr/lib/python3/dist-packages/pymysql/connections.py", line 1349, in read
+    first_packet = self.connection._read_packet()
+  File "/usr/lib/python3/dist-packages/pymysql/connections.py", line 1018, in _read_packet
+    packet.check_error()
+  File "/usr/lib/python3/dist-packages/pymysql/connections.py", line 384, in check_error
+    err.raise_mysql_exception(self._data)
+  File "/usr/lib/python3/dist-packages/pymysql/err.py", line 107, in raise_mysql_exception
+    raise errorclass(errno, errval)
+pymysql.err.InternalError: (1832, "Cannot change column 'firewall_group_id': used in a foreign key constraint 'firewall_group_port_associations_v2_ibfk_1'")
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/usr/bin/neutron-db-manage", line 10, in <module>
+    sys.exit(main())
+  File "/usr/lib/python3/dist-packages/neutron/db/migration/cli.py", line 657, in main
+    return_val |= bool(CONF.command.func(config, CONF.command.name))
+  File "/usr/lib/python3/dist-packages/neutron/db/migration/cli.py", line 181, in do_upgrade
+    desc=branch, sql=CONF.command.sql)
+  File "/usr/lib/python3/dist-packages/neutron/db/migration/cli.py", line 82, in do_alembic_command
+    getattr(alembic_command, cmd)(config, *args, **kwargs)
+  File "/usr/lib/python3/dist-packages/alembic/command.py", line 254, in upgrade
+    script.run_env()
+  File "/usr/lib/python3/dist-packages/alembic/script/base.py", line 427, in run_env
+    util.load_python_file(self.dir, 'env.py')
+  File "/usr/lib/python3/dist-packages/alembic/util/pyfiles.py", line 81, in load_python_file
+    module = load_module_py(module_id, path)
+  File "/usr/lib/python3/dist-packages/alembic/util/compat.py", line 82, in load_module_py
+    spec.loader.exec_module(module)
+  File "<frozen importlib._bootstrap_external>", line 678, in exec_module
+  File "<frozen importlib._bootstrap>", line 219, in _call_with_frames_removed
+  File "/usr/lib/python3/dist-packages/neutron_fwaas/db/migration/alembic_migrations/env.py", line 86, in <module>
+    run_migrations_online()
+  File "/usr/lib/python3/dist-packages/neutron_fwaas/db/migration/alembic_migrations/env.py", line 77, in run_migrations_online
+    context.run_migrations()
+  File "<string>", line 8, in run_migrations
+  File "/usr/lib/python3/dist-packages/alembic/runtime/environment.py", line 836, in run_migrations
+    self.get_context().run_migrations(**kw)
+  File "/usr/lib/python3/dist-packages/alembic/runtime/migration.py", line 330, in run_migrations
+    step.migration_fn(**kw)
+  File "/usr/lib/python3/dist-packages/neutron_fwaas/db/migration/alembic_migrations/versions/newton/expand/d6a12e637e28_neutron_fwaas_v2_0.py", line 112, in upgrade
+    ['firewall_group_id', 'port_id'])
+  File "<string>", line 8, in create_primary_key
+  File "<string>", line 3, in create_primary_key
+  File "/usr/lib/python3/dist-packages/alembic/operations/ops.py", line 269, in create_primary_key
+    return operations.invoke(op)
+  File "/usr/lib/python3/dist-packages/alembic/operations/base.py", line 319, in invoke
+    return fn(self, operation)
+  File "/usr/lib/python3/dist-packages/alembic/operations/toimpl.py", line 135, in create_constraint
+    operation.to_constraint(operations.migration_context)
+  File "/usr/lib/python3/dist-packages/alembic/ddl/impl.py", line 177, in add_constraint
+    self._exec(schema.AddConstraint(const))
+  File "/usr/lib/python3/dist-packages/alembic/ddl/impl.py", line 115, in _exec
+    return conn.execute(construct, *multiparams, **params)
+  File "/usr/lib/python3/dist-packages/sqlalchemy/engine/base.py", line 980, in execute
+    return meth(self, multiparams, params)
+  File "/usr/lib/python3/dist-packages/sqlalchemy/sql/ddl.py", line 72, in _execute_on_connection
+    return connection._execute_ddl(self, multiparams, params)
+  File "/usr/lib/python3/dist-packages/sqlalchemy/engine/base.py", line 1042, in _execute_ddl
+    compiled,
+  File "/usr/lib/python3/dist-packages/sqlalchemy/engine/base.py", line 1240, in _execute_context
+    e, statement, parameters, cursor, context
+  File "/usr/lib/python3/dist-packages/sqlalchemy/engine/base.py", line 1456, in _handle_dbapi_exception
+    util.raise_from_cause(newraise, exc_info)
+  File "/usr/lib/python3/dist-packages/sqlalchemy/util/compat.py", line 296, in raise_from_cause
+    reraise(type(exception), exception, tb=exc_tb, cause=cause)
+  File "/usr/lib/python3/dist-packages/sqlalchemy/util/compat.py", line 276, in reraise
+    raise value.with_traceback(tb)
+  File "/usr/lib/python3/dist-packages/sqlalchemy/engine/base.py", line 1236, in _execute_context
+    cursor, statement, parameters, context
+  File "/usr/lib/python3/dist-packages/sqlalchemy/engine/default.py", line 536, in do_execute
+    cursor.execute(statement, parameters)
+  File "/usr/lib/python3/dist-packages/pymysql/cursors.py", line 165, in execute
+    result = self._query(query)
+  File "/usr/lib/python3/dist-packages/pymysql/cursors.py", line 321, in _query
+    conn.query(q)
+  File "/usr/lib/python3/dist-packages/pymysql/connections.py", line 860, in query
+    self._affected_rows = self._read_query_result(unbuffered=unbuffered)
+  File "/usr/lib/python3/dist-packages/pymysql/connections.py", line 1061, in _read_query_result
+    result.read()
+  File "/usr/lib/python3/dist-packages/pymysql/connections.py", line 1349, in read
+    first_packet = self.connection._read_packet()
+  File "/usr/lib/python3/dist-packages/pymysql/connections.py", line 1018, in _read_packet
+    packet.check_error()
+  File "/usr/lib/python3/dist-packages/pymysql/connections.py", line 384, in check_error
+    err.raise_mysql_exception(self._data)
+  File "/usr/lib/python3/dist-packages/pymysql/err.py", line 107, in raise_mysql_exception
+    raise errorclass(errno, errval)
+oslo_db.exception.DBError: (pymysql.err.InternalError) (1832, "Cannot change column 'firewall_group_id': used in a foreign key constraint 'firewall_group_port_associations_v2_ibfk_1'") [SQL: 'ALTER TABLE firewall_group_port_associations_v2 ADD CONSTRAINT pk_firewall_group_port_associations_v2 PRIMARY KEY (firewall_group_id, port_id)'] (Background on this error at: http://sqlalche.me/e/2j85)
+
+
+
+root@wei-ThinkPad-X1-Extreme:~# mysql -u root --password=MARIADB_PASS --execute="use neutron;alter table firewall_group_port_associations_v2 drop foreign key firewall_group_port_associations_v2_ibfk_1;"
+
+
+root@wei-ThinkPad-X1-Extreme:~# su -s /bin/sh -c "neutron-db-manage --config-file /etc/neutron/neutron.conf --config-file /etc/neutron/plugins/ml2/ml2_conf.ini upgrade head" neutron
+INFO  [alembic.runtime.migration] Context impl MySQLImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+  Running upgrade for neutron ...
+INFO  [alembic.runtime.migration] Context impl MySQLImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+  OK
+INFO  [alembic.runtime.migration] Context impl MySQLImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+  Running upgrade for neutron-fwaas ...
+INFO  [alembic.runtime.migration] Context impl MySQLImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade 4b47ea298795 -> d6a12e637e28, neutron-fwaas v2.0
+Traceback (most recent call last):
+  File "/usr/lib/python3/dist-packages/sqlalchemy/engine/base.py", line 1236, in _execute_context
+    cursor, statement, parameters, context
+  File "/usr/lib/python3/dist-packages/sqlalchemy/engine/default.py", line 536, in do_execute
+    cursor.execute(statement, parameters)
+  File "/usr/lib/python3/dist-packages/pymysql/cursors.py", line 165, in execute
+    result = self._query(query)
+  File "/usr/lib/python3/dist-packages/pymysql/cursors.py", line 321, in _query
+    conn.query(q)
+  File "/usr/lib/python3/dist-packages/pymysql/connections.py", line 860, in query
+    self._affected_rows = self._read_query_result(unbuffered=unbuffered)
+  File "/usr/lib/python3/dist-packages/pymysql/connections.py", line 1061, in _read_query_result
+    result.read()
+  File "/usr/lib/python3/dist-packages/pymysql/connections.py", line 1349, in read
+    first_packet = self.connection._read_packet()
+  File "/usr/lib/python3/dist-packages/pymysql/connections.py", line 1018, in _read_packet
+    packet.check_error()
+  File "/usr/lib/python3/dist-packages/pymysql/connections.py", line 384, in check_error
+    err.raise_mysql_exception(self._data)
+  File "/usr/lib/python3/dist-packages/pymysql/err.py", line 107, in raise_mysql_exception
+    raise errorclass(errno, errval)
+pymysql.err.InternalError: (1050, "Table 'firewall_policies_v2' already exists")
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/usr/bin/neutron-db-manage", line 10, in <module>
+    sys.exit(main())
+  File "/usr/lib/python3/dist-packages/neutron/db/migration/cli.py", line 657, in main
+    return_val |= bool(CONF.command.func(config, CONF.command.name))
+  File "/usr/lib/python3/dist-packages/neutron/db/migration/cli.py", line 181, in do_upgrade
+    desc=branch, sql=CONF.command.sql)
+  File "/usr/lib/python3/dist-packages/neutron/db/migration/cli.py", line 82, in do_alembic_command
+    getattr(alembic_command, cmd)(config, *args, **kwargs)
+  File "/usr/lib/python3/dist-packages/alembic/command.py", line 254, in upgrade
+    script.run_env()
+  File "/usr/lib/python3/dist-packages/alembic/script/base.py", line 427, in run_env
+    util.load_python_file(self.dir, 'env.py')
+  File "/usr/lib/python3/dist-packages/alembic/util/pyfiles.py", line 81, in load_python_file
+    module = load_module_py(module_id, path)
+  File "/usr/lib/python3/dist-packages/alembic/util/compat.py", line 82, in load_module_py
+    spec.loader.exec_module(module)
+  File "<frozen importlib._bootstrap_external>", line 678, in exec_module
+  File "<frozen importlib._bootstrap>", line 219, in _call_with_frames_removed
+  File "/usr/lib/python3/dist-packages/neutron_fwaas/db/migration/alembic_migrations/env.py", line 86, in <module>
+    run_migrations_online()
+  File "/usr/lib/python3/dist-packages/neutron_fwaas/db/migration/alembic_migrations/env.py", line 77, in run_migrations_online
+    context.run_migrations()
+  File "<string>", line 8, in run_migrations
+  File "/usr/lib/python3/dist-packages/alembic/runtime/environment.py", line 836, in run_migrations
+    self.get_context().run_migrations(**kw)
+  File "/usr/lib/python3/dist-packages/alembic/runtime/migration.py", line 330, in run_migrations
+    step.migration_fn(**kw)
+  File "/usr/lib/python3/dist-packages/neutron_fwaas/db/migration/alembic_migrations/versions/newton/expand/d6a12e637e28_neutron_fwaas_v2_0.py", line 68, in upgrade
+    sa.Column('rule_count', sa.Integer))
+  File "<string>", line 8, in create_table
+  File "<string>", line 3, in create_table
+  File "/usr/lib/python3/dist-packages/alembic/operations/ops.py", line 1120, in create_table
+    return operations.invoke(op)
+  File "/usr/lib/python3/dist-packages/alembic/operations/base.py", line 319, in invoke
+    return fn(self, operation)
+  File "/usr/lib/python3/dist-packages/alembic/operations/toimpl.py", line 101, in create_table
+    operations.impl.create_table(table)
+  File "/usr/lib/python3/dist-packages/alembic/ddl/impl.py", line 190, in create_table
+    self._exec(schema.CreateTable(table))
+  File "/usr/lib/python3/dist-packages/alembic/ddl/impl.py", line 115, in _exec
+    return conn.execute(construct, *multiparams, **params)
+  File "/usr/lib/python3/dist-packages/sqlalchemy/engine/base.py", line 980, in execute
+    return meth(self, multiparams, params)
+  File "/usr/lib/python3/dist-packages/sqlalchemy/sql/ddl.py", line 72, in _execute_on_connection
+    return connection._execute_ddl(self, multiparams, params)
+  File "/usr/lib/python3/dist-packages/sqlalchemy/engine/base.py", line 1042, in _execute_ddl
+    compiled,
+  File "/usr/lib/python3/dist-packages/sqlalchemy/engine/base.py", line 1240, in _execute_context
+    e, statement, parameters, cursor, context
+  File "/usr/lib/python3/dist-packages/sqlalchemy/engine/base.py", line 1456, in _handle_dbapi_exception
+    util.raise_from_cause(newraise, exc_info)
+  File "/usr/lib/python3/dist-packages/sqlalchemy/util/compat.py", line 296, in raise_from_cause
+    reraise(type(exception), exception, tb=exc_tb, cause=cause)
+  File "/usr/lib/python3/dist-packages/sqlalchemy/util/compat.py", line 276, in reraise
+    raise value.with_traceback(tb)
+  File "/usr/lib/python3/dist-packages/sqlalchemy/engine/base.py", line 1236, in _execute_context
+    cursor, statement, parameters, context
+  File "/usr/lib/python3/dist-packages/sqlalchemy/engine/default.py", line 536, in do_execute
+    cursor.execute(statement, parameters)
+  File "/usr/lib/python3/dist-packages/pymysql/cursors.py", line 165, in execute
+    result = self._query(query)
+  File "/usr/lib/python3/dist-packages/pymysql/cursors.py", line 321, in _query
+    conn.query(q)
+  File "/usr/lib/python3/dist-packages/pymysql/connections.py", line 860, in query
+    self._affected_rows = self._read_query_result(unbuffered=unbuffered)
+  File "/usr/lib/python3/dist-packages/pymysql/connections.py", line 1061, in _read_query_result
+    result.read()
+  File "/usr/lib/python3/dist-packages/pymysql/connections.py", line 1349, in read
+    first_packet = self.connection._read_packet()
+  File "/usr/lib/python3/dist-packages/pymysql/connections.py", line 1018, in _read_packet
+    packet.check_error()
+  File "/usr/lib/python3/dist-packages/pymysql/connections.py", line 384, in check_error
+    err.raise_mysql_exception(self._data)
+  File "/usr/lib/python3/dist-packages/pymysql/err.py", line 107, in raise_mysql_exception
+    raise errorclass(errno, errval)
+oslo_db.exception.DBError: (pymysql.err.InternalError) (1050, "Table 'firewall_policies_v2' already exists") [SQL: '\nCREATE TABLE firewall_policies_v2 (\n\tid VARCHAR(36) NOT NULL, \n\tname VARCHAR(255), \n\tdescription VARCHAR(1024), \n\tproject_id VARCHAR(255), \n\taudited BOOL, \n\tpublic BOOL, \n\trule_count INTEGER, \n\tPRIMARY KEY (id), \n\tCHECK (audited IN (0, 1))\n)ENGINE=InnoDB\n\n'] (Background on this error at: http://sqlalche.me/e/2j85)
+
+
+
+root@wei-ThinkPad-X1-Extreme:~# mysql -u root --password=MARIADB_PASS --execute="use neutron;drop table if exists firewall_policies_v2;"
+ERROR 1451 (23000) at line 1: Cannot delete or update a parent row: a foreign key constraint fails
+
+
+root@wei-ThinkPad-X1-Extreme:~# mysql -u root --password=MARIADB_PASS --execute="use neutron;SET foreign_key_checks=0;drop table if exists firewall_policies_v2;SET foreign_key_checks=1;"
+
+
+
+root@wei-ThinkPad-X1-Extreme:~# su -s /bin/sh -c "neutron-db-manage --config-file /etc/neutron/neutron.conf --config-file /etc/neutron/plugins/ml2/ml2_conf.ini upgrade head" neutron
+INFO  [alembic.runtime.migration] Context impl MySQLImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+  Running upgrade for neutron ...
+INFO  [alembic.runtime.migration] Context impl MySQLImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+  OK
+INFO  [alembic.runtime.migration] Context impl MySQLImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+  Running upgrade for neutron-fwaas ...
+INFO  [alembic.runtime.migration] Context impl MySQLImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade 4b47ea298795 -> d6a12e637e28, neutron-fwaas v2.0
+Traceback (most recent call last):
+  File "/usr/lib/python3/dist-packages/sqlalchemy/engine/base.py", line 1236, in _execute_context
+    cursor, statement, parameters, context
+  File "/usr/lib/python3/dist-packages/sqlalchemy/engine/default.py", line 536, in do_execute
+    cursor.execute(statement, parameters)
+  File "/usr/lib/python3/dist-packages/pymysql/cursors.py", line 165, in execute
+    result = self._query(query)
+  File "/usr/lib/python3/dist-packages/pymysql/cursors.py", line 321, in _query
+    conn.query(q)
+  File "/usr/lib/python3/dist-packages/pymysql/connections.py", line 860, in query
+    self._affected_rows = self._read_query_result(unbuffered=unbuffered)
+  File "/usr/lib/python3/dist-packages/pymysql/connections.py", line 1061, in _read_query_result
+    result.read()
+  File "/usr/lib/python3/dist-packages/pymysql/connections.py", line 1349, in read
+    first_packet = self.connection._read_packet()
+  File "/usr/lib/python3/dist-packages/pymysql/connections.py", line 1018, in _read_packet
+    packet.check_error()
+  File "/usr/lib/python3/dist-packages/pymysql/connections.py", line 384, in check_error
+    err.raise_mysql_exception(self._data)
+  File "/usr/lib/python3/dist-packages/pymysql/err.py", line 107, in raise_mysql_exception
+    raise errorclass(errno, errval)
+pymysql.err.InternalError: (1050, "Table 'firewall_rules_v2' already exists")
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/usr/bin/neutron-db-manage", line 10, in <module>
+    sys.exit(main())
+  File "/usr/lib/python3/dist-packages/neutron/db/migration/cli.py", line 657, in main
+    return_val |= bool(CONF.command.func(config, CONF.command.name))
+  File "/usr/lib/python3/dist-packages/neutron/db/migration/cli.py", line 181, in do_upgrade
+    desc=branch, sql=CONF.command.sql)
+  File "/usr/lib/python3/dist-packages/neutron/db/migration/cli.py", line 82, in do_alembic_command
+    getattr(alembic_command, cmd)(config, *args, **kwargs)
+  File "/usr/lib/python3/dist-packages/alembic/command.py", line 254, in upgrade
+    script.run_env()
+  File "/usr/lib/python3/dist-packages/alembic/script/base.py", line 427, in run_env
+    util.load_python_file(self.dir, 'env.py')
+  File "/usr/lib/python3/dist-packages/alembic/util/pyfiles.py", line 81, in load_python_file
+    module = load_module_py(module_id, path)
+  File "/usr/lib/python3/dist-packages/alembic/util/compat.py", line 82, in load_module_py
+    spec.loader.exec_module(module)
+  File "<frozen importlib._bootstrap_external>", line 678, in exec_module
+  File "<frozen importlib._bootstrap>", line 219, in _call_with_frames_removed
+  File "/usr/lib/python3/dist-packages/neutron_fwaas/db/migration/alembic_migrations/env.py", line 86, in <module>
+    run_migrations_online()
+  File "/usr/lib/python3/dist-packages/neutron_fwaas/db/migration/alembic_migrations/env.py", line 77, in run_migrations_online
+    context.run_migrations()
+  File "<string>", line 8, in run_migrations
+  File "/usr/lib/python3/dist-packages/alembic/runtime/environment.py", line 836, in run_migrations
+    self.get_context().run_migrations(**kw)
+  File "/usr/lib/python3/dist-packages/alembic/runtime/migration.py", line 330, in run_migrations
+    step.migration_fn(**kw)
+  File "/usr/lib/python3/dist-packages/neutron_fwaas/db/migration/alembic_migrations/versions/newton/expand/d6a12e637e28_neutron_fwaas_v2_0.py", line 86, in upgrade
+    sa.Column('enabled', sa.Boolean))
+  File "<string>", line 8, in create_table
+  File "<string>", line 3, in create_table
+  File "/usr/lib/python3/dist-packages/alembic/operations/ops.py", line 1120, in create_table
+    return operations.invoke(op)
+  File "/usr/lib/python3/dist-packages/alembic/operations/base.py", line 319, in invoke
+    return fn(self, operation)
+  File "/usr/lib/python3/dist-packages/alembic/operations/toimpl.py", line 101, in create_table
+    operations.impl.create_table(table)
+  File "/usr/lib/python3/dist-packages/alembic/ddl/impl.py", line 190, in create_table
+    self._exec(schema.CreateTable(table))
+  File "/usr/lib/python3/dist-packages/alembic/ddl/impl.py", line 115, in _exec
+    return conn.execute(construct, *multiparams, **params)
+  File "/usr/lib/python3/dist-packages/sqlalchemy/engine/base.py", line 980, in execute
+    return meth(self, multiparams, params)
+  File "/usr/lib/python3/dist-packages/sqlalchemy/sql/ddl.py", line 72, in _execute_on_connection
+    return connection._execute_ddl(self, multiparams, params)
+  File "/usr/lib/python3/dist-packages/sqlalchemy/engine/base.py", line 1042, in _execute_ddl
+    compiled,
+  File "/usr/lib/python3/dist-packages/sqlalchemy/engine/base.py", line 1240, in _execute_context
+    e, statement, parameters, cursor, context
+  File "/usr/lib/python3/dist-packages/sqlalchemy/engine/base.py", line 1456, in _handle_dbapi_exception
+    util.raise_from_cause(newraise, exc_info)
+  File "/usr/lib/python3/dist-packages/sqlalchemy/util/compat.py", line 296, in raise_from_cause
+    reraise(type(exception), exception, tb=exc_tb, cause=cause)
+  File "/usr/lib/python3/dist-packages/sqlalchemy/util/compat.py", line 276, in reraise
+    raise value.with_traceback(tb)
+  File "/usr/lib/python3/dist-packages/sqlalchemy/engine/base.py", line 1236, in _execute_context
+    cursor, statement, parameters, context
+  File "/usr/lib/python3/dist-packages/sqlalchemy/engine/default.py", line 536, in do_execute
+    cursor.execute(statement, parameters)
+  File "/usr/lib/python3/dist-packages/pymysql/cursors.py", line 165, in execute
+    result = self._query(query)
+  File "/usr/lib/python3/dist-packages/pymysql/cursors.py", line 321, in _query
+    conn.query(q)
+  File "/usr/lib/python3/dist-packages/pymysql/connections.py", line 860, in query
+    self._affected_rows = self._read_query_result(unbuffered=unbuffered)
+  File "/usr/lib/python3/dist-packages/pymysql/connections.py", line 1061, in _read_query_result
+    result.read()
+  File "/usr/lib/python3/dist-packages/pymysql/connections.py", line 1349, in read
+    first_packet = self.connection._read_packet()
+  File "/usr/lib/python3/dist-packages/pymysql/connections.py", line 1018, in _read_packet
+    packet.check_error()
+  File "/usr/lib/python3/dist-packages/pymysql/connections.py", line 384, in check_error
+    err.raise_mysql_exception(self._data)
+  File "/usr/lib/python3/dist-packages/pymysql/err.py", line 107, in raise_mysql_exception
+    raise errorclass(errno, errval)
+oslo_db.exception.DBError: (pymysql.err.InternalError) (1050, "Table 'firewall_rules_v2' already exists") [SQL: "\nCREATE TABLE firewall_rules_v2 (\n\tid VARCHAR(36) NOT NULL, \n\tname VARCHAR(255), \n\tdescription VARCHAR(1024), \n\tproject_id VARCHAR(255), \n\tprotocol VARCHAR(40), \n\tip_version INTEGER, \n\tsource_ip_address VARCHAR(46), \n\tdestination_ip_address VARCHAR(46), \n\tsource_port_range_min INTEGER, \n\tsource_port_range_max INTEGER, \n\tdestination_port_range_min INTEGER, \n\tdestination_port_range_max INTEGER, \n\taction ENUM('allow','deny','reject'), \n\tpublic BOOL, \n\tenabled BOOL, \n\tPRIMARY KEY (id), \n\tCHECK (enabled IN (0, 1))\n)ENGINE=InnoDB\n\n"] (Background on this error at: http://sqlalche.me/e/2j85)
+
+
+root@wei-ThinkPad-X1-Extreme:~# mysql -u root --password=MARIADB_PASS --execute="use neutron;SET foreign_key_checks=0;alter table firewall_group_port_associations_v2 drop foreign key firewall_group_port_associations_v2_ibfk_1;alter table firewall_group_port_associations_v2 drop foreign key firewall_group_port_associations_v2_ibfk_2;drop table if exists firewall_policies_v2,firewall_rules_v2,firewall_group_port_associations_v2,firewall_groups_v2;"
+root@wei-ThinkPad-X1-Extreme:~# su -s /bin/sh -c "neutron-db-manage --config-file /etc/neutron/neutron.conf --config-file /etc/neutron/plugins/ml2/ml2_conf.ini upgrade head" neutron
+INFO  [alembic.runtime.migration] Context impl MySQLImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+  Running upgrade for neutron ...
+INFO  [alembic.runtime.migration] Context impl MySQLImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+  OK
+INFO  [alembic.runtime.migration] Context impl MySQLImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+  Running upgrade for neutron-fwaas ...
+INFO  [alembic.runtime.migration] Context impl MySQLImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade 4b47ea298795 -> d6a12e637e28, neutron-fwaas v2.0
+Traceback (most recent call last):
+  File "/usr/lib/python3/dist-packages/sqlalchemy/engine/base.py", line 1236, in _execute_context
+    cursor, statement, parameters, context
+  File "/usr/lib/python3/dist-packages/sqlalchemy/engine/default.py", line 536, in do_execute
+    cursor.execute(statement, parameters)
+  File "/usr/lib/python3/dist-packages/pymysql/cursors.py", line 165, in execute
+    result = self._query(query)
+  File "/usr/lib/python3/dist-packages/pymysql/cursors.py", line 321, in _query
+    conn.query(q)
+  File "/usr/lib/python3/dist-packages/pymysql/connections.py", line 860, in query
+    self._affected_rows = self._read_query_result(unbuffered=unbuffered)
+  File "/usr/lib/python3/dist-packages/pymysql/connections.py", line 1061, in _read_query_result
+    result.read()
+  File "/usr/lib/python3/dist-packages/pymysql/connections.py", line 1349, in read
+    first_packet = self.connection._read_packet()
+  File "/usr/lib/python3/dist-packages/pymysql/connections.py", line 1018, in _read_packet
+    packet.check_error()
+  File "/usr/lib/python3/dist-packages/pymysql/connections.py", line 384, in check_error
+    err.raise_mysql_exception(self._data)
+  File "/usr/lib/python3/dist-packages/pymysql/err.py", line 107, in raise_mysql_exception
+    raise errorclass(errno, errval)
+pymysql.err.InternalError: (1832, "Cannot change column 'firewall_group_id': used in a foreign key constraint 'firewall_group_port_associations_v2_ibfk_1'")
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/usr/bin/neutron-db-manage", line 10, in <module>
+    sys.exit(main())
+  File "/usr/lib/python3/dist-packages/neutron/db/migration/cli.py", line 657, in main
+    return_val |= bool(CONF.command.func(config, CONF.command.name))
+  File "/usr/lib/python3/dist-packages/neutron/db/migration/cli.py", line 181, in do_upgrade
+    desc=branch, sql=CONF.command.sql)
+  File "/usr/lib/python3/dist-packages/neutron/db/migration/cli.py", line 82, in do_alembic_command
+    getattr(alembic_command, cmd)(config, *args, **kwargs)
+  File "/usr/lib/python3/dist-packages/alembic/command.py", line 254, in upgrade
+    script.run_env()
+  File "/usr/lib/python3/dist-packages/alembic/script/base.py", line 427, in run_env
+    util.load_python_file(self.dir, 'env.py')
+  File "/usr/lib/python3/dist-packages/alembic/util/pyfiles.py", line 81, in load_python_file
+    module = load_module_py(module_id, path)
+  File "/usr/lib/python3/dist-packages/alembic/util/compat.py", line 82, in load_module_py
+    spec.loader.exec_module(module)
+  File "<frozen importlib._bootstrap_external>", line 678, in exec_module
+  File "<frozen importlib._bootstrap>", line 219, in _call_with_frames_removed
+  File "/usr/lib/python3/dist-packages/neutron_fwaas/db/migration/alembic_migrations/env.py", line 86, in <module>
+    run_migrations_online()
+  File "/usr/lib/python3/dist-packages/neutron_fwaas/db/migration/alembic_migrations/env.py", line 77, in run_migrations_online
+    context.run_migrations()
+  File "<string>", line 8, in run_migrations
+  File "/usr/lib/python3/dist-packages/alembic/runtime/environment.py", line 836, in run_migrations
+    self.get_context().run_migrations(**kw)
+  File "/usr/lib/python3/dist-packages/alembic/runtime/migration.py", line 330, in run_migrations
+    step.migration_fn(**kw)
+  File "/usr/lib/python3/dist-packages/neutron_fwaas/db/migration/alembic_migrations/versions/newton/expand/d6a12e637e28_neutron_fwaas_v2_0.py", line 112, in upgrade
+    ['firewall_group_id', 'port_id'])
+  File "<string>", line 8, in create_primary_key
+  File "<string>", line 3, in create_primary_key
+  File "/usr/lib/python3/dist-packages/alembic/operations/ops.py", line 269, in create_primary_key
+    return operations.invoke(op)
+  File "/usr/lib/python3/dist-packages/alembic/operations/base.py", line 319, in invoke
+    return fn(self, operation)
+  File "/usr/lib/python3/dist-packages/alembic/operations/toimpl.py", line 135, in create_constraint
+    operation.to_constraint(operations.migration_context)
+  File "/usr/lib/python3/dist-packages/alembic/ddl/impl.py", line 177, in add_constraint
+    self._exec(schema.AddConstraint(const))
+  File "/usr/lib/python3/dist-packages/alembic/ddl/impl.py", line 115, in _exec
+    return conn.execute(construct, *multiparams, **params)
+  File "/usr/lib/python3/dist-packages/sqlalchemy/engine/base.py", line 980, in execute
+    return meth(self, multiparams, params)
+  File "/usr/lib/python3/dist-packages/sqlalchemy/sql/ddl.py", line 72, in _execute_on_connection
+    return connection._execute_ddl(self, multiparams, params)
+  File "/usr/lib/python3/dist-packages/sqlalchemy/engine/base.py", line 1042, in _execute_ddl
+    compiled,
+  File "/usr/lib/python3/dist-packages/sqlalchemy/engine/base.py", line 1240, in _execute_context
+    e, statement, parameters, cursor, context
+  File "/usr/lib/python3/dist-packages/sqlalchemy/engine/base.py", line 1456, in _handle_dbapi_exception
+    util.raise_from_cause(newraise, exc_info)
+  File "/usr/lib/python3/dist-packages/sqlalchemy/util/compat.py", line 296, in raise_from_cause
+    reraise(type(exception), exception, tb=exc_tb, cause=cause)
+  File "/usr/lib/python3/dist-packages/sqlalchemy/util/compat.py", line 276, in reraise
+    raise value.with_traceback(tb)
+  File "/usr/lib/python3/dist-packages/sqlalchemy/engine/base.py", line 1236, in _execute_context
+    cursor, statement, parameters, context
+  File "/usr/lib/python3/dist-packages/sqlalchemy/engine/default.py", line 536, in do_execute
+    cursor.execute(statement, parameters)
+  File "/usr/lib/python3/dist-packages/pymysql/cursors.py", line 165, in execute
+    result = self._query(query)
+  File "/usr/lib/python3/dist-packages/pymysql/cursors.py", line 321, in _query
+    conn.query(q)
+  File "/usr/lib/python3/dist-packages/pymysql/connections.py", line 860, in query
+    self._affected_rows = self._read_query_result(unbuffered=unbuffered)
+  File "/usr/lib/python3/dist-packages/pymysql/connections.py", line 1061, in _read_query_result
+    result.read()
+  File "/usr/lib/python3/dist-packages/pymysql/connections.py", line 1349, in read
+    first_packet = self.connection._read_packet()
+  File "/usr/lib/python3/dist-packages/pymysql/connections.py", line 1018, in _read_packet
+    packet.check_error()
+  File "/usr/lib/python3/dist-packages/pymysql/connections.py", line 384, in check_error
+    err.raise_mysql_exception(self._data)
+  File "/usr/lib/python3/dist-packages/pymysql/err.py", line 107, in raise_mysql_exception
+    raise errorclass(errno, errval)
+oslo_db.exception.DBError: (pymysql.err.InternalError) (1832, "Cannot change column 'firewall_group_id': used in a foreign key constraint 'firewall_group_port_associations_v2_ibfk_1'") [SQL: 'ALTER TABLE firewall_group_port_associations_v2 ADD CONSTRAINT pk_firewall_group_port_associations_v2 PRIMARY KEY (firewall_group_id, port_id)'] (Background on this error at: http://sqlalche.me/e/2j85)
+
+
+root@wei-ThinkPad-X1-Extreme:~# mysql -u root --password=MARIADB_PASS --execute="use neutron;SET foreign_key_checks=0;drop table if exists firewall_policies_v2,firewall_rules_v2,firewall_groups_v2,firewall_group_port_associations_v2,firewall_policy_rule_associations_v2;"
+
+root@wei-ThinkPad-X1-Extreme:~# su -s /bin/sh -c "neutron-db-manage --config-file /etc/neutron/neutron.conf --config-file /etc/neutron/plugins/ml2/ml2_conf.ini upgrade head" neutron
+INFO  [alembic.runtime.migration] Context impl MySQLImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+  Running upgrade for neutron ...
+INFO  [alembic.runtime.migration] Context impl MySQLImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+  OK
+INFO  [alembic.runtime.migration] Context impl MySQLImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+  Running upgrade for neutron-fwaas ...
+INFO  [alembic.runtime.migration] Context impl MySQLImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade 4b47ea298795 -> d6a12e637e28, neutron-fwaas v2.0
+INFO  [alembic.runtime.migration] Running upgrade d6a12e637e28 -> 876782258a43, create_default_firewall_groups_table
+INFO  [alembic.runtime.migration] Running upgrade 876782258a43 -> f24e0d5e5bff, uniq_firewallgroupportassociation0port
+INFO  [alembic.runtime.migration] Running upgrade f24e0d5e5bff -> 2a0d33e9ef63, add pk firewall_group_associations_v2
+INFO  [alembic.runtime.migration] Running upgrade kilo -> 67c8e8d61d5, Initial Liberty no-op script.
+INFO  [alembic.runtime.migration] Running upgrade 67c8e8d61d5 -> 458aa42b14b, fw_table_alter script to make <name> column case sensitive
+INFO  [alembic.runtime.migration] Running upgrade 458aa42b14b -> f83a0b2964d0, rename tenant to project
+INFO  [alembic.runtime.migration] Running upgrade f83a0b2964d0 -> fd38cd995cc0, change shared attribute for firewall resource
+  OK
+
+
+https://github.com/openstack/neutron-fwaas/blob/master/neutron_fwaas/db/migration/alembic_migrations/versions/newton/expand/d6a12e637e28_neutron_fwaas_v2_0.py
+
+    op.create_table(
+        'firewall_group_port_associations_v2',
+        sa.Column('firewall_group_id', sa.String(length=36)),
+        sa.Column('port_id', sa.String(length=36))
+    )        
+    # op.create_table(
+    #     'firewall_group_port_associations_v2',
+    #     sa.Column('firewall_group_id', sa.String(length=36),
+    #               sa.ForeignKey('firewall_groups_v2.id', ondelete='CASCADE')),
+    #     sa.Column('port_id', sa.String(length=36),
+    #               sa.ForeignKey('ports.id', ondelete='CASCADE'))
+    # )
+    # op.create_primary_key(
+    #     'pk_firewall_group_port_associations_v2',
+    #     'firewall_group_port_associations_v2',
+    #     ['firewall_group_id', 'port_id'])
+
+    op.create_table(
+        'firewall_policy_rule_associations_v2',
+        sa.Column('firewall_policy_id', sa.String(length=36)),
+        sa.Column('firewall_rule_id', sa.String(length=36)),
+        sa.Column('position', sa.Integer))
+
+    # op.create_table(
+    #     'firewall_policy_rule_associations_v2',
+    #     sa.Column('firewall_policy_id', sa.String(length=36),
+    #               sa.ForeignKey('firewall_policies_v2.id', ondelete='CASCADE'),
+    #               nullable=False, primary_key=True),
+    #     sa.Column('firewall_rule_id', sa.String(length=36),
+    #               sa.ForeignKey('firewall_rules_v2.id', ondelete='CASCADE'),
+    #               nullable=False, primary_key=True),
+    #     sa.Column('position', sa.Integer))
+
+
+MariaDB [(none)]> SELECT * FROM   INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE INFORMATION_SCHEMA.TABLE_CONSTRAINTS.TABLE_SCHEMA = 'neutron' AND INFORMATION_SCHEMA.TABLE_CONSTRAINTS.TABLE_NAME='firewall_group_port_associations_v2' AND INFORMATION_SCHEMA.TABLE_CONSTRAINTS.CONSTRAINT_TYPE='FOREIGN KEY';
++--------------------+-------------------+--------------------------------------------+--------------+-------------------------------------+-----------------+
+| CONSTRAINT_CATALOG | CONSTRAINT_SCHEMA | CONSTRAINT_NAME                            | TABLE_SCHEMA | TABLE_NAME                          | CONSTRAINT_TYPE |
++--------------------+-------------------+--------------------------------------------+--------------+-------------------------------------+-----------------+
+| def                | neutron           | firewall_group_port_associations_v2_ibfk_1 | neutron      | firewall_group_port_associations_v2 | FOREIGN KEY     |
+| def                | neutron           | firewall_group_port_associations_v2_ibfk_2 | neutron      | firewall_group_port_associations_v2 | FOREIGN KEY     |
++--------------------+-------------------+--------------------------------------------+--------------+-------------------------------------+-----------------+
+2 rows in set (0.00 sec)
+
+MariaDB [neutron]> select * from alembic_version;
++--------------+
+| version_num  |
++--------------+
+| 5c85685d616d |
+| c613d0b82681 |
++--------------+
+2 rows in set (0.00 sec)
+
+MariaDB [neutron]> select * from alembic_version_fwaas;
++--------------+
+| version_num  |
++--------------+
+| 4b47ea298795 |
++--------------+
+1 row in set (0.01 sec)
+
+
+
+https://docs.openstack.org/neutron/train/install/compute-install-ubuntu.html
+
+Compute networking
+
+root@wei-ThinkPad-X1-Extreme:~# apt-get install -y neutron-linuxbridge-agent
+Reading package lists... Done
+Building dependency tree       
+Reading state information... Done
+neutron-linuxbridge-agent is already the newest version (2:15.0.0-0ubuntu1~cloud0).
+The following packages were automatically installed and are no longer required:
+  fonts-liberation2 fonts-opensymbol gir1.2-geocodeglib-1.0
+  gir1.2-gst-plugins-base-1.0 gir1.2-gstreamer-1.0 gir1.2-gudev-1.0
+  gir1.2-udisks-2.0 grilo-plugins-0.3-base gstreamer1.0-gtk3
+  libboost-date-time1.65.1 libboost-filesystem1.65.1 libboost-iostreams1.65.1
+  libboost-locale1.65.1 libcdr-0.1-1 libclucene-contribs1v5 libclucene-core1v5
+  libcmis-0.5-5v5 libcolamd2 libdazzle-1.0-0 libe-book-0.1-1
+  libedataserverui-1.2-2 libeot0 libepubgen-0.1-1 libetonyek-0.1-1 libexiv2-14
+  libfreerdp-client2-2 libfreerdp2-2 libgc1c2 libgee-0.8-2 libgexiv2-2
+  libgom-1.0-0 libgpgmepp6 libgpod-common libgpod4 liblangtag-common
+  liblangtag1 liblirc-client0 libllvm8 libmediaart-2.0-0 libmspub-0.1-1
+  libodfgen-0.1-1 libqqwing2v5 libraw16 librevenge-0.0-0 libsgutils2-2
+  libssh-4 libsuitesparseconfig5 libvncclient1 libwinpr2-2 libxapian30
+  libxmlsec1-nss lp-solve media-player-info syslinux syslinux-common
+  syslinux-legacy usb-creator-common
+Use 'apt autoremove' to remove them.
+0 upgraded, 0 newly installed, 0 to remove and 0 not upgraded.
+
+
+root@wei-ThinkPad-X1-Extreme:~# systemctl restart nova-compute.service
+
+wei@wei-ThinkPad-X1-Extreme:~$ sudo tail -f /var/log/nova/nova-compute.log 
+
+2020-02-01 16:26:42.786 20955 INFO nova.virt.libvirt.host [-] Libvirt host capabilities <capabilities>
+
+  <host>
+    <uuid>ee78314c-2dbc-11b2-a85c-984d5a7c3167</uuid>
+    <cpu>
+      <arch>x86_64</arch>
+      <model>Broadwell-noTSX-IBRS</model>
+      <vendor>Intel</vendor>
+      <microcode version='202'/>
+      <topology sockets='1' cores='6' threads='2'/>
+      <feature name='vme'/>
+      <feature name='ds'/>
+      <feature name='acpi'/>
+      <feature name='ss'/>
+      <feature name='ht'/>
+      <feature name='tm'/>
+      <feature name='pbe'/>
+      <feature name='dtes64'/>
+      <feature name='monitor'/>
+      <feature name='ds_cpl'/>
+      <feature name='vmx'/>
+      <feature name='est'/>
+      <feature name='tm2'/>
+      <feature name='xtpr'/>
+      <feature name='pdcm'/>
+      <feature name='osxsave'/>
+      <feature name='f16c'/>
+      <feature name='rdrand'/>
+      <feature name='arat'/>
+      <feature name='tsc_adjust'/>
+      <feature name='mpx'/>
+      <feature name='clflushopt'/>
+      <feature name='intel-pt'/>
+      <feature name='md-clear'/>
+      <feature name='stibp'/>
+      <feature name='ssbd'/>
+      <feature name='xsaveopt'/>
+      <feature name='xsavec'/>
+      <feature name='xgetbv1'/>
+      <feature name='xsaves'/>
+      <feature name='pdpe1gb'/>
+      <feature name='abm'/>
+      <feature name='invtsc'/>
+      <pages unit='KiB' size='4'/>
+      <pages unit='KiB' size='2048'/>
+      <pages unit='KiB' size='1048576'/>
+    </cpu>
+    <power_management>
+      <suspend_mem/>
+    </power_management>
+    <iommu support='no'/>
+    <migration_features>
+      <live/>
+      <uri_transports>
+        <uri_transport>tcp</uri_transport>
+        <uri_transport>rdma</uri_transport>
+      </uri_transports>
+    </migration_features>
+    <topology>
+      <cells num='1'>
+        <cell id='0'>
+          <memory unit='KiB'>15841864</memory>
+          <pages unit='KiB' size='4'>3960466</pages>
+          <pages unit='KiB' size='2048'>0</pages>
+          <pages unit='KiB' size='1048576'>0</pages>
+          <distances>
+            <sibling id='0' value='10'/>
+          </distances>
+          <cpus num='12'>
+            <cpu id='0' socket_id='0' core_id='0' siblings='0,6'/>
+            <cpu id='1' socket_id='0' core_id='1' siblings='1,7'/>
+            <cpu id='2' socket_id='0' core_id='2' siblings='2,8'/>
+            <cpu id='3' socket_id='0' core_id='3' siblings='3,9'/>
+            <cpu id='4' socket_id='0' core_id='4' siblings='4,10'/>
+            <cpu id='5' socket_id='0' core_id='5' siblings='5,11'/>
+            <cpu id='6' socket_id='0' core_id='0' siblings='0,6'/>
+            <cpu id='7' socket_id='0' core_id='1' siblings='1,7'/>
+            <cpu id='8' socket_id='0' core_id='2' siblings='2,8'/>
+            <cpu id='9' socket_id='0' core_id='3' siblings='3,9'/>
+            <cpu id='10' socket_id='0' core_id='4' siblings='4,10'/>
+            <cpu id='11' socket_id='0' core_id='5' siblings='5,11'/>
+          </cpus>
+        </cell>
+      </cells>
+    </topology>
+    <cache>
+      <bank id='0' level='3' type='both' size='9' unit='MiB' cpus='0-11'/>
+    </cache>
+    <secmodel>
+      <model>apparmor</model>
+      <doi>0</doi>
+    </secmodel>
+    <secmodel>
+      <model>dac</model>
+      <doi>0</doi>
+      <baselabel type='kvm'>+64055:+135</baselabel>
+      <baselabel type='qemu'>+64055:+135</baselabel>
+    </secmodel>
+  </host>
+
+  <guest>
+    <os_type>hvm</os_type>
+    <arch name='i686'>
+      <wordsize>32</wordsize>
+      <emulator>/usr/bin/qemu-system-i386</emulator>
+      <machine maxCpus='255'>pc-i440fx-eoan</machine>
+      <machine canonical='pc-i440fx-eoan' maxCpus='255'>ubuntu</machine>
+      <machine maxCpus='1'>isapc</machine>
+      <machine maxCpus='255'>pc-1.1</machine>
+      <machine maxCpus='255'>pc-1.2</machine>
+      <machine maxCpus='255'>pc-1.3</machine>
+      <machine maxCpus='255'>pc-i440fx-zesty</machine>
+      <machine maxCpus='255'>pc-i440fx-2.8</machine>
+      <machine maxCpus='255'>pc-1.0</machine>
+      <machine maxCpus='255'>pc-i440fx-2.9</machine>
+      <machine maxCpus='255'>pc-i440fx-2.6</machine>
+      <machine maxCpus='255'>pc-i440fx-2.7</machine>
+      <machine maxCpus='128'>xenfv</machine>
+      <machine maxCpus='255'>pc-i440fx-wily</machine>
+      <machine maxCpus='255'>pc-i440fx-2.3</machine>
+      <machine maxCpus='255'>pc-i440fx-2.4</machine>
+      <machine maxCpus='255'>pc-i440fx-2.5</machine>
+      <machine maxCpus='288'>pc-q35-disco-hpb</machine>
+      <machine maxCpus='255'>pc-i440fx-yakkety</machine>
+      <machine maxCpus='255'>pc-i440fx-4.0</machine>
+      <machine canonical='pc-i440fx-4.0' maxCpus='255'>pc</machine>
+      <machine maxCpus='255'>pc-i440fx-2.1</machine>
+      <machine maxCpus='255'>pc-i440fx-2.2</machine>
+      <machine maxCpus='288'>pc-q35-eoan</machine>
+      <machine maxCpus='288'>pc-q35-3.1</machine>
+      <machine maxCpus='255'>pc-i440fx-2.0</machine>
+      <machine maxCpus='255'>pc-q35-yakkety</machine>
+      <machine maxCpus='255'>pc-i440fx-cosmic-hpb</machine>
+      <machine maxCpus='255'>pc-i440fx-bionic-hpb</machine>
+      <machine maxCpus='288'>pc-q35-2.11</machine>
+      <machine maxCpus='255'>pc-i440fx-xenial</machine>
+      <machine maxCpus='288'>pc-q35-eoan-hpb</machine>
+      <machine maxCpus='288'>pc-q35-2.12</machine>
+      <machine maxCpus='255'>pc-i440fx-eoan-hpb</machine>
+      <machine maxCpus='288'>pc-q35-3.0</machine>
+      <machine maxCpus='1'>xenpv</machine>
+      <machine maxCpus='288'>pc-q35-2.10</machine>
+      <machine maxCpus='288'>pc-q35-disco</machine>
+      <machine maxCpus='288'>pc-q35-cosmic-hpb</machine>
+      <machine maxCpus='288'>pc-q35-bionic-hpb</machine>
+      <machine maxCpus='255'>pc-i440fx-disco-hpb</machine>
+      <machine maxCpus='255'>pc-q35-xenial</machine>
+      <machine maxCpus='255'>pc-i440fx-artful</machine>
+      <machine maxCpus='255'>pc-i440fx-1.7</machine>
+      <machine maxCpus='288'>pc-q35-2.9</machine>
+      <machine maxCpus='255'>pc-0.15</machine>
+      <machine maxCpus='255'>pc-i440fx-cosmic</machine>
+      <machine maxCpus='255'>pc-i440fx-1.5</machine>
+      <machine maxCpus='255'>pc-q35-2.7</machine>
+      <machine maxCpus='255'>pc-i440fx-1.6</machine>
+      <machine maxCpus='255'>pc-i440fx-2.11</machine>
+      <machine maxCpus='288'>pc-q35-2.8</machine>
+      <machine maxCpus='288'>pc-q35-zesty</machine>
+      <machine maxCpus='255'>pc-i440fx-disco</machine>
+      <machine maxCpus='255'>pc-i440fx-bionic</machine>
+      <machine maxCpus='255'>pc-0.13</machine>
+      <machine maxCpus='288'>pc-q35-artful</machine>
+      <machine maxCpus='255'>pc-0.14</machine>
+      <machine maxCpus='255'>pc-i440fx-3.0</machine>
+      <machine maxCpus='255'>pc-i440fx-2.12</machine>
+      <machine maxCpus='255'>pc-i440fx-3.1</machine>
+      <machine maxCpus='255'>pc-q35-2.4</machine>
+      <machine maxCpus='255'>pc-i440fx-trusty</machine>
+      <machine maxCpus='255'>pc-q35-2.5</machine>
+      <machine maxCpus='255'>pc-q35-2.6</machine>
+      <machine maxCpus='255'>pc-i440fx-1.4</machine>
+      <machine maxCpus='255'>pc-i440fx-2.10</machine>
+      <machine maxCpus='255'>pc-0.12</machine>
+      <machine maxCpus='288'>pc-q35-4.0</machine>
+      <machine canonical='pc-q35-4.0' maxCpus='288'>q35</machine>
+      <machine maxCpus='288'>pc-q35-cosmic</machine>
+      <machine maxCpus='288'>pc-q35-bionic</machine>
+      <domain type='qemu'/>
+      <domain type='kvm'/>
+    </arch>
+    <features>
+      <cpuselection/>
+      <deviceboot/>
+      <disksnapshot default='on' toggle='no'/>
+      <acpi default='on' toggle='yes'/>
+      <apic default='on' toggle='no'/>
+      <pae/>
+      <nonpae/>
+    </features>
+  </guest>
+
+  <guest>
+    <os_type>hvm</os_type>
+    <arch name='x86_64'>
+      <wordsize>64</wordsize>
+      <emulator>/usr/bin/qemu-system-x86_64</emulator>
+      <machine maxCpus='255'>pc-i440fx-eoan</machine>
+      <machine canonical='pc-i440fx-eoan' maxCpus='255'>ubuntu</machine>
+      <machine maxCpus='1'>isapc</machine>
+      <machine maxCpus='255'>pc-1.1</machine>
+      <machine maxCpus='255'>pc-1.2</machine>
+      <machine maxCpus='255'>pc-1.3</machine>
+      <machine maxCpus='255'>pc-i440fx-zesty</machine>
+      <machine maxCpus='255'>pc-i440fx-2.8</machine>
+      <machine maxCpus='255'>pc-1.0</machine>
+      <machine maxCpus='255'>pc-i440fx-2.9</machine>
+      <machine maxCpus='255'>pc-i440fx-2.6</machine>
+      <machine maxCpus='255'>pc-i440fx-2.7</machine>
+      <machine maxCpus='128'>xenfv</machine>
+      <machine maxCpus='255'>pc-i440fx-wily</machine>
+      <machine maxCpus='255'>pc-i440fx-2.3</machine>
+      <machine maxCpus='255'>pc-i440fx-2.4</machine>
+      <machine maxCpus='255'>pc-i440fx-2.5</machine>
+      <machine maxCpus='288'>pc-q35-disco-hpb</machine>
+      <machine maxCpus='255'>pc-i440fx-yakkety</machine>
+      <machine maxCpus='255'>pc-i440fx-4.0</machine>
+      <machine canonical='pc-i440fx-4.0' maxCpus='255'>pc</machine>
+      <machine maxCpus='255'>pc-i440fx-2.1</machine>
+      <machine maxCpus='255'>pc-i440fx-2.2</machine>
+      <machine maxCpus='288'>pc-q35-eoan</machine>
+      <machine maxCpus='288'>pc-q35-3.1</machine>
+      <machine maxCpus='255'>pc-i440fx-2.0</machine>
+      <machine maxCpus='255'>pc-q35-yakkety</machine>
+      <machine maxCpus='255'>pc-i440fx-cosmic-hpb</machine>
+      <machine maxCpus='255'>pc-i440fx-bionic-hpb</machine>
+      <machine maxCpus='288'>pc-q35-2.11</machine>
+      <machine maxCpus='255'>pc-i440fx-xenial</machine>
+      <machine maxCpus='288'>pc-q35-eoan-hpb</machine>
+      <machine maxCpus='288'>pc-q35-2.12</machine>
+      <machine maxCpus='255'>pc-i440fx-eoan-hpb</machine>
+      <machine maxCpus='288'>pc-q35-3.0</machine>
+      <machine maxCpus='1'>xenpv</machine>
+      <machine maxCpus='288'>pc-q35-2.10</machine>
+      <machine maxCpus='288'>pc-q35-disco</machine>
+      <machine maxCpus='288'>pc-q35-cosmic-hpb</machine>
+      <machine maxCpus='288'>pc-q35-bionic-hpb</machine>
+      <machine maxCpus='255'>pc-i440fx-disco-hpb</machine>
+      <machine maxCpus='255'>pc-q35-xenial</machine>
+      <machine maxCpus='255'>pc-i440fx-artful</machine>
+      <machine maxCpus='255'>pc-i440fx-1.7</machine>
+      <machine maxCpus='288'>pc-q35-2.9</machine>
+      <machine maxCpus='255'>pc-0.15</machine>
+      <machine maxCpus='255'>pc-i440fx-cosmic</machine>
+      <machine maxCpus='255'>pc-i440fx-1.5</machine>
+      <machine maxCpus='255'>pc-q35-2.7</machine>
+      <machine maxCpus='255'>pc-i440fx-1.6</machine>
+      <machine maxCpus='255'>pc-i440fx-2.11</machine>
+      <machine maxCpus='288'>pc-q35-2.8</machine>
+      <machine maxCpus='288'>pc-q35-zesty</machine>
+      <machine maxCpus='255'>pc-i440fx-disco</machine>
+      <machine maxCpus='255'>pc-i440fx-bionic</machine>
+      <machine maxCpus='255'>pc-0.13</machine>
+      <machine maxCpus='288'>pc-q35-artful</machine>
+      <machine maxCpus='255'>pc-0.14</machine>
+      <machine maxCpus='255'>pc-i440fx-3.0</machine>
+      <machine maxCpus='255'>pc-i440fx-2.12</machine>
+      <machine maxCpus='255'>pc-i440fx-3.1</machine>
+      <machine maxCpus='255'>pc-q35-2.4</machine>
+      <machine maxCpus='255'>pc-i440fx-trusty</machine>
+      <machine maxCpus='255'>pc-q35-2.5</machine>
+      <machine maxCpus='255'>pc-q35-2.6</machine>
+      <machine maxCpus='255'>pc-i440fx-1.4</machine>
+      <machine maxCpus='255'>pc-i440fx-2.10</machine>
+      <machine maxCpus='255'>pc-0.12</machine>
+      <machine maxCpus='288'>pc-q35-4.0</machine>
+      <machine canonical='pc-q35-4.0' maxCpus='288'>q35</machine>
+      <machine maxCpus='288'>pc-q35-cosmic</machine>
+      <machine maxCpus='288'>pc-q35-bionic</machine>
+      <domain type='qemu'/>
+      <domain type='kvm'/>
+    </arch>
+    <features>
+      <cpuselection/>
+      <deviceboot/>
+      <disksnapshot default='on' toggle='no'/>
+      <acpi default='on' toggle='yes'/>
+      <apic default='on' toggle='no'/>
+    </features>
+  </guest>
+
+</capabilities>
+
+2020-02-01 16:26:42.813 20955 INFO nova.compute.manager [req-1bcba83d-35c2-4065-8eb4-49c31a2256fa - - - - -] Looking for unclaimed instances stuck in BUILDING status for nodes managed by this host
+2020-02-01 16:26:43.344 20955 INFO nova.virt.libvirt.host [req-1bcba83d-35c2-4065-8eb4-49c31a2256fa - - - - -] kernel doesn't support AMD SEV
+
+
+
+
+
+
+Verify DevOps
+
+wei@wei-ThinkPad-X1-Extreme:~$ openstack extension list --network
++----------------------------------------------------------------------------------------------------------------------------------------------------------------+---------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------+
+| Name                                                                                                                                                           | Alias                                 | Description                                                                                                                                              |
++----------------------------------------------------------------------------------------------------------------------------------------------------------------+---------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------+
+| Address scope                                                                                                                                                  | address-scope                         | Address scopes extension.                                                                                                                                |
+| Enforce Router's Admin State Down Before Update Extension                                                                                                      | router-admin-state-down-before-update | Ensure that the admin state of a router is down (admin_state_up=False) before updating the distributed attribute                                         |
+| agent                                                                                                                                                          | agent                                 | The agent management extension.                                                                                                                          |
+| Agent's Resource View Synced to Placement                                                                                                                      | agent-resources-synced                | Stores success/failure of last sync to Placement                                                                                                         |
+| Allowed Address Pairs                                                                                                                                          | allowed-address-pairs                 | Provides allowed address pairs                                                                                                                           |
+| Auto Allocated Topology Services                                                                                                                               | auto-allocated-topology               | Auto Allocated Topology Services.                                                                                                                        |
+| Availability Zone                                                                                                                                              | availability_zone                     | The availability zone extension.                                                                                                                         |
+| Availability Zone Filter Extension                                                                                                                             | availability_zone_filter              | Add filter parameters to AvailabilityZone resource                                                                                                       |
+| Default Subnetpools                                                                                                                                            | default-subnetpools                   | Provides ability to mark and use a subnetpool as the default.                                                                                            |
+| DHCP Agent Scheduler                                                                                                                                           | dhcp_agent_scheduler                  | Schedule networks among dhcp agents                                                                                                                      |
+| Distributed Virtual Router                                                                                                                                     | dvr                                   | Enables configuration of Distributed Virtual Routers.                                                                                                    |
+| Empty String Filtering Extension                                                                                                                               | empty-string-filtering                | Allow filtering by attributes with empty string value                                                                                                    |
+| Neutron external network                                                                                                                                       | external-net                          | Adds external network attribute to network resource.                                                                                                     |
+| Neutron Extra DHCP options                                                                                                                                     | extra_dhcp_opt                        | Extra options configuration for DHCP. For example PXE boot options to DHCP clients can be specified (e.g. tftp-server, server-ip-address, bootfile-name) |
+| Neutron Extra Route                                                                                                                                            | extraroute                            | Extra routes configuration for L3 router                                                                                                                 |
+| Atomically add/remove extra routes                                                                                                                             | extraroute-atomic                     | Edit extra routes of a router on server side by atomically adding/removing extra routes                                                                  |
+| Filter parameters validation                                                                                                                                   | filter-validation                     | Provides validation on filter parameters.                                                                                                                |
+| Floating IP Port Details Extension                                                                                                                             | fip-port-details                      | Add port_details attribute to Floating IP resource                                                                                                       |
+| Neutron Service Flavors                                                                                                                                        | flavors                               | Flavor specification for Neutron advanced services.                                                                                                      |
+| Floating IP Pools Extension                                                                                                                                    | floatingip-pools                      | Provides a floating IP pools API.                                                                                                                        |
+| IP address substring filtering                                                                                                                                 | ip-substring-filtering                | Provides IP address substring filtering when listing ports                                                                                               |
+| Neutron L3 Router                                                                                                                                              | router                                | Router abstraction for basic L3 forwarding between L2 Neutron networks and access to external networks via a NAT gateway.                                |
+| Neutron L3 Configurable external gateway mode                                                                                                                  | ext-gw-mode                           | Extension of the router abstraction for specifying whether SNAT should occur on the external gateway                                                     |
+| HA Router extension                                                                                                                                            | l3-ha                                 | Adds HA capability to routers.                                                                                                                           |
+| Router Flavor Extension                                                                                                                                        | l3-flavors                            | Flavor support for routers.                                                                                                                              |
+| Prevent L3 router ports IP address change extension                                                                                                            | l3-port-ip-change-not-allowed         | Prevent change of IP address for some L3 router ports                                                                                                    |
+| L3 Agent Scheduler                                                                                                                                             | l3_agent_scheduler                    | Schedule routers among l3 agents                                                                                                                         |
+| Multi Provider Network                                                                                                                                         | multi-provider                        | Expose mapping of virtual networks to multiple physical networks                                                                                         |
+| Network MTU                                                                                                                                                    | net-mtu                               | Provides MTU attribute for a network resource.                                                                                                           |
+| Network MTU (writable)                                                                                                                                         | net-mtu-writable                      | Provides a writable MTU attribute for a network resource.                                                                                                |
+| Network Availability Zone                                                                                                                                      | network_availability_zone             | Availability zone support for network.                                                                                                                   |
+| Network IP Availability                                                                                                                                        | network-ip-availability               | Provides IP availability data for each network and subnet.                                                                                               |
+| Pagination support                                                                                                                                             | pagination                            | Extension that indicates that pagination is enabled.                                                                                                     |
+| Neutron Port MAC address regenerate                                                                                                                            | port-mac-address-regenerate           | Network port MAC address regenerate                                                                                                                      |
+| Port Binding                                                                                                                                                   | binding                               | Expose port bindings of a virtual port to external application                                                                                           |
+| Port Bindings Extended                                                                                                                                         | binding-extended                      | Expose port bindings of a virtual port to external application                                                                                           |
+| Port Security                                                                                                                                                  | port-security                         | Provides port security                                                                                                                                   |
+| project_id field enabled                                                                                                                                       | project-id                            | Extension that indicates that project_id field is enabled.                                                                                               |
+| Provider Network                                                                                                                                               | provider                              | Expose mapping of virtual networks to physical networks                                                                                                  |
+| Quota management support                                                                                                                                       | quotas                                | Expose functions for quotas management per tenant                                                                                                        |
+| Quota details management support                                                                                                                               | quota_details                         | Expose functions for quotas usage statistics per project                                                                                                 |
+| RBAC Policies                                                                                                                                                  | rbac-policies                         | Allows creation and modification of policies that control tenant access to resources.                                                                    |
+| Add security_group type to network RBAC                                                                                                                        | rbac-security-groups                  | Add security_group type to network RBAC                                                                                                                  |
+| If-Match constraints based on revision_number                                                                                                                  | revision-if-match                     | Extension indicating that If-Match based on revision_number is supported.                                                                                |
+| Resource revision numbers                                                                                                                                      | standard-attr-revisions               | This extension will display the revision number of neutron resources.                                                                                    |
+| Router Availability Zone                                                                                                                                       | router_availability_zone              | Availability zone support for router.                                                                                                                    |
+| Port filtering on security groups                                                                                                                              | port-security-groups-filtering        | Provides security groups filtering when listing ports                                                                                                    |
+| security-group                                                                                                                                                 | security-group                        | The security groups extension.                                                                                                                           |
+| Neutron Service Type Management                                                                                                                                | service-type                          | API for retrieving service providers for Neutron advanced services                                                                                       |
+| Sorting support                                                                                                                                                | sorting                               | Extension that indicates that sorting is enabled.                                                                                                        |
+| standard-attr-description                                                                                                                                      | standard-attr-description             | Extension to add descriptions to standard attributes                                                                                                     |
+| Subnet Onboard                                                                                                                                                 | subnet_onboard                        | Provides support for onboarding subnets into subnet pools                                                                                                |
+| Subnet service types                                                                                                                                           | subnet-service-types                  | Provides ability to set the subnet service_types field                                                                                                   |
+| Subnet Allocation                                                                                                                                              | subnet_allocation                     | Enables allocation of subnets from a subnet pool                                                                                                         |
+| Subnet Pool Prefix Operations                                                                                                                                  | subnetpool-prefix-ops                 | Provides support for adjusting the prefix list of subnet pools                                                                                           |
+| Tag support for resources with standard attribute: port, subnet, subnetpool, network, router, floatingip, policy, security_group, trunk, network_segment_range | standard-attr-tag                     | Enables to set tag on resources with standard attribute.                                                                                                 |
+| Resource timestamps                                                                                                                                            | standard-attr-timestamp               | Adds created_at and updated_at fields to all Neutron resources that have Neutron standard attributes.                                                    |
++----------------------------------------------------------------------------------------------------------------------------------------------------------------+---------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------+
+
